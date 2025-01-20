@@ -39,4 +39,4 @@ The system is based on a **Client-Server** architecture, with:
 
 #### 1. **Clone the Repo**:
 ```bash
-git clone https://github.com/your-repo/web-booking-platform.git
+git clone https://github.com/BookingPlatform_Node/web-booking-platform.git
