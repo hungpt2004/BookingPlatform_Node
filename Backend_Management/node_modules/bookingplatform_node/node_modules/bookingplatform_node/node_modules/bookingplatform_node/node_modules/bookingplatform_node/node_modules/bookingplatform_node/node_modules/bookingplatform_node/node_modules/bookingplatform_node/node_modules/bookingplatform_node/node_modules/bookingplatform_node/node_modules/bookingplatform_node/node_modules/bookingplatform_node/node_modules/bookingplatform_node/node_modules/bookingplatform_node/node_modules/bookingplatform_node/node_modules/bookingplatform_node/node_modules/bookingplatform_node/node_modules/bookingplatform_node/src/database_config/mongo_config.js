@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const mongoURI = ''; 
+const mongoURI = 'mongodb+srv://haonudechimlac:EQcA2jqEVmQCmUUQ@mydb.dyiwq.mongodb.net/BookingDatabaseNew';
 
 const connectDB = async () => {
    try {
@@ -12,4 +12,4 @@ const connectDB = async () => {
    }
 };
 
-module.exports = connectDB;
+module.exports = connectDB; 

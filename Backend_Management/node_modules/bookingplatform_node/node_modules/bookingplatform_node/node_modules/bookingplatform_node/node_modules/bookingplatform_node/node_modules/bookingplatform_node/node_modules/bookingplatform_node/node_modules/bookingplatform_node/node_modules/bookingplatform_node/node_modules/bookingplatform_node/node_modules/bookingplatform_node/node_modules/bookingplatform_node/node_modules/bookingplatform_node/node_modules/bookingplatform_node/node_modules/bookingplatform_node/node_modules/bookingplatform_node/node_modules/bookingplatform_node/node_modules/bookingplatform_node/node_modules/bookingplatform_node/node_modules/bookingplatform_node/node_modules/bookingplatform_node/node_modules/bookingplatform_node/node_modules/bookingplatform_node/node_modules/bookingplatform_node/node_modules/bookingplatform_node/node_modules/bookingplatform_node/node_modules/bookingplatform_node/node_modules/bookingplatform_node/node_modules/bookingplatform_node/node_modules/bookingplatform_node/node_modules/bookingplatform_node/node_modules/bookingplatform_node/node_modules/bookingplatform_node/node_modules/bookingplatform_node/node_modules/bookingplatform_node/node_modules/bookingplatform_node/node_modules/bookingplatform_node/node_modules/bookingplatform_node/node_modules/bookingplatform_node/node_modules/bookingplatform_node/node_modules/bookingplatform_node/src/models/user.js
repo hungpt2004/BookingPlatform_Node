@@ -10,6 +10,7 @@ const UserSchema = new Schema(
     cmnd: { type: String, require: true },
     updatedAt: { type: Date, default: new Date().getTime() },
     role: { type: String, enum: ["CUSTOMER", "ADMIN", "OWNER"], default: "CUSTOMER" },
+
     reservations: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Reservation" },
     ],
@@ -27,6 +28,7 @@ const UserSchema = new Schema(
         ref: "Hotel",
       },
     ], // Mảng các khách sạn yêu thích (tham chiếu đến Hotel)
+    
   },
   { versionKey: false }
 );
