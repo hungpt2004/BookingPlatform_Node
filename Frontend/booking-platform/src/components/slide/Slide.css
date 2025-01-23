@@ -1,0 +1,19 @@
+/* styles.css */
+.swiper-image {
+   width: 100%;  /* Ensures the image fills the width of the container */
+   height: 300px; /* Set a fixed height for all images */
+}
+.card-hotel:hover{
+   transform: translateY(-10px);
+   transition: ease-in 0.4s;
+   box-shadow: 0 8px 20px #aeaeae;
+}
+.card-hotel{
+   transition: ease-in 0.4s;
+}
+.title {
+   overflow: hidden;
+   display: -webkit-box;
+   -webkit-line-clamp: 1; /* Số dòng tối đa */
+   -webkit-box-orient: vertical;
+}
