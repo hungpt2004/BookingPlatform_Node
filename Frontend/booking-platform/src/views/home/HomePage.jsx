@@ -41,7 +41,7 @@ export const HomePage = () => {
       setTimeout(() => {
         setHotels(data);
         setShowHotels(true);
-      }, 2000);
+      }, 1000);
     } catch (error) {
       console.error('Error fetching hotels:', error);
     } finally {
@@ -125,15 +125,18 @@ export const HomePage = () => {
       </div>
       {showHotels && (
         <div>
-          {hotels.map((hotel) => (
-            <div key={hotel._id} style={styles.card}>
-              <h2>{hotel.hotelName}</h2>
-              <p>{hotel.description}</p>
-              <p>Price per Night: ${hotel.pricePerNight}</p>
-              <p>Address: {hotel.address}</p>
-              <p>Rating: {hotel.rating}</p>
-            </div>
-          ))}
+          {hotels.map((hotelData) => {
+            const hotel = hotelData.hotel || hotelData;
+            return (
+              <div key={hotel._id.toString()} style={styles.card}>
+                <h2>{hotel.hotelName}</h2>
+                <p>{hotel.description}</p>
+                <p>Price per Night: ${hotel.pricePerNight}</p>
+                <p>Address: {hotel.address}</p>
+                <p>Rating: {hotel.rating}</p>
+              </div>
+            );
+          })}
         </div>
       )}
     </>
