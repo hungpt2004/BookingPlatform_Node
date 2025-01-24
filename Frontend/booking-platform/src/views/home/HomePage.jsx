@@ -32,7 +32,6 @@ export const HomePage = () => {
           return `priceRange=${min}-${max}`;
         }).join('&')
         : '';
-
       const response = await fetch(`http://localhost:8080/user/search?hotelName=${hotelName}&address=${address}&checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&${priceRangeQuery}&numberOfPeople=${numberOfPeople}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');

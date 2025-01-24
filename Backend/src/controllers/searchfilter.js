@@ -14,6 +14,7 @@ exports.getAllHotels = async (req, res) => {
 
 exports.searchAndFilterHotels = async (req, res) => {
     try {
+        console.log("hihi");
         const { hotelName, address, checkinDate, checkoutDate, priceRange, numberOfPeople } = req.query;
         let query = {};
         if (hotelName) {
