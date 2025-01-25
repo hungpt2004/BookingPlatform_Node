@@ -1,10 +1,13 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
 
-const mongoURI = 'mongodb://localhost:27017/BookingDatabase';
+// const mongoURL = process.env.MNHAT_URL;
+
+const mongoURL = process.env.MONGO_URL;
 
 const connectDB = async () => {
    try {
-      await mongoose.connect(mongoURI); 
+      await mongoose.connect(mongoURL); 
       console.log('MongoDB connected successfully');
    } catch (err) {
       console.error('Error connecting MongoDB:', err.message);
