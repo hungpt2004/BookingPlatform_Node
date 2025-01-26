@@ -29,7 +29,7 @@ export const HomePage = () => {
       );
       const data = await response.json();
       setTimeout(() => {
-        setHotels(data);
+        setHotels(data.hotelsWithCapacity);
         setShowHotels(true);
         setMinRating(0); // Reset the rating after the search
       }, 1500);
