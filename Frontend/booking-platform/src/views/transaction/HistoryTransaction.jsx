@@ -113,16 +113,21 @@ export const HistoryTransaction = () => {
                                                    <p>🗓️ Check In Date: {formatDate(item.checkInDate, 'DD/MM/YYYY')}</p>
                                                    <p>🗓️ Check Out Date: {formatDate(item.checkOutDate, 'DD/MM/YYYY')}</p>
                                                    <p>💰 Price: {item.totalPrice}$</p>
-                                                   <Badge className="py-2 px-3" bg={statusColors[item.status]}>
+                                                   <Badge className="badge-status py-2 px-3" bg={statusColors[item.status]}>
                                                       {statusText[item.status] || 'Unknown Status'}
                                                    </Badge>
                                                    {item.status === 'CHECKED OUT' ? (
-                                                      <Button className="mx-2" variant="outline-primary">
-                                                         📝 Feedback
+                                                      <Button className="mx-1" variant="outline-primary">
+                                                         📝Feedback
                                                       </Button>
                                                    ) : null}
-                                                   <Button className="mx-2" variant="outline-dark">
-                                                      🔍 View Details
+                                                   {item.status === 'BOOKED' ? (
+                                                      <Button className="mx-1" variant="outline-danger">
+                                                         ❌ Cancel 
+                                                      </Button>
+                                                   ) : null}
+                                                   <Button className="mx-1" variant="outline-dark">
+                                                      🔍View Details
                                                    </Button>
                                                 </Card.Body>
                                              </>
