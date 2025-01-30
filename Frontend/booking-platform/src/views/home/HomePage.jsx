@@ -1,6 +1,8 @@
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import CustomNavbar from '../../components/navbar/CustomNavbar';
 import CustomSlide from '../../components/slide/CustomSlide';
+import Booking from '../../components/booking/Booking';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai'; // Import heart icons
 
 export const HomePage = () => {
   const [hotels, setHotels] = useState([]);
@@ -12,41 +14,27 @@ export const HomePage = () => {
   const [numberOfPeople, setNumberOfPeople] = useState('');
   const [loading, setLoading] = useState(false);
   const [showHotels, setShowHotels] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedHotelId, setSelectedHotelId] = useState(null);
+  const [favorites, setFavorites] = useState([]);
 
-  const StarRating = ({ value, onChange }) => {
-    const [hoverValue, setHoverValue] = useState(null);
+  const userId = "67961bea7f3d8b7d458856fe"; // Replace with the actual user ID
 
-    const handleClick = (index) => {
-      onChange(index + 1); 
-    };
-
-    const handleMouseEnter = (index) => {
-      setHoverValue(index + 1);
-    };
-
-    const handleMouseLeave = () => {
-      setHoverValue(null);
-    };
-
-    return (
-      <div style={{ display: 'flex', cursor: 'pointer' }}>
-        {[...Array(5)].map((_, index) => (
-          <span
-            key={index}
-            style={{
-              fontSize: '24px',
-              color: (hoverValue || value) > index ? '#FFD700' : '#ccc',
-            }}
-            onClick={() => handleClick(index)}
-            onMouseEnter={() => handleMouseEnter(index)}
-            onMouseLeave={handleMouseLeave}
-          >
-            ★
-          </span>
-        ))}
-      </div>
-    );
+  const fetchFavorites = async () => {
+    try {
+      const response = await fetch(`http://localhost:8080/user/get-favorite-hotels/${userId}`);
+      const data = await response.json();
+      if (!data.error) {
+        setFavorites(data.favorites.map((fav) => fav._id));
+      }
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchFavorites();
+  }, [setFavorites]);
 
   const fetchHotels = async () => {
     setLoading(true);
@@ -74,32 +62,38 @@ export const HomePage = () => {
     fetchHotels();
   }, [hotelName, address, checkinDate, checkoutDate, minRating, numberOfPeople]);
 
-  const styles = {
-    card: {
-      border: '1px solid #ccc',
-      borderRadius: '8px',
-      padding: '16px',
-      margin: '16px 0',
-      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    },
-    spinnerContainer: {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100px',
-    },
-    spinner: {
-      width: '50px',
-      height: '50px',
-      border: '5px solid #ccc',
-      borderTop: '5px solid #000',
-      borderRadius: '50%',
-      animation: 'spin 1s linear infinite',
-    },
-    '@keyframes spin': {
-      '0%': { transform: 'rotate(0deg)' },
-      '100%': { transform: 'rotate(360deg)' },
-    },
+  const toggleFavorite = async (hotelId) => {
+    const isFavorite = favorites.includes(hotelId);
+    try {
+      const response = await fetch(
+        `http://localhost:8080/user/${isFavorite ? 'remove-favorite-hotel' : 'add-favorite-hotel'}`,
+        {
+          method: isFavorite ? 'DELETE' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId, hotelId }),
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      if (!data.error) {
+        if (isFavorite) {
+          setFavorites((prev) => prev.filter((id) => id !== hotelId));
+        } else {
+          setFavorites((prev) => [...prev, hotelId]);
+        }
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error(`Error ${isFavorite ? 'removing' : 'adding'} favorite:`, error);
+    }
+  };
+
+  const handleReserve = (hotelId) => {
+    setSelectedHotelId(hotelId);
+    setOpenModal(true);
   };
 
   return (
@@ -132,7 +126,7 @@ export const HomePage = () => {
         />
         <div>
           <h3>Select Rating:</h3>
-          <StarRating value={minRating} onChange={(value) => setMinRating(value)} />
+          {/* Add StarRating here if needed */}
         </div>
         <input
           type="number"
@@ -149,12 +143,28 @@ export const HomePage = () => {
             <div>
               {hotels.map((hotelData) => {
                 const hotel = hotelData.hotel || hotelData;
+                const isFavorite = favorites.includes(hotel._id);
                 return (
-                  <div key={hotel._id.toString()}>
-                    <h2>{hotel.hotelName}</h2>
-                    <p>{hotel.description}</p>
-                    <p>Rating: {hotel.rating}</p>
-                    <p>Address: {hotel.address}</p>
+                  <div key={hotel._id.toString()} style={{ display: 'flex', alignItems: 'center' }}>
+                    <div style={{ flex: 1 }}>
+                      <h2>{hotel.hotelName}</h2>
+                      <p>{hotel.description}</p>
+                      <p>Rating: {hotel.rating}</p>
+                      <p>Address: {hotel.address}</p>
+                      <button onClick={() => handleReserve(hotel._id)}>
+                        Reserve or Book Now!
+                      </button>
+                    </div>
+                    <div>
+                      {/* Favorite Icon */}
+                      <button onClick={() => toggleFavorite(hotel._id)} style={{ fontSize: '24px' }}>
+                        {isFavorite ? (
+                          <AiFillHeart style={{ color: 'red' }} />
+                        ) : (
+                          <AiOutlineHeart />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 );
               })}
@@ -162,6 +172,15 @@ export const HomePage = () => {
           )
         )}
       </div>
+      {openModal && (
+        <Booking
+          setOpen={setOpenModal}
+          hotelId={selectedHotelId}
+          checkInDate={checkinDate}
+          checkOutDate={checkoutDate}
+          userId={userId}
+        />
+      )}
     </>
   );
 };

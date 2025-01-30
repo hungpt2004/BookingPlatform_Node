@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 exports.authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   console.log('Chạy ở authenToken')
-  console.log('Header: ',authHeader);
+  console.log('Header: ', authHeader);
   const token = authHeader && authHeader.split(" ")[1]; // Lấy token từ header
 
   if (!token) {
@@ -17,4 +17,5 @@ exports.authenticateToken = (req, res, next) => {
     req.user = user; // Gắn thông tin người dùng vào req.user
     next(); // Tiếp tục xử lý
   });
+
 };

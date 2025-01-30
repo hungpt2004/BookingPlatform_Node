@@ -5,7 +5,7 @@ exports.getAllHotels = asyncHandler(async (req, res) => {
 
    const hotels = await Hotel.find();
 
-   if(hotels.length === 0) {
+   if (hotels.length === 0) {
       return res.status(404).json({
          error: true,
          message: "No hotels found"
@@ -19,3 +19,5 @@ exports.getAllHotels = asyncHandler(async (req, res) => {
    })
 
 })
+
+

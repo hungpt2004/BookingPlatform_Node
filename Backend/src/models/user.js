@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
@@ -28,13 +29,13 @@ const UserSchema = new Schema(
         ref: "Hotel",
       },
     ], // Mảng các khách sạn yêu thích (tham chiếu đến Hotel)
-    
+
   },
   { versionKey: false }
 );
 
 // Hashing mật khẩu trước khi lưu
-UserSchema.pre("save", async function(next) {
+UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
