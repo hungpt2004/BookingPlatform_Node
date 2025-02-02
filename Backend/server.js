@@ -5,7 +5,7 @@ const UserRouter = require('./src/routes/user.route');
 const HotelRouter = require('./src/routes/hotel.route');
 const ReservationRouter = require('./src/routes/reservation.route');
 const PaymentRouter = require('./src/routes/payment.route');
-const feedbackRoutes = require("./routes/feedback.routes");
+const feedbackRoutes = require('./src/routes/feedback.route');
 require("dotenv").config();
 const fileupload = require("express-fileupload"); 
 const app = express(); //Create server

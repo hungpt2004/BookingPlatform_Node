@@ -47,12 +47,51 @@ exports.createUser = (req, res) => {
     message: "This route is not yet defined!",
   });
 };
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is not yet defined!",
+// exports.updateUser = (req, res) => {
+//   res.status(500).json({
+//     status: "error",
+//     message: "This route is not yet defined!",
+//   });
+// };
+
+exports.updateUser = catchAsync(async (req, res, next) => {
+  const userId = req.user.id; // Chỉ lấy ID từ token, không từ params
+  const updates = {};
+
+  if (req.body.phone) {
+    updates.phone = req.body.phone;
+  }
+
+  if (req.body.address) {
+    updates.address = req.body.address;
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(500).json({
+      status: "fail",
+      message: "No data provided for update",
+    });
+  }
+
+  const user = await User.findByIdAndUpdate(userId, updates, {
+    new: true,
+    runValidators: true,
   });
-};
+
+  if (!user) {
+    return res.status(500).json({
+      status: "fail",
+      message: "User not found",
+    });
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: { user },
+  });
+});
+
+
 exports.deleteUser = (req, res) => {
   res.status(500).json({
     status: "error",
