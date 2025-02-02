@@ -5,6 +5,7 @@ const UserRouter = require('./src/routes/user.route');
 const HotelRouter = require('./src/routes/hotel.route');
 const ReservationRouter = require('./src/routes/reservation.route');
 const PaymentRouter = require('./src/routes/payment.route');
+const feedbackRoutes = require("./routes/feedback.routes");
 require("dotenv").config();
 const fileupload = require("express-fileupload"); 
 const app = express(); //Create server
@@ -31,6 +32,9 @@ app.use("/reservation", ReservationRouter);
 
 //Payment
 app.use("/payment", PaymentRouter)
+
+//Feedback
+app.use("/api/feedback", feedbackRoutes);
 
 //Connect Mongo Config
 connectDB();
