@@ -6,11 +6,12 @@ const HotelRouter = require('./src/routes/hotel.route');
 const ReservationRouter = require('./src/routes/reservation.route');
 const PaymentRouter = require('./src/routes/payment.route');
 require("dotenv").config();
-
+const fileupload = require("express-fileupload"); 
 const app = express(); //Create server
 
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true })); // Hỗ trợ dữ liệu form-urlencoded
+app.use(fileupload({ useTempFiles: true }));
 //Cors setting
 app.use(
    cors({

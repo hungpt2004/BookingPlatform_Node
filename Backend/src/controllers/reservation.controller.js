@@ -154,7 +154,7 @@ const autoUpdateReservationStatus = asyncHandler(async () => {
 });
 
 //setinterval auto run after each minutes
-cron.schedule("* * * * *", () => {
-  console.log("THIS FUNCTION AUTO UPDATE EVERY MINUTES");
-  autoUpdateReservationStatus();
-});
+// cron.schedule("* * * * *", () => {
+//   console.log("THIS FUNCTION AUTO UPDATE EVERY MINUTES");
+//   autoUpdateReservationStatus();
+// });
