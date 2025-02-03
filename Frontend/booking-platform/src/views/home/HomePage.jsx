@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import CustomNavbar from '../../components/navbar/CustomNavbar';
 import CustomSlide from '../../components/slide/CustomSlide';
-import Booking from '../../components/booking/Booking';
-import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai'; // Import heart icons
+import { HashLoader } from 'react-spinners';
+import CustomInput from '../../components/input/CustomInput';
+import LottieComponent from '../../components/lottie/LottieComponent';
+import { Badge, Card } from 'react-bootstrap';
+import { motion } from 'framer-motion';  // Import motion
+import './HomePage.css';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
+import Booking from '../../components/booking/Booking.jsx';
+import ImageNotFound from '../../assets/svg/notfound.jpg'
+
 
 export const HomePage = () => {
   const [hotels, setHotels] = useState([]);
@@ -43,18 +51,18 @@ export const HomePage = () => {
       const response = await fetch(
         `http://localhost:8080/user/search?hotelName=${hotelName}&address=${address}&checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&priceRange=${minRating}-5&numberOfPeople=${numberOfPeople}`
       );
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
       const data = await response.json();
       setTimeout(() => {
-        setHotels(data);
+        setHotels(data.hotelsWithCapacity);
         setShowHotels(true);
+        setMinRating(0); // Reset the rating after the search
       }, 1500);
     } catch (error) {
       console.error('Error fetching hotels:', error);
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
     }
   };
 
@@ -98,42 +106,50 @@ export const HomePage = () => {
 
   return (
     <>
-      <div>
-        <h2>Search Hotels</h2>
-        <input
-          type="text"
-          placeholder="Hotel Name"
-          value={hotelName}
-          onChange={(e) => setHotelName(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
-        <input
-          type="date"
-          placeholder="Check-in Date"
-          value={checkinDate}
-          onChange={(e) => setCheckinDate(e.target.value)}
-        />
-        <input
-          type="date"
-          placeholder="Check-out Date"
-          value={checkoutDate}
-          onChange={(e) => setCheckoutDate(e.target.value)}
-        />
-        <div>
-          <h3>Select Rating:</h3>
-          {/* Add StarRating here if needed */}
+      <CustomNavbar />
+      <CustomSlide />
+      <LottieComponent />
+      <div className="row d-flex justify-content-center align-items-center">
+        <div className="col-md-2">
+          <CustomInput
+            type="text"
+            placeHolder="Name"
+            value={hotelName}
+            onChange={(e) => setHotelName(e.target.value)}
+          />
         </div>
-        <input
-          type="number"
-          placeholder="Number of People"
-          value={numberOfPeople}
-          onChange={(e) => setNumberOfPeople(e.target.value)}
-        />
+        <div className="col-md-2">
+          <CustomInput
+            type="text"
+            placeHolder="Address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+          />
+        </div>
+        <div className="col-md-2">
+          <CustomInput
+            type="date"
+            placeHolder="Check-in Date"
+            value={checkinDate}
+            onChange={(e) => setCheckinDate(e.target.value)}
+          />
+        </div>
+        <div className="col-md-2">
+          <CustomInput
+            type="date"
+            placeHolder="Check-out Date"
+            value={checkoutDate}
+            onChange={(e) => setCheckoutDate(e.target.value)}
+          />
+        </div>
+        <div className="col-md-2">
+          <CustomInput
+            type="number"
+            placeHolder="Number's People"
+            value={numberOfPeople}
+            onChange={(e) => setNumberOfPeople(e.target.value)}
+          />
+        </div>
       </div>
       <div>
         {loading ? (
@@ -171,6 +187,72 @@ export const HomePage = () => {
             </div>
           )
         )}
+        <div className="container-fluid">
+          <div className="row mx-5 mt-5">
+            {/* Filter and Map Section */}
+            <div className="col-md-3">
+              <motion.div
+                className='rounded-4'
+                style={{ height: '250px', backgroundColor: '#e0e0e0' }}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.5 }}
+              >
+                <p className='text-center'>Map (Google Map or Leaflet here)</p>
+              </motion.div>
+              <motion.div
+                className="mt-3"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.5 }}
+              >
+                <StarRating value={minRating} onChange={(value) => setMinRating(value)} />
+              </motion.div>
+            </div>
+            {/* Hotels Display Section */}
+            <div className="col-md-9">
+              {loading ? (
+                <div className="d-flex justify-content-center p-5 align-items-center">
+                  <HashLoader size={40} color="#6499E9" />
+                </div>
+              ) : (
+                showHotels && (
+                  <motion.div
+                    className="row"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 1 }}
+                  >
+                    {hotels.length > 0 ? (hotels.map((hotelData) => {
+                      const hotel = hotelData.hotel || hotelData;
+                      return (
+                        <motion.div
+                          key={hotel._id.toString()}
+                          className="col-md-4 mb-4"
+                          initial={{ opacity: 0, y: 50 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.5 }}
+                        >
+                          <Card className='card-search-hotel' style={{ width: '100%' }}>
+                            <Card.Img variant="top" src={hotel.imageUrl || 'default_image_url'} />
+                            <Card.Body>
+                              <Card.Title>{hotel.hotelName}</Card.Title>
+                              <Card.Text>{hotel.description}</Card.Text>
+                              <Card.Text>Rating: {hotel.rating}</Card.Text>
+                              <Card.Text>Address: {hotel.address}</Card.Text>
+                            </Card.Body>
+                          </Card>
+                        </motion.div>
+                      );
+                    })) : (
+                      <div className='alert alert-danger'><p className='text-center'>Not found any hotel with that information</p></div>
+                    )}
+                  </motion.div>
+                )
+              )}
+            </div>
+          </div>
+        </div>
       </div>
       {openModal && (
         <Booking
@@ -182,5 +264,46 @@ export const HomePage = () => {
         />
       )}
     </>
+  );
+}
+
+const StarRating = ({ value, onChange }) => {
+  const [hoverValue, setHoverValue] = useState(null);
+
+  const handleClick = (index) => {
+    onChange(index + 1);
+  };
+
+  const handleMouseEnter = (index) => {
+    setHoverValue(index + 1);
+  };
+
+  const handleMouseLeave = () => {
+    setHoverValue(null);
+  };
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+      <Badge className='fw-4 fs-5' style={{ backgroundColor: '#6499E9' }}>Filter By Star</Badge>
+      {[...Array(5)].map((_, index) => (
+        <>
+          <span
+            key={index}
+            style={{
+              fontSize: '30px',
+              color: (hoverValue || value) > index ? '#FFD700' : '#ccc',
+              transition: 'color 0.3s ease, transform 0.2s ease',
+              margin: '0 5px',
+              transform: (hoverValue || value) > index ? 'scale(1.2)' : 'scale(1)',
+            }}
+            onClick={() => handleClick(index)}
+            onMouseEnter={() => handleMouseEnter(index)}
+            onMouseLeave={handleMouseLeave}
+          >
+            ★
+          </span>
+        </>
+      ))}
+    </div>
   );
 };

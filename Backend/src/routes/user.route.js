@@ -11,4 +11,5 @@ UserRouter.post("/add-favorite-hotel", UserController.addFavoriteHotel);
 UserRouter.get("/get-favorite-hotels/:userId", UserController.getFavoriteHotels);
 UserRouter.delete("/remove-favorite-hotel", UserController.removeFavoriteHotel);
 UserRouter.post("/booking", ReservationController.createBooking);
+
 module.exports = UserRouter;

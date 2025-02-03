@@ -4,6 +4,8 @@ const cors = require('cors')
 const UserRouter = require('./src/routes/user.route');
 const HotelRouter = require('./src/routes/hotel.route');
 const RoomRouter = require('./src/routes/room.route');
+const ReservationRouter = require('./src/routes/reservation.route');
+const PaymentRouter = require('./src/routes/payment.route');
 require("dotenv").config();
 
 const app = express(); //Create server
@@ -26,6 +28,11 @@ app.use("/hotel", HotelRouter);
 
 //Room
 app.use("/room", RoomRouter);
+//Reservation
+app.use("/reservation", ReservationRouter);
+
+//Payment
+app.use("/payment", PaymentRouter)
 
 //Connect Mongo Config
 connectDB();
