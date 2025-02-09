@@ -3,26 +3,22 @@ const Room = require("../models/room")
 
 exports.searchAndFilterHotels = async (req, res) => {
   try {
-    const {
-      hotelName,
-      address,
-      checkinDate,
-      checkoutDate,
-      priceRange,
-      numberOfPeople,
-    } = req.query;
+    const {hotelName,address,checkinDate,checkoutDate,hotelRating,numberOfPeople,} = req.query;
     let query = {};
 
     if (hotelName) {
-      query.hotelName = { $regex: hotelName, $options: "i" };
+      query.hotelName = { $regex: hotelName, $options: "i" }; 
     }
 
     if (address) {
       query.address = { $regex: address, $options: "i" };
     }
 
-    if (priceRange) {
-      const [minRating, maxRating] = priceRange.split("-").map(Number);
+    if (hotelRating) {
+      const [minRating, maxRating] = hotelRating.split("-").map(Number);
+      if (isNaN(minRating) || isNaN(maxRating)) {
+        return res.status(400).json({ error: true, message: "Invalid price range" });
+      }
       query.rating = { $gte: minRating, $lte: maxRating };
     }
 
@@ -42,6 +38,20 @@ exports.searchAndFilterHotels = async (req, res) => {
     );
 
     if (checkinDate && checkoutDate) {
+      if (checkinDate > checkoutDate) {
+        return res.status(400).json({
+          error: true,
+          message: "CheckInDate cannot be before CheckOutDate",
+        });
+      }
+
+      if (new Date(checkoutDate) < new Date()) {
+        return res.status(400).json({
+          error: true,
+          message: "CheckOutDate cannot be in the past",
+        });
+      }
+
       const reservedRooms = await Reservation.find({
         checkInDate: { $lt: new Date(checkoutDate) },
         checkOutDate: { $gt: new Date(checkinDate) },
@@ -49,7 +59,7 @@ exports.searchAndFilterHotels = async (req, res) => {
 
       const availableHotels = hotelsWithCapacity.map((hotel) => {
         const availableRooms = hotel.availableRooms.filter(
-          (room) => !reservedRooms.includes(room._id.toString())
+          (room) => !reservedRooms.some(reservedRoom => reservedRoom.equals(room._id))
         );
         return { hotel: hotel.hotel, availableRooms };
       });
@@ -57,6 +67,7 @@ exports.searchAndFilterHotels = async (req, res) => {
       const finalFilteredHotels = availableHotels.filter(
         (hotel) => hotel.availableRooms.length > 0
       );
+      return res.status(200).json(finalFilteredHotels);
       return res.status(200).json(finalFilteredHotels);
     }
     return res.status(200).json(hotelsWithCapacity);

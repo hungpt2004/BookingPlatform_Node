@@ -7,6 +7,8 @@ import LottieComponent from '../../components/lottie/LottieComponent';
 import { Badge, Button, Card, Col, Container, Image, Form, InputGroup } from 'react-bootstrap';
 import { motion } from 'framer-motion';  // Import motion
 import './HomePage.css';
+import { FiMinus, FiPlus } from 'react-icons/fi';
+import ImageNotFound from '../../assets/svg/notfound.jpg'
 import { BASE_URL } from '../../utils/Constant';
 import axios from 'axios';
 import { CustomBanner } from '../../components/banner/CustomBanner';
@@ -27,23 +29,116 @@ export const HomePage = () => {
   const [checkinDate, setCheckinDate] = useState('');
   const [checkoutDate, setCheckoutDate] = useState('');
   const [minRating, setMinRating] = useState(0);
-  const [numberOfPeople, setNumberOfPeople] = useState('');
+  const [numberOfPeople, setNumberOfPeople] = useState(1);
   const [loading, setLoading] = useState(false);
   const [showHotels, setShowHotels] = useState(false);
-  const [showNews, setShowNews] = useState(false);
+  const [checkInError, setCheckInError] = useState('');
+  const [checkOutError, setCheckOutError] = useState('');
+  const [addressError, setAddressError] = useState('');
+
+  const validateDates = () => {
+    const today = new Date().toISOString().split('T')[0];
+    let isValid = true;
+
+    setCheckInError('');
+    setCheckOutError('');
+
+    if (checkinDate) {
+      if (checkinDate < today) {
+        setCheckInError('Check-in date cannot be in the past');
+        isValid = false;
+      }
+
+      if (checkoutDate && checkinDate > checkoutDate) {
+        setCheckInError('Check-in cannot be after check-out');
+        isValid = false;
+      }
+    }
+
+    if (checkoutDate) {
+      if (checkoutDate < today) {
+        setCheckOutError('Check-out date cannot be in the past');
+        isValid = false;
+      }
+
+      if (checkinDate && checkoutDate < checkinDate) {
+        setCheckOutError('Check-out cannot be before check-in');
+        isValid = false;
+      }
+    }
+
+    return isValid;
+  };
+
+  const handleIncrement = () => setNumberOfPeople((prev) => prev + 1);
+  const handleDecrement = () => setNumberOfPeople((prev) => (prev > 1 ? prev - 1 : 1));
+
+  const StarRating = ({ value, onChange }) => {
+    const [hoverValue, setHoverValue] = useState(null);
+
+    const handleClick = (index) => {
+      onChange(index + 1);
+    };
+
+    const handleMouseEnter = (index) => {
+      setHoverValue(index + 1);
+    };
+
+    const handleMouseLeave = () => {
+      setHoverValue(null);
+    };
+
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+        <Badge className='fw-4 fs-5' style={{ backgroundColor: '#6499E9' }}>Filter By Star</Badge>
+        {[...Array(5)].map((_, index) => (
+          <>
+            <span
+              key={index}
+              style={{
+                fontSize: '30px',
+                color: (hoverValue || value) > index ? '#FFD700' : '#ccc',
+                transition: 'color 0.3s ease, transform 0.2s ease',
+                margin: '0 5px',
+                transform: (hoverValue || value) > index ? 'scale(1.2)' : 'scale(1)',
+              }}
+              onClick={() => handleClick(index)}
+              onMouseEnter={() => handleMouseEnter(index)}
+              onMouseLeave={handleMouseLeave}
+            >
+              ★
+            </span>
+          </>
+        ))}
+      </div>
+    );
+  };
+
+  const CustomDateValidator = ({ label, error, ...props }) => (
+    <div className="mb-3">
+      {label && <label className="form-label">{label}</label>}
+      <input
+        {...props}
+        className={`form-control ${error ? 'is-invalid' : ''}`}
+      />
+      {error && <div className="error-message">{error}</div>}
+    </div>
+  );
 
   const fetchHotels = async () => {
+    if (!validateDates()) return;
     setLoading(true);
     setShowHotels(false);
     try {
       const response = await fetch(
-        `http://localhost:8080/customer/search?hotelName=${hotelName}&address=${address}&checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&priceRange=${minRating}-5&numberOfPeople=${numberOfPeople}`
+        `http://localhost:8080/user/search?hotelName=${hotelName}&address=${address}&checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&hotelRating=${minRating}-5&numberOfPeople=${numberOfPeople}`
       );
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
       setTimeout(() => {
+        setHotels(data);
         setHotels(data);
         setShowHotels(true);
       }, 1500);
@@ -54,9 +149,17 @@ export const HomePage = () => {
     }
   };
 
-  useEffect(() => {
+  const handleSearch = () => {
+    if (!address.trim()) {
+      setAddressError('Please enter your destination.');
+      return;
+    }
+    setAddressError('');
     fetchHotels();
-  }, [hotelName, address, checkinDate, checkoutDate, minRating, numberOfPeople]);
+  };
+  // useEffect(() => {
+  //   fetchHotels();
+  // }, [hotelName, address, checkinDate, checkoutDate, minRating, numberOfPeople]);
 
   return (
     <>
@@ -86,32 +189,59 @@ export const HomePage = () => {
             type="text"
             placeHolder="Address"
             value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            onChange={(e) => {
+              setAddress(e.target.value);
+              if (e.target.value.trim()) setAddressError('');
+            }}
+            error={addressError}
           />
         </div>
-        <div className="col-md-2">
-          <CustomInput
-            type="date"
-            placeHolder="Check-in Date"
-            value={checkinDate}
-            onChange={(e) => setCheckinDate(e.target.value)}
-          />
+        <div className="col-md-4">
+          <div className="date-picker-group">
+            <div className="date-input-container">
+              <CustomDateValidator
+                type="date"
+                placeHolder="Check-in Date"
+                value={checkinDate}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) => {
+                  setCheckinDate(e.target.value);
+                  if (checkoutDate && e.target.value > checkoutDate) {
+                    setCheckoutDate('');
+                  }
+                }}
+                label="Check-in"
+                error={checkInError}
+              />
+              <CustomDateValidator
+                type="date"
+                placeHolder="Check-out Date"
+                value={checkoutDate}
+                min={checkinDate || new Date().toISOString().split('T')[0]}
+                onChange={(e) => setCheckoutDate(e.target.value)}
+                label="Check-out"
+                error={checkOutError}
+              />
+            </div>
+          </div>
         </div>
-        <div className="col-md-2">
-          <CustomInput
-            type="date"
-            placeHolder="Check-out Date"
-            value={checkoutDate}
-            onChange={(e) => setCheckoutDate(e.target.value)}
-          />
+        <div className="col-md-2 d-flex align-items-center">
+          <Button variant="outline-secondary" onClick={handleDecrement} disabled={numberOfPeople <= 1}>
+            <FiMinus />
+          </Button>
+          <span className="mx-3 fs-5 fw-bold">{numberOfPeople}</span>
+          <Button variant="outline-secondary" onClick={handleIncrement}>
+            <FiPlus />
+          </Button>
         </div>
-        <div className="col-md-2">
-          <CustomInput
-            type="number"
-            placeHolder="Number's People"
-            value={numberOfPeople}
-            onChange={(e) => setNumberOfPeople(e.target.value)}
-          />
+        <div className="col-md-2 d-flex align-items-center">
+          <Button
+            variant="primary"
+            onClick={handleSearch}
+            disabled={loading} 
+          >
+            {loading ? 'Searching...' : 'Search'}
+          </Button>
         </div>
       </div>
       <div className="container-fluid">
@@ -406,7 +536,7 @@ const StarRating = ({ value, onChange }) => {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-      <Badge className='fw-4 fs-5' style={{ backgroundColor: '#6499E9', borderColor: '#6499E9' }}>Filter By Star</Badge>
+      <Badge className='fw-4 fs-5' style={{backgroundColor: '#6499E9'}}>Filter By Star</Badge>
       {[...Array(5)].map((_, index) => (
         <>
           <span
@@ -429,4 +559,3 @@ const StarRating = ({ value, onChange }) => {
     </div>
   );
 };
-

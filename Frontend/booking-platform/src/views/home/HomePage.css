@@ -56,3 +56,45 @@
    object-fit: cover;
  }
  
+
+.date-picker-group {
+   border: 1px solid #ddd;
+   border-radius: 8px;
+   padding: 15px;
+   background: #f8f9fa;
+ }
+ 
+ .date-input-container {
+   display: flex;
+   gap: 10px;
+ }
+ 
+ .date-input-container > div {
+   flex: 1;
+ }
+ 
+ .error-message {
+   color: #dc3545;
+   font-size: 0.875rem;
+   margin-top: 0.25rem;
+ }
+.search-button {
+   padding: 10px 20px;
+   font-size: 16px;
+   font-weight: bold;
+   border-radius: 8px;
+   background-color: #6499E9;
+   color: white;
+   border: none;
+   cursor: pointer;
+   transition: background-color 0.3s ease;
+ }
+ 
+ .search-button:disabled {
+   background-color: #ccc;
+   cursor: not-allowed;
+ }
+ 
+ .search-button:hover:not(:disabled) {
+   background-color: #4a7ec9;
+ }
