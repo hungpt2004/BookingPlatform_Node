@@ -1,0 +1,15 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Great+Vibes&display=swap'); */
+
+* {
+   font-family: 'Great Vibes', cursive;
+}
+
+h1:hover {
+   color: #6499E9;
+   transition: ease-in 0.3s;
+   transform: scale(1.1);
+}
+
+h1 {
+   transition: ease-in 0.3s;
+}
