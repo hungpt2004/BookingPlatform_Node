@@ -3,6 +3,9 @@ const Reservation = require("../models/reservation");
 const cron = require("node-cron");
 
 exports.getALlReservation = asyncHandler(async (req, res) => {
+  let perPage = 9;
+  let page = parseInt(req.query.page) || 1;
+
   //Get user
   //const user = req.user.user;
 
@@ -11,7 +14,12 @@ exports.getALlReservation = asyncHandler(async (req, res) => {
   //     totalPrice: -1,
   //   });
 
-  const reservations = await Reservation.find();
+  const totalPageReservations = await Reservation.countDocuments();
+  const totalPage = Math.ceil(totalPageReservations / perPage);
+  const reservations = await Reservation.find()
+    .sort({ totalPrice: -1 })
+    .skip((page - 1) * perPage)
+    .limit(perPage);
 
   //   if (!user) {
   //     return res.status(500).json({
@@ -19,8 +27,6 @@ exports.getALlReservation = asyncHandler(async (req, res) => {
   //       message: "Authenticated user failed",
   //     });
   //   }
-
-  console.log(reservations);
 
   if (reservations.length === 0) {
     return res.status(404).json({
@@ -31,6 +37,10 @@ exports.getALlReservation = asyncHandler(async (req, res) => {
 
   return res.status(200).json({
     error: false,
+    currentPage: page,
+    totalPages: totalPage,
+    totalReservations: totalPageReservations,
+    perPage: perPage,
     reservations,
     message: "Get all reservations success",
   });
@@ -68,7 +78,7 @@ exports.getHotelByReservationId = asyncHandler(async (req, res) => {
     _id: reservationId,
   }).populate("hotel");
 
-  console.log(reservation);
+  // console.log(reservation);
 
   if (!reservation) {
     return res.status(404).json({
@@ -85,11 +95,11 @@ exports.getHotelByReservationId = asyncHandler(async (req, res) => {
 });
 
 exports.getReservationByStatus = asyncHandler(async (req, res) => {
-  //user
-
   const { status } = req.query;
+  const perPage = 6;
+  const page = parseInt(req.query.page) || 1; // Fix: Get 'page' from query params
 
-  console.log(`This is ${status}`);
+  console.log(`Page ${page}`);
 
   if (!status) {
     return res.status(400).json({
@@ -98,41 +108,34 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
     });
   }
 
-  let reservations = null;
+  let query = status === "ALL" ? {} : { status }; // If "ALL", return all reservations
+  let totalPageReservations = await Reservation.countDocuments(query); // Fix: Await countDocuments
 
-  if (status === "ALL") {
-    reservations = await Reservation.find();
-    if (reservations.length === 0) {
-      return res.status(404).json({
-        error: true,
-        message: "No have any reservations",
-      });
-    }
-
-    return res.status(200).json({
-      error: false,
-      reservations,
-      message: "Get reservations by 'ALL' successfully",
-    });
-  }
-
-  reservations = await Reservation.find({ status });
-
-  //Need user id to verify
-
-  if (reservations.length === 0) {
+  if (totalPageReservations === 0) {
     return res.status(404).json({
       error: true,
-      message: "No have any rooms",
+      message: "No reservations found",
     });
   }
+
+  let totalPages = Math.ceil(totalPageReservations / perPage); // Fix: Calculate total pages correctly
+
+  const reservations = await Reservation.find(query)
+    .sort({ totalPrice: -1 }) // Sort by total price
+    .skip((page - 1) * perPage) // Fix: Apply pagination correctly
+    .limit(perPage);
 
   return res.status(200).json({
     error: false,
+    currentPage: page,
+    totalPages: totalPages,
+    totalReservations: totalPageReservations,
+    perPage: perPage,
     reservations,
-    message: `Get reservations by ${status} successfully`,
+    message: `Get reservations by '${status}' successfully`,
   });
 });
+
 
 //automatic update status of reservations
 const autoUpdateReservationStatus = asyncHandler(async () => {
@@ -149,7 +152,7 @@ const autoUpdateReservationStatus = asyncHandler(async () => {
 
     await Reservation.updateOne({ _id: r._id }, { $set: { status: r.status } });
 
-    console.log(`Updated status for note ID ${r._id} to ${r.status}`);
+    // console.log(`Updated status for note ID ${r._id} to ${r.status}`);
   }
 });
 

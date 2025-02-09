@@ -28,6 +28,7 @@ export const HomePage = () => {
         `http://localhost:8080/user/search?hotelName=${hotelName}&address=${address}&checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&priceRange=${minRating}-5&numberOfPeople=${numberOfPeople}`
       );
       const data = await response.json();
+      console.log(data);
       setTimeout(() => {
         setHotels(data.hotelsWithCapacity);
         setShowHotels(true);

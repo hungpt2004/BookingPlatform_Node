@@ -10,14 +10,14 @@ export const statusColors = {
 };
 
 export const statusText = {
-   "CHECKED IN": "✔️ CHECKED IN",
-   "CHECKED OUT": "✔️ CHECKED OUT",
-   "BOOKED": "📝 BOOKED",
-   "COMPLETED": "✅ COMPLETED",
-   "PENDING": "⏳ PENDING",
-   "CANCELED": "❌ CANCELED",
-   "NOT PAID": "💳 NOT PAID",
-   "ALL": "📜 ALL"
+   "CHECKED IN": "CHECKED IN",
+   "CHECKED OUT": "CHECKED OUT",
+   "BOOKED": "BOOKED",
+   "COMPLETED": "COMPLETED",
+   "PENDING": "PENDING",
+   "CANCELED": "CANCELED",
+   "NOT PAID": "NOT PAID",
+   "ALL": "ALL"
 };
 
 export const dataStatus = [
