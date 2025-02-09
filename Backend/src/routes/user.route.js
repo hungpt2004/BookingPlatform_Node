@@ -4,7 +4,9 @@ const UserController = require("../controllers/user.controller");
 const SearchController = require("../controllers/searchfilter");
 const authController = require("../controllers/authenticate.controller");
 const avatarController = require("../controllers/user.update");
-const { authenticateToken } = require("../utils/authenticateToken");
+
+const {authenticateToken} = require("../utils/authenticateToken");
+master
 UserRouter.get("/get-all-user", UserController.getAllUsers);
 UserRouter.get("/search", SearchController.searchAndFilterHotels);
 UserRouter.post("/signup", authController.signup);
@@ -22,11 +24,13 @@ UserRouter.route("/")
 
 UserRouter.route("/:id")
   .get(UserController.getUser)
-  .patch(authenticateToken, UserController.updateUser)
+
+  .patch(UserController.updateUser)
   .delete(UserController.deleteUser);
 UserRouter.put(
   "/update-avatar/:id",
-  authenticateToken,
+   authenticateToken,
+
   avatarController.updateAvatar
 );
 module.exports = UserRouter;

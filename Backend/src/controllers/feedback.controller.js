@@ -1,7 +1,6 @@
 const Feedback = require('../models/feedback')
 const asyncHandler = require('../middlewares/asyncHandler')
-const Reservation = require("../models/reservation");
-
+const Reservation = require('../models/reservation')
 exports.getAllFeedBackByHotelId = asyncHandler( async (req, res) => {
    
    const { hotelId } = req.params;
@@ -23,6 +22,7 @@ exports.getAllFeedBackByHotelId = asyncHandler( async (req, res) => {
 
 })
 
+//test tạo feedback
 exports.createFeedback = async (req, res) => {
   try {
     const { reservationId, content, rating } = req.body;
@@ -59,4 +59,6 @@ exports.createFeedback = async (req, res) => {
     console.error("Error creating feedback:", error);
     res.status(500).json({ message: "Lỗi server!" });
   }
+
 };
+
