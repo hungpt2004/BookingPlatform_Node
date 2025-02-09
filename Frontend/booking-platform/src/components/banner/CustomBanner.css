@@ -1,0 +1,9 @@
+.overlay-blur {
+   background: rgba(0, 0, 0, 0.3); /* Màu đen với độ trong suốt */
+   backdrop-filter: blur(2px); /* Làm mờ nền */
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+}

@@ -22,14 +22,12 @@ const hotelData = [
 
 const CustomSlide = () => {
    return (
-      <Container fluid className='container-top'>
-         <div className='content'>
-            <h1 className="text-center typing-text">Welcome to Our Travelofy</h1>
-         </div>
+      <Container fluid>
+         <h1 className='text-center fw-bold mt-5'>Top Ranking Hotels In Travelofy</h1>
          <Swiper
             className='p-5 mt-5'
             slidesPerView={4}
-            spaceBetween={100}
+            spaceBetween={50}
             onSlideChange={() => console.log('slide change')}
             onSwiper={(swiper) => console.log(swiper)}
             autoplay={true}
@@ -38,14 +36,14 @@ const CustomSlide = () => {
                const { name, price, rating, bookings } = hotelData[index];
                return (
                   <SwiperSlide key={index}>
-                     <Card className='w-75 rounded-4 mt-4 card-hotel'>
-                        <Image className="img-fluid swiper-image rounded-top-4" src={item} />
+                     <Card className='shadow-lg p-2 mb-2 bg-body-tertiary rounded'>
+                        <Card.Img variant='top' className="" src={item} />
                         <Card.Body>
-                           <Card.Title className='text-center fs-4 title'>{name}</Card.Title>
-                           <Card.Text className='text-center'>💰 Price: {price}</Card.Text>
-                           <Card.Text className='text-center'>⭐ Rating: {rating}</Card.Text>
-                           <Card.Text className='text-center'>📅 Bookings: {bookings}</Card.Text>
-                           <Button className='text-center justify-content-center' variant='outline-primary'>Booking Now</Button>
+                           <Card.Title className='fs-4 title'>{name}</Card.Title>
+                           <Card.Text >💰 Price: {price}</Card.Text>
+                           <Card.Text >⭐ Rating: {rating}</Card.Text>
+                           <Card.Text >📅 Bookings: {bookings}</Card.Text>
+                           <div className='d-flex justify-content-center align-items-center'><Button className='text-center justify-content-center' variant='outline-primary'>Booking Now</Button></div>
                         </Card.Body>
                      </Card>
                   </SwiperSlide>
