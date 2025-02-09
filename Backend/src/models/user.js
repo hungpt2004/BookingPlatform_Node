@@ -22,10 +22,8 @@ const UserSchema = new Schema(
     },
     createOn: { type: Date, default: new Date().getTime() },
     cmnd: { type: String, require: true },
-
     phone: { type: String, default: "N/A" },
     address: { type: String, default: "N/A" },
-
     updatedAt: { type: Date, default: new Date().getTime() },
     role: {
       type: String,
@@ -35,14 +33,12 @@ const UserSchema = new Schema(
     reservations: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Reservation" },
     ],
-
     ownedHotels: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Hotel",
       },
     ], // Mảng các khách sạn người dùng sở hữu (tham chiếu đến Hotel),
-
     favorites: [
       {
         type: mongoose.Schema.Types.ObjectId,

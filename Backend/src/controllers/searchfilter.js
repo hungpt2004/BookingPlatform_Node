@@ -44,7 +44,6 @@ exports.searchAndFilterHotels = async (req, res) => {
     );
 
     if (checkinDate && checkoutDate) {
-
       if (checkinDate > checkoutDate) {
         return res.status(400).json({
           error: true,
@@ -83,11 +82,10 @@ exports.searchAndFilterHotels = async (req, res) => {
     }
 
     return res.json({
-        error: false,
-        hotelsWithCapacity,
-        message:'Search successfully'
-    })
-
+      error: false,
+      hotelsWithCapacity,
+      message: "Search successfully",
+    });
   } catch (error) {
     res.status(500).json({
       error: true,
