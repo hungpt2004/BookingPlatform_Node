@@ -33,6 +33,7 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "bcrypt"
-    ]
+    ],
+    "validator": "^13.12.0"
   }
 }

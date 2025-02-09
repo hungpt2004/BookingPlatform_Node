@@ -1,6 +1,5 @@
 const Hotel = require("../models/hotel");
-const Room = require("../models/room");
-const Reservation = require("../models/reservation");
+const Room = require("../models/room")
 
 exports.searchAndFilterHotels = async (req, res) => {
   try {
@@ -15,7 +14,7 @@ exports.searchAndFilterHotels = async (req, res) => {
     let query = {};
 
     if (hotelName) {
-      query.hotelName = { $regex: hotelName, $options: "i" }; //hotel name
+      query.hotelName = { $regex: hotelName, $options: "i" };
     }
 
     if (address) {
@@ -38,27 +37,11 @@ exports.searchAndFilterHotels = async (req, res) => {
       })
     );
 
-    //Filter khách sạn có phòng còn trống lớn hơn 0
     const hotelsWithCapacity = filteredHotelsByCapacity.filter(
       (hotel) => hotel.availableRooms.length > 0
     );
 
     if (checkinDate && checkoutDate) {
-      if (checkinDate > checkoutDate) {
-        return res.status(400).json({
-          error: true,
-          message: "CheckInDate can not before CheckOutDate",
-        });
-      }
-
-      if (checkoutDate < Date.now()) {
-        return res.status(400).json({
-          error: true,
-          message: "CheckOutDate can not after time now",
-        });
-      }
-
-      //Change to check checkindate and checkoutdate of hotel
       const reservedRooms = await Reservation.find({
         checkInDate: { $lt: new Date(checkoutDate) },
         checkOutDate: { $gt: new Date(checkinDate) },
@@ -74,18 +57,15 @@ exports.searchAndFilterHotels = async (req, res) => {
       const finalFilteredHotels = availableHotels.filter(
         (hotel) => hotel.availableRooms.length > 0
       );
-      return res.status(200).json({
-        error: false,
-        finalFilteredHotels,
-        message: "Searching Hotel Successfully",
-      });
+      return res.status(200).json(finalFilteredHotels);
     }
 
     return res.json({
-      error: false,
-      hotelsWithCapacity,
-      message: "Search successfully",
-    });
+        error: false,
+        hotelsWithCapacity,
+        message:'Search successfully'
+    })
+
   } catch (error) {
     res.status(500).json({
       error: true,

@@ -11,18 +11,34 @@
   },
   "dependencies": {
     "@react-oauth/google": "^0.12.1",
+<<<<<<< HEAD:Frontend/package.json
     "@tailwindcss/vite": "^4.0.2",
+=======
+    "@tailwindcss/vite": "^4.0.3",
+>>>>>>> main:Frontend/booking-platform/package.json
     "axios": "^1.7.9",
     "booking-platform": "file:",
     "bootstrap": "^5.3.3",
     "dayjs": "^1.11.13",
+    "dotenv": "^16.4.7",
+    "flowbite": "^3.1.1",
+    "flowbite-react": "^0.10.2",
     "framer-motion": "^12.0.5",
     "lottie-react": "^2.4.1",
+<<<<<<< HEAD:Frontend/package.json
     "lucide-react": "^0.474.0",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.8",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.5.1",
+=======
+    "lucide-react": "^0.475.0",
+    "react": "^18.3.1",
+    "react-bootstrap": "^2.10.8",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.4.0",
+    "react-leaflet": "^4.2.1",
+>>>>>>> main:Frontend/booking-platform/package.json
     "react-loader-spinner": "^6.1.6",
     "react-lottie": "^1.2.10",
     "react-router-dom": "^7.1.3",

@@ -6,14 +6,15 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const { promisify } = require("util");
 const User = require("../models/user");
-const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const asyncHandler = require("../middlewares/asyncHandler");
+const catchAsync = require("../utils/catchAsync.js");
 const cloudinary = require("../utils/cloudinary");
 const {
   PASSWORD_RESET_REQUEST_TEMPLATE,
   VERIFICATION_EMAIL_TEMPLATE,
 } = require("../templates/emailTemplates.js");
-const { json } = require("stream/consumers");
+
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Email Transporter
@@ -139,7 +140,6 @@ exports.signup = catchAsync(async (req, res, next) => {
     },
   });
 });
-
 // Email Verification (corrected)
 exports.verifyEmail = catchAsync(async (req, res, next) => {
   const { email, otp } = req.body;
@@ -224,7 +224,6 @@ exports.resendEmailVerification = catchAsync(async (req, res, next) => {
 // Login
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-  console.log("Request Body:", req.body);
 
   if (!email || !password) {
     return next(new AppError("Please provide email and password!", 400));
@@ -250,7 +249,7 @@ exports.googleLogin = catchAsync(async (req, res, next) => {
   // Verify the Google token
   const ticket = await client.verifyIdToken({
     idToken: credential,
-    audience: process.env.GOOGLE_CLIENT_ID,
+    audience: process.env.GG_CLIENT_ID,
   });
 
   const payload = ticket.getPayload();
@@ -268,6 +267,11 @@ exports.googleLogin = catchAsync(async (req, res, next) => {
       password: randomPassword,
       isVerified: true, // Google users are automatically verified
       picture, // Save profile picture URL if needed
+    });
+  } else {
+    return res.status(403).json({
+      error: true,
+      message: "User already exist",
     });
   }
 
@@ -371,9 +375,9 @@ exports.protect = catchAsync(async (req, res, next) => {
     return next(new AppError("User does not exist.", 401));
   }
 
-  if (currentUser.changedPasswordAfter(decoded.iat)) {
-    return next(new AppError("Password changed recently! Log in again.", 401));
-  }
+  // if (currentUser.changedPasswordAfter(decoded.iat)) {
+  //   return next(new AppError("Password changed recently! Log in again.", 401));
+  // }
 
   req.user = currentUser;
   next();
@@ -386,4 +390,4 @@ exports.restrictTo = (...roles) =>
       return next(new AppError("Permission denied", 403));
     }
     next();
-  });
+});
