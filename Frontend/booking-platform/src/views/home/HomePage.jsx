@@ -35,6 +35,8 @@ export const HomePage = () => {
   const [checkInError, setCheckInError] = useState('');
   const [checkOutError, setCheckOutError] = useState('');
   const [addressError, setAddressError] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const validateDates = () => {
     const today = new Date().toISOString().split('T')[0];
@@ -125,23 +127,23 @@ export const HomePage = () => {
     </div>
   );
 
-  const fetchHotels = async () => {
+  const fetchHotels = async (newPage = 1) => {
     if (!validateDates()) return;
     setLoading(true);
     setShowHotels(false);
+
     try {
       const response = await fetch(
-        `http://localhost:8080/user/search?hotelName=${hotelName}&address=${address}&checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&hotelRating=${minRating}-5&numberOfPeople=${numberOfPeople}`
+        `${BASE_URL}/customer/search?hotelName=${hotelName}&address=${address}&checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&hotelRating=${minRating}-5&numberOfPeople=${numberOfPeople}&page=${newPage}`
       );
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      setTimeout(() => {
-        setHotels(data);
-        setHotels(data);
-        setShowHotels(true);
-      }, 1500);
+      setHotels(data.hotels);
+      setTotalPages(data.totalPages);
+      setPage(newPage);
+      setShowHotels(true);
     } catch (error) {
       console.error('Error fetching hotels:', error);
     } finally {
@@ -149,21 +151,30 @@ export const HomePage = () => {
     }
   };
 
+
   const handleSearch = () => {
     if (!address.trim()) {
       setAddressError('Please enter your destination.');
       return;
     }
     setAddressError('');
-    fetchHotels();
+    setPage(1); 
+    fetchHotels(1); 
   };
+
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    fetchHotels(newPage);
+  };
+
+
   // useEffect(() => {
   //   fetchHotels();
   // }, [hotelName, address, checkinDate, checkoutDate, minRating, numberOfPeople]);
 
   return (
     <>
-      <CustomNavbar/>
+      <CustomNavbar />
       <CustomBanner />
       <CustomSlide />
       <LottieComponent />
@@ -201,7 +212,7 @@ export const HomePage = () => {
             <div className="date-input-container">
               <CustomDateValidator
                 type="date"
-                placeHolder="Check-in Date"
+                placeholder="Check-in Date"
                 value={checkinDate}
                 min={new Date().toISOString().split('T')[0]}
                 onChange={(e) => {
@@ -215,7 +226,7 @@ export const HomePage = () => {
               />
               <CustomDateValidator
                 type="date"
-                placeHolder="Check-out Date"
+                placeholder="Check-out Date"
                 value={checkoutDate}
                 min={checkinDate || new Date().toISOString().split('T')[0]}
                 onChange={(e) => setCheckoutDate(e.target.value)}
@@ -238,7 +249,7 @@ export const HomePage = () => {
           <Button
             variant="primary"
             onClick={handleSearch}
-            disabled={loading} 
+            disabled={loading}
           >
             {loading ? 'Searching...' : 'Search'}
           </Button>
@@ -247,7 +258,7 @@ export const HomePage = () => {
       <div className="container-fluid">
         <div className="row mx-5 mt-5">
           <div className="col-md-3">
-            <MapComponent/>
+            <MapComponent />
             <motion.div
               className="mt-3"
               initial={{ opacity: 0, y: 50 }}
@@ -266,45 +277,64 @@ export const HomePage = () => {
               </div>
             ) : (
               showHotels && (
-                <motion.div
-                  className="row"
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 1 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                >
-                  {hotels.length > 0 ? (hotels.map((hotelData) => {
-                    const hotel = hotelData.hotel || hotelData;
-                    return (
-                      <motion.div
-                        key={hotel._id.toString()}
-                        className="col-md-4 mb-4"
-                        initial={{ opacity: 0, y: 50 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1 }}
-                        viewport={{ once: true, amount: 0.3 }}
-                      >
-                        <Card className='card-search-hotel' style={{ width: '100%' }}>
-                          <Card.Img variant="top" src={hotel.imageUrl || 'default_image_url'} />
-                          <Card.Body>
-                            <Card.Title>{hotel.hotelName}</Card.Title>
-                            <Card.Text>{hotel.description}</Card.Text>
-                            <Card.Text>Rating: {hotel.rating}</Card.Text>
-                            <Card.Text>Address: {hotel.address}</Card.Text>
-                          </Card.Body>
-                        </Card>
-                      </motion.div>
-                    );
-                  })) : (
-                    <div className='alert alert-danger'><p className='text-center'>Not found any hotel with that information</p></div>
+                <motion.div className="row">
+                  {hotels.length > 0 ? (
+                    hotels.map((hotelData) => {
+                      const hotel = hotelData.hotel || hotelData;
+                      return (
+                        <motion.div
+                          key={hotel._id.toString()}
+                          className="col-md-6 mb-4"
+                          initial={{ opacity: 0, y: 50 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 1 }}
+                          viewport={{ once: true, amount: 0.3 }}
+                        >
+                          <Card className='card-search-hotel' style={{ width: '100%' }}>
+                            <Card.Img variant="top" src={hotel.imageUrl || 'default_image_url'} />
+                            <Card.Body>
+                              <Card.Title>{hotel.hotelName}</Card.Title>
+                              <Card.Text>{hotel.description}</Card.Text>
+                              <Card.Text>Rating: {hotel.rating}</Card.Text>
+                              <Card.Text>Address: {hotel.address}</Card.Text>
+                            </Card.Body>
+                          </Card>
+                        </motion.div>
+                      );
+                    })
+                  ) : (
+                    <div className='alert alert-danger'>
+                      <p className='text-center'>Not found any hotel with that information</p>
+                    </div>
                   )}
                 </motion.div>
               )
             )}
+
+            {showHotels && totalPages > 1 && (
+              <div className="d-flex justify-content-center mt-4">
+                <Button
+                  variant="outline-primary"
+                  onClick={() => handlePageChange(page - 1)}
+                  disabled={page === 1}
+                >
+                  Previous
+                </Button>
+                <span className="mx-3 fs-5 fw-bold">
+                  Page {page} of {totalPages}
+                </span>
+                <Button
+                  variant="outline-primary"
+                  onClick={() => handlePageChange(page + 1)}
+                  disabled={page === totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
-
       {/* News */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -536,7 +566,7 @@ const StarRating = ({ value, onChange }) => {
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-      <Badge className='fw-4 fs-5' style={{backgroundColor: '#6499E9'}}>Filter By Star</Badge>
+      <Badge className='fw-4 fs-5' style={{ backgroundColor: '#6499E9' }}>Filter By Star</Badge>
       {[...Array(5)].map((_, index) => (
         <>
           <span
