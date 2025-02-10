@@ -17,12 +17,12 @@ function CustomNavbar() {
             <Nav.Link eventKey={2} href="#memes">Achievements</Nav.Link>
           </Nav>
           <Nav>
-            <Nav.Link href="/home">Home</Nav.Link>
+            <Nav.Link href="#">Home</Nav.Link>
             <Nav.Link href="#">About</Nav.Link>
             <NavDropdown title="Service" id="collapsible-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Favorite List</NavDropdown.Item>
               <NavDropdown.Divider />
-              <NavDropdown.Item href="/transaction">Transaction History</NavDropdown.Item>
+              <NavDropdown.Item href="#action/3.2">Transaction History</NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item href="#action/3.3">Information</NavDropdown.Item>
             </NavDropdown>

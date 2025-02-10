@@ -19,3 +19,5 @@ exports.getAllHotels = asyncHandler(async (req, res) => {
    })
 
 })
+
+

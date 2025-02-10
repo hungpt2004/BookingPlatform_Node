@@ -23,7 +23,7 @@ const hotelSchema = new Schema(
     services: [
       {
         type: Schema.Types.ObjectId,
-        ref: "HotelService",
+        ref: "Service",
       },
     ],
     facility: [

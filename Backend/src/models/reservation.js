@@ -32,12 +32,12 @@ const reservationSchema = new Schema(
       type: String,
       enum: [
         "BOOKED",        // Đã đặt, trả tiền nhưng chưa check-in
-        "CHECKED IN",    // Đang ở, đã check-in
-        "CHECKED OUT",   // Đã check-out, có thể để lại phản hồi
+        "CHECKED_IN",    // Đang ở, đã check-in
+        "CHECKED_OUT",   // Đã check-out, có thể để lại phản hồi
         "COMPLETED",     // Hoàn thành, đã phản hồi
         "PENDING",       // Chờ xử lý hoặc xác nhận
         "CANCELLED",     // Đã hủy
-        "NOT PAID"       // Chưa trả tiền
+        "NOT_PAID"       // Chưa trả tiền
       ],
       default: "PENDING", // Mặc định là chờ xử lý
     },

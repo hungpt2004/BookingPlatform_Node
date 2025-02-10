@@ -6,11 +6,10 @@
 .card-hotel:hover{
    transform: translateY(-10px);
    transition: ease-in 0.4s;
-   box-shadow: 0 10px 15px #aeaeae;
+   box-shadow: 0 8px 20px #aeaeae;
 }
 .card-hotel{
    transition: ease-in 0.4s;
-   border-width: 5;
 }
 .title {
    overflow: hidden;
@@ -18,45 +17,3 @@
    -webkit-line-clamp: 1; /* Số dòng tối đa */
    -webkit-box-orient: vertical;
 }
-.typing-text {
-   font-size: 1.5rem;
-   color: black;
-   padding: 5px 50px;
-   border-radius: 30px;
-   background-color: white;
-   white-space: nowrap;
-   overflow: hidden;
-   width: 0;
-   animation: typing 3s steps(30) 1s forwards, blink 0.75s step-end infinite;
- }
- .content {
-   position: absolute;
-   transform: translate(-50%, -50%);
-   left: 50%;
-   top: 10%;
-   color: white;
-   text-align: center;
-   margin-top: 50px;
- }
- 
- .content h1 {
-   font-size: 3.5rem;
-   font-weight: bold;
-   margin-bottom: 20px;
- }
- 
- @keyframes typing {
-   from {
-     width: 0;
-     color: white;
-   }
-   to {
-     width: 100%;
-   }
- }
- .container-top{
-   background-color: #6499E9;
- }
- btn {
-   margin: 0 auto;
- }
