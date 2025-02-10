@@ -7,8 +7,6 @@ exports.createBooking = asyncHandler(async (req, res) => {
     const { userId, hotelId, roomId, checkInDate, checkOutDate } = req.body;
 
     try {
-        // console.log(req.body);
-
         // Validate required fields
         if (!userId || !hotelId || !roomId || !checkInDate || !checkOutDate) {
             return res.status(400).json({ error: true, message: "Missing required fields" });
@@ -20,12 +18,17 @@ exports.createBooking = asyncHandler(async (req, res) => {
             return res.status(404).json({ error: true, message: "Hotel not found" });
         }
 
-        // Validate that the rooms exist and belong to the hotel
-        const rooms = await Room.find({ _id: { $in: roomId }, hotel: hotelId });
+        // Validate that the rooms exist, belong to the hotel, and have quantity > 0
+        const rooms = await Room.find({ _id: { $in: roomId }, hotel: hotelId, quantity: { $gt: 0 } });
+
+        // // Validate that the rooms exist and belong to the hotel
+        // const rooms = await Room.find({ _id: { $in: roomId }, hotel: hotelId });
+
         // console.log(rooms.length, roomId.length);
-        if (rooms.length === 0) {
+        if (rooms.length !== roomId.length) {
             return res.status(404).json({ error: true, message: "Some rooms were not found or do not belong to the specified hotel" });
         }
+
 
         const checkIn = new Date(checkInDate);
         const checkOut = new Date(checkOutDate);
@@ -101,8 +104,14 @@ exports.createBooking = asyncHandler(async (req, res) => {
             status: "BOOKED", // Default status
         });
 
-        // Save the reservation to the database
-        await reservation.save();
+        // // Save the reservation to the database
+        // await reservation.save();
+
+        // // Decrement the quantity of the booked rooms
+        // for (const room of rooms) {
+        //     room.quantity -= 1;
+        //     await room.save();
+        // }
 
         res.status(201).json({
             error: false,

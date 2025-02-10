@@ -98,7 +98,6 @@ exports.createRoomFacility = asyncHandler(async (req, res) => {
         name,
         description,
         url, // Assuming `url` is a Buffer; handle image uploads separately if needed
-        unavailableDates,
     });
 
     await roomFacility.save();

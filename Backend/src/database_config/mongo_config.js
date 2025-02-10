@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const mongoURI = 'mongodb://localhost:27017/BookingDatabase';
+const mongoURI = 'mongodb+srv://haonudechimlac:EQcA2jqEVmQCmUUQ@mydb.dyiwq.mongodb.net/BookingDatabase';
 
 const connectDB = async () => {
    try {
