@@ -360,7 +360,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 // Restrict Middleware
-exports.restrictTo = (...roles) =>
+exports.restrictTo = (...roles) => 
   catchAsync(async (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(new AppError("Permission denied", 403));

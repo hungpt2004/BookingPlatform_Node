@@ -27,7 +27,7 @@ const CustomSlide = () => {
          <Swiper
             className='p-5 mt-5'
             slidesPerView={4}
-            spaceBetween={50}
+            spaceBetween={100}
             onSlideChange={() => console.log('slide change')}
             onSwiper={(swiper) => console.log(swiper)}
             autoplay={true}
@@ -36,8 +36,8 @@ const CustomSlide = () => {
                const { name, price, rating, bookings } = hotelData[index];
                return (
                   <SwiperSlide key={index}>
-                     <Card className='shadow-lg p-2 mb-2 bg-body-tertiary rounded'>
-                        <Card.Img variant='top' className="" src={item} />
+                     <Card className='shadow-lg p-2 mb-2 bg-body-tertiary rounded-4'>
+                        <Card.Img variant='top' className="rounded-top-4" src={item} />
                         <Card.Body>
                            <Card.Title className='fs-4 title'>{name}</Card.Title>
                            <Card.Text >💰 Price: {price}</Card.Text>

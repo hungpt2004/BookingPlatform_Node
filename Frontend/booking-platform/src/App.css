@@ -1,7 +1,8 @@
 /* @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Great+Vibes&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Liter&display=swap');
 
 * {
-   font-family: 'Great Vibes', cursive;
+   font-family: 'Liter', sans-serif;
 }
 
 h1:hover {

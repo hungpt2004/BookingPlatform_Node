@@ -8,6 +8,7 @@ import "./HistoryTransaction.css";
 import { Badge, Button, Card } from "react-bootstrap";
 import { formatDate } from "../../utils/FormatDatePrint";
 import { dataStatus, statusColors, statusText } from "./DataStatus";
+import axiosInstance from "../../utils/AxiosInstance";
 
 export const HistoryTransaction = () => {
    const [status, setStatus] = useState("ALL");
@@ -28,7 +29,7 @@ export const HistoryTransaction = () => {
    const fetchDataReservation = async () => {
       setLoading(true);
       try {
-         const response = await axios.get(`${BASE_URL}/reservation/search-status`, {
+         const response = await axiosInstance.get(`/reservation/search-status`, {
             params: { status, page }
          });
 
@@ -48,7 +49,7 @@ export const HistoryTransaction = () => {
 
    const fetchHotelFromReservation = async (reservationId) => {
       try {
-         const response = await axios.get(`${BASE_URL}/reservation/hotel/${reservationId}`);
+         const response = await axiosInstance.get(`/reservation/hotel/${reservationId}`);
          if (response.data && response.data.hotel) {
             return response.data.hotel; // Return the hotel data
          }
@@ -142,8 +143,8 @@ export const HistoryTransaction = () => {
                                        <Card.Title className="text-center">{hotel.hotelName || "Unknown Hotel"}</Card.Title>
                                        <Card.Body>
                                           <p>📍 Address: {hotel.address || "N/A"}</p>
-                                          <p>🗓️ Check In Date: {formatDate(item.checkInDate, "DD/MM/YYYY")}</p>
-                                          <p>🗓️ Check Out Date: {formatDate(item.checkOutDate, "DD/MM/YYYY")}</p>
+                                          <p>🗓️ Check In: {formatDate(item.checkInDate, "DD/MM/YYYY")}</p>
+                                          <p>🗓️ Check Out: {formatDate(item.checkOutDate, "DD/MM/YYYY")}</p>
                                           <p>💰 Price: {item.totalPrice}$</p>
                                           <Badge className="badge-status py-2 px-3" bg={statusColors[item.status]}>
                                              {statusText[item.status] || "Unknown Status"}
