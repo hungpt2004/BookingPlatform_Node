@@ -14,12 +14,6 @@ import { CustomToast } from '../../components/toast/CustomToast';
 
 
 export const LoginPage = () => {
-<<<<<<< HEAD:Frontend/src/views/login/LoginPage.jsx
-   const [username, setUsername] = useState('');
-   const [password, setPassword] = useState(''); // Sửa lỗi chính tả từ setPasword thành setPassword
-   const navigate = useNavigate();
-   
-=======
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
    const [loading, setLoading] = useState(false);
@@ -93,7 +87,6 @@ export const LoginPage = () => {
       }
    };
 
->>>>>>> main:Frontend/booking-platform/src/views/login/LoginPage.jsx
    return (
       <>
          <CustomToast />

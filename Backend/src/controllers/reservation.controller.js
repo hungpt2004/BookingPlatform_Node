@@ -71,9 +71,7 @@ exports.getRoomByReservationId = asyncHandler(async (req, res) => {
 
 exports.getHotelByReservationId = asyncHandler(async (req, res) => {
   //user
-
   const { reservationId } = req.params;
-
   const reservation = await Reservation.findOne({
     _id: reservationId,
   }).populate("hotel");
@@ -121,6 +119,7 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   let totalPages = Math.ceil(totalPageReservations / perPage); // Fix: Calculate total pages correctly
 
   const reservations = await Reservation.find(query)
+    .populate('hotel')
     .sort({ totalPrice: -1 }) // Sort by total price
     .skip((page - 1) * perPage) // Fix: Apply pagination correctly
     .limit(perPage);

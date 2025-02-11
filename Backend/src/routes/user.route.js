@@ -3,7 +3,7 @@ const UserRouter = express.Router();
 const UserController = require("../controllers/user.controller");
 const SearchController = require("../controllers/searchfilter");
 const authController = require("../controllers/authenticate.controller");
-const avatarController = require("../controllers/user.update");
+const avatarController = require("../controllers/user.controller");
 const {authenticateToken} = require("../utils/authenticateToken");
 UserRouter.get("/get-all-user", UserController.getAllUsers);
 UserRouter.get("/search", SearchController.searchAndFilterHotels);
@@ -28,7 +28,6 @@ UserRouter.route("/:id")
 UserRouter.put(
   "/update-avatar/:id",
    authenticateToken,
-
   avatarController.updateAvatar
 );
 module.exports = UserRouter;

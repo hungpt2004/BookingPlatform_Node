@@ -5,14 +5,15 @@ const axiosInstance = axios.create({
    baseURL: BASE_URL,
    timeout: 10000,
    headers: {
-      "Content-Type":"application/json", //Dữ liệu gửi đi dạng JSON
+      "Content-Type": "application/json", //Dữ liệu gửi đi dạng JSON
    }
 })
 
 axiosInstance.interceptors.request.use(
    (config) => {
-      const accessToken = localStorage.getItem('token');
-      if(accessToken) {
+      const accessToken = sessionStorage.getItem('token');
+      console.log(accessToken)
+      if (accessToken) {
          config.headers.Authorization = `Bearer ${accessToken}`
       }
       return config;
@@ -21,3 +22,5 @@ axiosInstance.interceptors.request.use(
       return Promise.reject(error);
    }
 );
+
+export default axiosInstance;

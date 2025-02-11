@@ -1,15 +1,3 @@
-<<<<<<< HEAD:Frontend/src/views/home/HomePage.jsx
-import React, { useState, useEffect } from "react";
-import CustomNavbar from "../../components/navbar/CustomNavbar";
-import CustomSlide from "../../components/slide/CustomSlide";
-import { HashLoader } from "react-spinners";
-import CustomInput from "../../components/input/CustomInput";
-import LottieComponent from "../../components/lottie/LottieComponent";
-import { Badge, Card } from "react-bootstrap";
-import { motion } from "framer-motion"; // Import motion
-import "./HomePage.css";
-import ImageNotFound from "../../assets/svg/notfound.jpg";
-=======
 import React, { useState, useEffect } from 'react';
 import CustomNavbar from '../../components/navbar/CustomNavbar';
 import CustomSlide from '../../components/slide/CustomSlide';
@@ -31,16 +19,15 @@ import 'swiper/css/pagination';
 import MapComponent from '../../components/map/MapComponent';
 
 
->>>>>>> main:Frontend/booking-platform/src/views/home/HomePage.jsx
 
 export const HomePage = () => {
   const [hotels, setHotels] = useState([]);
-  const [hotelName, setHotelName] = useState("");
-  const [address, setAddress] = useState("");
-  const [checkinDate, setCheckinDate] = useState("");
-  const [checkoutDate, setCheckoutDate] = useState("");
+  const [hotelName, setHotelName] = useState('');
+  const [address, setAddress] = useState('');
+  const [checkinDate, setCheckinDate] = useState('');
+  const [checkoutDate, setCheckoutDate] = useState('');
   const [minRating, setMinRating] = useState(0);
-  const [numberOfPeople, setNumberOfPeople] = useState("");
+  const [numberOfPeople, setNumberOfPeople] = useState('');
   const [loading, setLoading] = useState(false);
   const [showHotels, setShowHotels] = useState(false);
   const [showNews, setShowNews] = useState(false);
@@ -61,7 +48,7 @@ export const HomePage = () => {
         setShowHotels(true);
       }, 1500);
     } catch (error) {
-      console.error("Error fetching hotels:", error);
+      console.error('Error fetching hotels:', error);
     } finally {
       setLoading(false);
     }
@@ -69,18 +56,11 @@ export const HomePage = () => {
 
   useEffect(() => {
     fetchHotels();
-  }, [
-    hotelName,
-    address,
-    checkinDate,
-    checkoutDate,
-    minRating,
-    numberOfPeople,
-  ]);
+  }, [hotelName, address, checkinDate, checkoutDate, minRating, numberOfPeople]);
 
   return (
     <>
-      <CustomNavbar/>
+      <CustomNavbar />
       <CustomBanner />
       <CustomSlide />
       <LottieComponent />
@@ -137,19 +117,7 @@ export const HomePage = () => {
       <div className="container-fluid">
         <div className="row mx-5 mt-5">
           <div className="col-md-3">
-<<<<<<< HEAD:Frontend/src/views/home/HomePage.jsx
-            <motion.div
-              className="rounded-4"
-              style={{ height: "250px", backgroundColor: "#e0e0e0" }}
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.5 }}
-            >
-              <p className="text-center">Map (Google Map or Leaflet here)</p>
-            </motion.div>
-=======
-            <MapComponent/>
->>>>>>> main:Frontend/booking-platform/src/views/home/HomePage.jsx
+            <MapComponent />
             <motion.div
               className="mt-3"
               initial={{ opacity: 0, y: 50 }}
@@ -157,10 +125,7 @@ export const HomePage = () => {
               transition={{ duration: 1 }}
               viewport={{ once: true, amount: 0.3 }}
             >
-              <StarRating
-                value={minRating}
-                onChange={(value) => setMinRating(value)}
-              />
+              <StarRating value={minRating} onChange={(value) => setMinRating(value)} />
             </motion.div>
           </div>
           {/* Hotels Display Section */}
@@ -178,43 +143,6 @@ export const HomePage = () => {
                   transition={{ duration: 1 }}
                   viewport={{ once: true, amount: 0.3 }}
                 >
-<<<<<<< HEAD:Frontend/src/views/home/HomePage.jsx
-                  {hotels.length > 0 ? (
-                    hotels.map((hotelData) => {
-                      const hotel = hotelData.hotel || hotelData;
-                      return (
-                        <motion.div
-                          key={hotel._id.toString()}
-                          className="col-md-4 mb-4"
-                          initial={{ opacity: 0, y: 50 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5 }}
-                        >
-                          <Card
-                            className="card-search-hotel"
-                            style={{ width: "100%" }}
-                          >
-                            <Card.Img
-                              variant="top"
-                              src={hotel.imageUrl || "default_image_url"}
-                            />
-                            <Card.Body>
-                              <Card.Title>{hotel.hotelName}</Card.Title>
-                              <Card.Text>{hotel.description}</Card.Text>
-                              <Card.Text>Rating: {hotel.rating}</Card.Text>
-                              <Card.Text>Address: {hotel.address}</Card.Text>
-                            </Card.Body>
-                          </Card>
-                        </motion.div>
-                      );
-                    })
-                  ) : (
-                    <div className="alert alert-danger">
-                      <p className="text-center">
-                        Not found any hotel with that information
-                      </p>
-                    </div>
-=======
                   {hotels.length > 0 ? (hotels.map((hotelData) => {
                     const hotel = hotelData.hotel || hotelData;
                     return (
@@ -239,7 +167,6 @@ export const HomePage = () => {
                     );
                   })) : (
                     <div className='alert alert-danger'><p className='text-center'>Not found any hotel with that information</p></div>
->>>>>>> main:Frontend/booking-platform/src/views/home/HomePage.jsx
                   )}
                 </motion.div>
               )
@@ -478,26 +405,18 @@ const StarRating = ({ value, onChange }) => {
   };
 
   return (
-<<<<<<< HEAD:Frontend/src/views/home/HomePage.jsx
-    <div style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
-      <Badge className="fw-4 fs-5" style={{ backgroundColor: "#6499E9" }}>
-        Filter By Star
-      </Badge>
-=======
     <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
       <Badge className='fw-4 fs-5' style={{ backgroundColor: '#6499E9', borderColor: '#6499E9' }}>Filter By Star</Badge>
->>>>>>> main:Frontend/booking-platform/src/views/home/HomePage.jsx
       {[...Array(5)].map((_, index) => (
         <>
           <span
             key={index}
             style={{
-              fontSize: "30px",
-              color: (hoverValue || value) > index ? "#FFD700" : "#ccc",
-              transition: "color 0.3s ease, transform 0.2s ease",
-              margin: "0 5px",
-              transform:
-                (hoverValue || value) > index ? "scale(1.2)" : "scale(1)",
+              fontSize: '30px',
+              color: (hoverValue || value) > index ? '#FFD700' : '#ccc',
+              transition: 'color 0.3s ease, transform 0.2s ease',
+              margin: '0 5px',
+              transform: (hoverValue || value) > index ? 'scale(1.2)' : 'scale(1)',
             }}
             onClick={() => handleClick(index)}
             onMouseEnter={() => handleMouseEnter(index)}
@@ -510,4 +429,3 @@ const StarRating = ({ value, onChange }) => {
     </div>
   );
 };
-

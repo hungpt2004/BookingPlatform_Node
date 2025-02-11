@@ -8,7 +8,7 @@ import "./HistoryTransaction.css";
 import { Badge, Button, Card } from "react-bootstrap";
 import { formatDate } from "../../utils/FormatDatePrint";
 import { dataStatus, statusColors, statusText } from "./DataStatus";
-
+import FeedbackModal from "../../components/feedback/Feedback";
 export const HistoryTransaction = () => {
   const [status, setStatus] = useState("ALL");
   const [loading, setLoading] = useState(false);
@@ -18,7 +18,9 @@ export const HistoryTransaction = () => {
   const [hotels, setHotels] = useState({});
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // Thêm state tổng số trang
-
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [selectedReservationId, setSelectedReservationId] = useState (null);
+  const[getHotel, setGetHotel] = useState(null);
   const handleChangeStatus = (newStatus) => {
     setStatus(newStatus);
     setActiveStatus(newStatus);
@@ -143,13 +145,12 @@ export const HistoryTransaction = () => {
                         <div
                           key={index}
                           className={`
-                                    ${
-                                      reservations.length === 1
-                                        ? "col-md-12"
-                                        : reservations.length === 2
-                                        ? "col-md-6"
-                                        : "col-md-4"
-                                    }`}
+                                    ${reservations.length === 1
+                              ? "col-md-12"
+                              : reservations.length === 2
+                                ? "col-md-6"
+                                : "col-md-4"
+                            }`}
                         >
                           <Card className="card-search-hotel p-3 m-3">
                             <Card.Title className="text-center">
@@ -178,6 +179,13 @@ export const HistoryTransaction = () => {
                                 <Button
                                   className="mb-1"
                                   variant="outline-primary"
+                                  onClick={() => {
+                                    setShowFeedback(true)
+                                    setSelectedReservationId(item._id);
+                                    setGetHotel(hotel._id);
+                                    console.log("reservation", item._id);
+                                    console.log("hotel", hotel._id);
+                                  }}
                                 >
                                   Feedback
                                 </Button>
@@ -193,6 +201,7 @@ export const HistoryTransaction = () => {
                               <Button className="" variant="outline-dark">
                                 View Details
                               </Button>
+
                             </Row>
                           </Card>
                         </div>
@@ -205,7 +214,19 @@ export const HistoryTransaction = () => {
             <p>{err}</p>
           </div>
         </div>
-      </div>
+      </div >
+      {/* Gọi modal */}
+      <FeedbackModal
+        show={showFeedback}
+        onClose={() => {
+          setShowFeedback(false);
+          setSelectedReservationId(null);
+          setGetHotel(null);
+          // Add this prop
+        }}
+        reservationId={selectedReservationId}
+        getHotel={getHotel}
+      />
     </>
   );
 };
