@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Spinner, Alert, Table } from "react-bootstrap";
+import { Button, Spinner, Alert, Table, Badge } from "react-bootstrap";
 import axiosInstance from "../../utils/AxiosInstance";
 
 const Booking = ({ setOpen, hotelId, checkInDate, checkOutDate, userId }) => {
@@ -47,6 +47,13 @@ const Booking = ({ setOpen, hotelId, checkInDate, checkOutDate, userId }) => {
         });
     };
 
+    const calculateTotalPrice = () => {
+        return rooms.reduce((total, room) => {
+            const quantity = selectedRooms[room._id] || 0;
+            return total + (room.price * quantity);
+        }, 0);
+    };
+
     const handleContinueBooking = async () => {
         if (Object.keys(selectedRooms).length === 0) return;
 
@@ -90,7 +97,6 @@ const Booking = ({ setOpen, hotelId, checkInDate, checkOutDate, userId }) => {
                         <thead>
                             <tr>
                                 <th>Room Type</th>
-                                <th>Price/Night</th>
                                 <th>Capacity</th>
                                 <th>Available Rooms</th>
                                 <th>Quantity</th>
@@ -100,7 +106,6 @@ const Booking = ({ setOpen, hotelId, checkInDate, checkOutDate, userId }) => {
                             {rooms.map(room => (
                                 <tr key={room._id}>
                                     <td>{room.type}</td>
-                                    <td>${room.price}</td>
                                     <td>{room.capacity}</td>
                                     <td>{room.quantity}</td>
                                     <td>
@@ -128,6 +133,15 @@ const Booking = ({ setOpen, hotelId, checkInDate, checkOutDate, userId }) => {
                             ))}
                         </tbody>
                     </Table>
+                </div>
+            )}
+
+            {/* Total Price Display */}
+            {Object.keys(selectedRooms).length > 0 && (
+                <div className="d-flex justify-content-end mt-3">
+                    <Badge bg="primary" className="p-3 fs-5 shadow">
+                        Total: ${calculateTotalPrice().toLocaleString()}
+                    </Badge>
                 </div>
             )}
 
