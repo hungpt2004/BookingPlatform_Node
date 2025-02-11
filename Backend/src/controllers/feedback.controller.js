@@ -32,15 +32,16 @@ exports.createFeedback = async (req, res) => {
     const userId = req.user.id;
 
     if (!reservationId) {
-      return res.status(400).json({ 
-        message: "reservationId is required." });
+      return res.status(400).json({
+        message: "reservationId is required."
+      });
     }
 
     const reservation = await Reservation.findOne({
       _id: reservationId,
       user: userId,
       status: "CHECKED OUT", // Chỉ cho phép gửi feedback khi đã checkout
-    }).populate('hotel');;
+    }).populate('hotel');
 
     if (!reservation) {
       return res
@@ -51,8 +52,6 @@ exports.createFeedback = async (req, res) => {
     // if (reservation.status !== "CHECKED OUT") {
     //   return res.status(400).json({ message: "Reservation chưa hoàn tất check-out." });
     // }
-
-
     // Tạo feedback mới
     const feedback = new Feedback({
       user: userId,                  // ObjectId of user
@@ -74,6 +73,57 @@ exports.createFeedback = async (req, res) => {
     console.error("Error creating feedback:", error);
     res.status(500).json({ message: "Lỗi server!" });
   }
-
 };
 
+//update feedback
+exports.updateFeedback = asyncHandler(async (req, res) => {
+  const { feedbackId } = req.params;
+  const updates = {};
+
+  if (req.body.content) {
+    updates.content = req.body.content;
+  }
+  if (req.body.rating) {
+    updates.rating = req.body.rating;
+  }
+  if (Object.keys(updates).length === 0) {
+    return res.status(500).json({
+      status: "fail",
+      message: "No data provided for update",
+    });
+  }
+  const feedback = await Feedback.findByIdAndUpdate(feedbackId, updates, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!feedback) {
+    return res.status(404).json({
+      error: true,
+      message: "Feedback not found"
+    })
+  }
+
+  res.status(200).json({
+    error: false,
+    feedback,
+    message: "Update feedback success"
+  })
+});
+
+//delete feedback
+exports.deleteFeedback = asyncHandler(async (req, res) => {
+  const { feedbackId } = req.params;
+  const feedback = await Feedback.findByIdAndDelete(feedbackId);
+  if (!feedback) {
+    return res.status(404).json({
+      error: true,
+      message: "Feedback not found"
+    })
+  }
+
+  res.status(200).json({
+    error: false,
+    message: "Delete feedback success"
+  })
+});

@@ -4,4 +4,5 @@ const feedbackController = require("../controllers/feedback.controller");
 const { authenticateToken } = require("../utils/authenticateToken"); // Middleware xác thực user
 
 router.post("/create/:reservationId", authenticateToken, feedbackController.createFeedback);
+router.patch("/update/:feedbackId", authenticateToken, feedbackController.updateFeedback);
 module.exports = router;
