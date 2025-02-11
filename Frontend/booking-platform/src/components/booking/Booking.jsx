@@ -1,165 +1,148 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-import useFetch from "../../../hooks/useFetch";
-import { Modal, Button, Form, Spinner, ListGroup, Alert } from "react-bootstrap";
+import { Button, Spinner, Alert, Table } from "react-bootstrap";
+import axiosInstance from "../../utils/AxiosInstance";
 
 const Booking = ({ setOpen, hotelId, checkInDate, checkOutDate, userId }) => {
-    const [selectedRooms, setSelectedRooms] = useState([]);
-    const { data, loading, error } = useFetch(`http://localhost:8080/room/get-room-by-hotel/${hotelId}`);
+    const [selectedRooms, setSelectedRooms] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [rooms, setRooms] = useState([]);
     const navigate = useNavigate();
 
-    const toggleRoomSelection = (roomId) => {
-        setSelectedRooms((prev) =>
-            prev.includes(roomId)
-                ? prev.filter((id) => id !== roomId)
-                : [...prev, roomId]
-        );
-    };
-
-    const handleConfirmBooking = async () => {
+    // Fetch rooms using axiosInstance
+    const fetchRooms = async () => {
         try {
-            const response = await fetch("http://localhost:8080/user/booking", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    userId,
-                    hotelId,
-                    roomId: selectedRooms,
-                    checkInDate,
-                    checkOutDate,
-                }),
-            });
-
-            const result = await response.json();
-            if (!result.error) {
-                alert("Booking successful!");
-                setOpen(false);
-            } else {
-                alert(result.message);
-            }
-        } catch (error) {
-            console.error("Error during booking:", error);
-            alert("An error occurred while booking.");
+            const response = await axiosInstance.get(`/room/get-room-by-hotel/${hotelId}`);
+            setRooms(response.data.rooms);
+            setError(null);
+        } catch (err) {
+            setError(err.response?.data?.message || "Failed to fetch rooms");
+        } finally {
+            setLoading(false);
         }
     };
 
-    // Increment the quantity for a specific room, not exceeding the max available
+    React.useEffect(() => {
+        fetchRooms();
+    }, [hotelId]);
+
     const incrementRoomQuantity = (roomId, maxQuantity) => {
-        setSelectedRooms((prev) => {
-            const currentQuantity = prev[roomId] || 0;
-            if (currentQuantity < maxQuantity) {
-                return { ...prev, [roomId]: currentQuantity + 1 };
-            }
-            return prev;
-        });
+        setSelectedRooms(prev => ({
+            ...prev,
+            [roomId]: Math.min((prev[roomId] || 0) + 1, maxQuantity)
+        }));
     };
 
-    // Decrement the quantity for a specific room and remove the key when it reaches zero
     const decrementRoomQuantity = (roomId) => {
-        setSelectedRooms((prev) => {
-            const currentQuantity = prev[roomId] || 0;
-            if (currentQuantity > 0) {
-                const newQuantity = currentQuantity - 1;
-                if (newQuantity === 0) {
-                    // Remove the room from selectedRooms when quantity is 0
-                    const { [roomId]: removed, ...rest } = prev;
-                    return rest;
-                }
-                return { ...prev, [roomId]: newQuantity };
+        setSelectedRooms(prev => {
+            const current = prev[roomId] || 0;
+            if (current <= 0) return prev;
+            const newCount = current - 1;
+            if (newCount === 0) {
+                const { [roomId]: _, ...rest } = prev;
+                return rest;
             }
-            return prev;
+            return { ...prev, [roomId]: newCount };
         });
     };
 
-    // Prepare booking data and navigate to the next step
-    const handleContinueBooking = () => {
-        if (Object.keys(selectedRooms).length === 0) return; // No room selected
-
+    const handleContinueBooking = async () => {
+        if (Object.keys(selectedRooms).length === 0) return;
 
         const bookingData = {
             userId,
             hotelId,
-            roomQuantities: selectedRooms, // Object with roomId as key and quantity as value
+            roomQuantities: selectedRooms,
             checkInDate,
             checkOutDate,
         };
-        console.log("bookingData", bookingData);
 
         navigate('/booking-step2', { state: bookingData });
     };
 
     return (
-        <Modal show={true} onHide={() => setOpen(false)} centered>
-            <Modal.Header closeButton>
-                <Modal.Title>Select Rooms</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                {loading && (
-                    <div className="text-center">
-                        <Spinner animation="border" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                        </Spinner>
-                    </div>
-                )}
-
-                {error && (
-                    <Alert variant="danger" className="text-center">
-                        {error}
-                    </Alert>
-                )}
-
-                {!loading && !error && (
-                    <ListGroup>
-                        {data?.rooms?.map((room) => (
-                            <ListGroup.Item key={room._id} className="mb-2">
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 className="mb-1">{room.type}</h6>
-                                        <small className="text-muted">
-                                            ${room.price}/night · Sleeps {room.capacity} · Available Room: {room.quantity}
-                                        </small>
-                                    </div>
-                                    <div className="d-flex align-items-center">
-                                        <Button
-                                            variant="secondary"
-                                            size="sm"
-                                            onClick={() => decrementRoomQuantity(room._id)}
-                                            disabled={!(selectedRooms[room._id] > 0)}
-                                        >
-                                            –
-                                        </Button>
-                                        <span className="mx-2">{selectedRooms[room._id] || 0}</span>
-                                        <Button
-                                            variant="secondary"
-                                            size="sm"
-                                            onClick={() => incrementRoomQuantity(room._id, room.quantity)}
-                                            disabled={(selectedRooms[room._id] || 0) >= room.quantity}
-                                        >
-                                            +
-                                        </Button>
-                                    </div>
-                                </div>
-                            </ListGroup.Item>
-                        ))}
-                    </ListGroup>
-                )}
-            </Modal.Body>
-            <Modal.Footer>
+        <div className="container mt-4">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2>Select Rooms</h2>
                 <Button variant="secondary" onClick={() => setOpen(false)}>
-                    Cancel
+                    Close
                 </Button>
+            </div>
+
+            {loading && (
+                <div className="text-center">
+                    <Spinner animation="border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </Spinner>
+                </div>
+            )}
+
+            {error && (
+                <Alert variant="danger" className="text-center">
+                    {error}
+                </Alert>
+            )}
+
+            {!loading && !error && (
+                <div className="table-responsive">
+                    <Table striped bordered hover className="align-middle">
+                        <thead>
+                            <tr>
+                                <th>Room Type</th>
+                                <th>Price/Night</th>
+                                <th>Capacity</th>
+                                <th>Available Rooms</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rooms.map(room => (
+                                <tr key={room._id}>
+                                    <td>{room.type}</td>
+                                    <td>${room.price}</td>
+                                    <td>{room.capacity}</td>
+                                    <td>{room.quantity}</td>
+                                    <td>
+                                        <div className="d-flex align-items-center justify-content-center">
+                                            <Button
+                                                variant="outline-secondary"
+                                                size="sm"
+                                                onClick={() => decrementRoomQuantity(room._id)}
+                                                disabled={!(selectedRooms[room._id] > 0)}
+                                            >
+                                                -
+                                            </Button>
+                                            <span className="mx-2">{selectedRooms[room._id] || 0}</span>
+                                            <Button
+                                                variant="outline-secondary"
+                                                size="sm"
+                                                onClick={() => incrementRoomQuantity(room._id, room.quantity)}
+                                                disabled={(selectedRooms[room._id] || 0) >= room.quantity}
+                                            >
+                                                +
+                                            </Button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                </div>
+            )}
+
+            <div className="d-flex justify-content-end mt-4">
                 <Button
                     variant="primary"
                     onClick={handleContinueBooking}
                     disabled={Object.keys(selectedRooms).length === 0}
+                    size="lg"
                 >
-                    Continue
+                    Continue to Payment
                 </Button>
-            </Modal.Footer>
-        </Modal>
+            </div>
+        </div>
     );
 };
-
 
 export default Booking;
