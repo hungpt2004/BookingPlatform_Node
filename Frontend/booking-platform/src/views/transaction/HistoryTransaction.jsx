@@ -19,8 +19,8 @@ export const HistoryTransaction = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // Thêm state tổng số trang
   const [showFeedback, setShowFeedback] = useState(false);
-  const [selectedReservationId, setSelectedReservationId] = useState (null);
-  const[getHotel, setGetHotel] = useState(null);
+  const [selectedReservationId, setSelectedReservationId] = useState(null);
+  const [feedbackData, setFeedbackData] = useState({});
   const handleChangeStatus = (newStatus) => {
     setStatus(newStatus);
     setActiveStatus(newStatus);
@@ -182,9 +182,7 @@ export const HistoryTransaction = () => {
                                   onClick={() => {
                                     setShowFeedback(true)
                                     setSelectedReservationId(item._id);
-                                    setGetHotel(hotel._id);
                                     console.log("reservation", item._id);
-                                    console.log("hotel", hotel._id);
                                   }}
                                 >
                                   Feedback
@@ -196,6 +194,19 @@ export const HistoryTransaction = () => {
                                   variant="outline-danger"
                                 >
                                   Cancel
+                                </Button>
+                              )}
+                              {item.status === "COMPLETED" && (
+                                <Button
+                                  className="mb-1"
+                                  variant="outline-primary"
+                                  onClick={() => {
+                                    setShowFeedback(true)
+                                    setSelectedReservationId(item._id);
+                                    setFeedbackData({})
+                                  }}
+                                >
+                                  Feedback
                                 </Button>
                               )}
                               <Button className="" variant="outline-dark">
@@ -221,11 +232,9 @@ export const HistoryTransaction = () => {
         onClose={() => {
           setShowFeedback(false);
           setSelectedReservationId(null);
-          setGetHotel(null);
           // Add this prop
         }}
         reservationId={selectedReservationId}
-        getHotel={getHotel}
       />
     </>
   );

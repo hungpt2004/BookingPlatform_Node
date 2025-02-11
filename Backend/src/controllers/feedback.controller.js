@@ -28,7 +28,7 @@ exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
 exports.createFeedback = async (req, res) => {
   try {
     const { reservationId } = req.params;
-    const { content, rating, hotel } = req.body;
+    const { content, rating } = req.body;
     const userId = req.user.id;
 
     if (!reservationId) {
@@ -56,7 +56,7 @@ exports.createFeedback = async (req, res) => {
     const feedback = new Feedback({
       user: userId,                  // ObjectId of user
       reservation: reservationId,    // ObjectId of reservation
-      hotel,      // ObjectId of hotel from reservation
+      hotel: reservation.hotel,      // ObjectId of hotel from reservation
       content,              // String content
       rating: parseInt(rating),      // Number rating
       createdAt: new Date()         // Current timestamp
@@ -126,4 +126,32 @@ exports.deleteFeedback = asyncHandler(async (req, res) => {
     error: false,
     message: "Delete feedback success"
   })
+});
+
+//get feedback by user_id
+exports.getFeedbackByUserAndReservation = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const { reservationId } = req.params;
+
+  try {
+    const feedback = await Feedback.findOne({ user: userId, reservation: reservationId });
+
+    if (!feedback) {
+      return res.status(404).json({
+        error: true,
+        message: "No feedback found for this reservation",
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      feedback,
+      message: "Feedback retrieved successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      message: "Server Error",
+    });
+  }
 });
