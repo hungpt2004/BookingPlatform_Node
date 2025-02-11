@@ -57,13 +57,29 @@ const Booking = ({ setOpen, hotelId, checkInDate, checkOutDate, userId }) => {
     const handleContinueBooking = async () => {
         if (Object.keys(selectedRooms).length === 0) return;
 
+        // Prepare room details with quantities and prices
+        const roomDetails = rooms
+            .filter(room => selectedRooms[room._id] > 0) // Only include selected rooms
+            .map(room => ({
+                roomId: room._id,
+                roomType: room.type,
+                quantity: selectedRooms[room._id],
+                pricePerRoom: room.price,
+                totalPrice: room.price * selectedRooms[room._id],
+            }));
+
+
         const bookingData = {
             userId,
             hotelId,
             roomQuantities: selectedRooms,
             checkInDate,
             checkOutDate,
+            totalPrice: calculateTotalPrice(),
+            roomDetails,
         };
+        console.log("Booking Data", bookingData);
+
 
         navigate('/booking-step2', { state: bookingData });
     };

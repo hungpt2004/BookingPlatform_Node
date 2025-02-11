@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Container, Card, Button, ListGroup } from "react-bootstrap";
+import { Container, Card, Button, ListGroup, Badge } from "react-bootstrap";
 
 const BookingStepTwo = () => {
     const { state: bookingData } = useLocation();
@@ -18,32 +18,55 @@ const BookingStepTwo = () => {
         );
     }
 
-    const { userId, hotelId, roomQuantities, checkInDate, checkOutDate } = bookingData;
+    const {
+        userId,
+        hotelId,
+        checkInDate,
+        checkOutDate,
+        totalPrice,
+        roomDetails,
+    } = bookingData;
 
     return (
         <Container className="mt-5">
-            <Card>
-                <Card.Header as="h5">Booking Summary</Card.Header>
+            <Card className="shadow">
+                <Card.Header as="h5" className="bg-primary text-white">
+                    Booking Summary
+                </Card.Header>
                 <Card.Body>
                     <ListGroup variant="flush">
+                        {/* User and Hotel Details */}
                         <ListGroup.Item>
                             <strong>User ID:</strong> {userId}
                         </ListGroup.Item>
                         <ListGroup.Item>
                             <strong>Hotel ID:</strong> {hotelId}
                         </ListGroup.Item>
+
+                        {/* Room Details */}
                         <ListGroup.Item>
-                            <strong>Room Quantities:</strong>
-                            <ul className="list-unstyled mb-0">
+                            <strong>Selected Rooms:</strong>
+                            <ul className="list-unstyled mb-0 mt-2">
+                                {roomDetails.map((room, index) => (
+                                    <li key={index} className="mb-2">
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>{room.roomType}</strong>
+                                                <br />
+                                                <small className="text-muted">
+                                                    Quantity: {room.quantity} | Price per room: ${room.pricePerRoom}
+                                                </small>
+                                            </div>
+                                            <Badge bg="info" className="fs-6">
+                                                ${room.totalPrice}
+                                            </Badge>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </ListGroup.Item>
 
-                                {roomQuantities &&
-                                    Object.entries(roomQuantities).map(([roomId, quantity]) => (
-                                        <li key={roomId}>
-                                            <strong>Room ID:</strong> {roomId} - <strong>Quantity:</strong> {quantity}
-                                        </li>
-                                    ))}
-
-                            </ul>                        </ListGroup.Item>
+                        {/* Dates */}
                         <ListGroup.Item>
                             <strong>Check-in Date:</strong>{" "}
                             {new Date(checkInDate).toLocaleDateString()}
@@ -52,12 +75,25 @@ const BookingStepTwo = () => {
                             <strong>Check-out Date:</strong>{" "}
                             {new Date(checkOutDate).toLocaleDateString()}
                         </ListGroup.Item>
+
+                        {/* Total Price */}
+                        <ListGroup.Item className="d-flex justify-content-between align-items-center">
+                            <strong>Total Price:</strong>
+                            <Badge bg="success" className="fs-5 p-2">
+                                ${totalPrice.toLocaleString()}
+                            </Badge>
+                        </ListGroup.Item>
                     </ListGroup>
-                    <div className="mt-3 d-flex justify-content-between">
+
+                    {/* Action Buttons */}
+                    <div className="mt-4 d-flex justify-content-between">
                         <Button variant="secondary" onClick={() => navigate(-1)}>
                             Back
                         </Button>
-                        <Button variant="success" onClick={() => navigate("/payment", { state: bookingData })}>
+                        <Button
+                            variant="success"
+                            onClick={() => navigate("/payment", { state: bookingData })}
+                        >
                             Proceed to Payment
                         </Button>
                     </div>
