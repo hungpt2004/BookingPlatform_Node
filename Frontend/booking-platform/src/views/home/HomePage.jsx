@@ -4,7 +4,7 @@ import CustomSlide from '../../components/slide/CustomSlide';
 import { HashLoader } from 'react-spinners';
 import CustomInput from '../../components/input/CustomInput';
 import LottieComponent from '../../components/lottie/LottieComponent';
-import { Badge, Button, Card, Col, Container, Image, Form, InputGroup } from 'react-bootstrap';
+import { Badge, Button, Card, Image, Form, InputGroup, ButtonGroup } from 'react-bootstrap';
 import { motion } from 'framer-motion';  // Import motion
 import './HomePage.css';
 import { FiMinus, FiPlus } from 'react-icons/fi';
@@ -12,14 +12,12 @@ import ImageNotFound from '../../assets/svg/notfound.jpg'
 import { BASE_URL } from '../../utils/Constant';
 import axios from 'axios';
 import { CustomBanner } from '../../components/banner/CustomBanner';
-import { Footer, FooterCopyright, FooterIcon, FooterLink, FooterLinkGroup, FooterTitle } from "flowbite-react";
-import { BsDribbble, BsFacebook, BsGithub, BsInstagram, BsTwitter } from "react-icons/bs";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { IoIosArrowForward } from "react-icons/io";
 import 'swiper/css';
 import 'swiper/css/pagination';
 import MapComponent from '../../components/map/MapComponent';
-
+import { IoIosArrowDropright, IoIosArrowDropleft } from "react-icons/io";
 
 
 export const HomePage = () => {
@@ -72,8 +70,18 @@ export const HomePage = () => {
     return isValid;
   };
 
-  const handleIncrement = () => setNumberOfPeople((prev) => prev + 1);
-  const handleDecrement = () => setNumberOfPeople((prev) => (prev > 1 ? prev - 1 : 1));
+
+
+  const CustomDateValidator = ({ label, error, ...props }) => (
+    <div className="mb-0">
+      {label && <label className="form-label">{label}</label>}
+      <input
+        {...props}
+        className={`form-control ${error ? 'is-invalid' : ''}`}
+      />
+      {error && <div className="error-message">{error}</div>}
+    </div>
+  );
 
   const StarRating = ({ value, onChange }) => {
     const [hoverValue, setHoverValue] = useState(null);
@@ -116,32 +124,29 @@ export const HomePage = () => {
     );
   };
 
-  const CustomDateValidator = ({ label, error, ...props }) => (
-    <div className="mb-3">
-      {label && <label className="form-label">{label}</label>}
-      <input
-        {...props}
-        className={`form-control ${error ? 'is-invalid' : ''}`}
-      />
-      {error && <div className="error-message">{error}</div>}
-    </div>
-  );
 
+  const fetchHotels = async (newPage = 1) => {
+    if (!validateDates()) return;
   const fetchHotels = async (newPage = 1) => {
     if (!validateDates()) return;
     setLoading(true);
     setShowHotels(false);
 
     try {
-      const response = await fetch(
-        `${BASE_URL}/customer/search?hotelName=${hotelName}&address=${address}&checkinDate=${checkinDate}&checkoutDate=${checkoutDate}&hotelRating=${minRating}-5&numberOfPeople=${numberOfPeople}&page=${newPage}`
-      );
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      setHotels(data.hotels);
-      setTotalPages(data.totalPages);
+      const response = await axios.get(`${BASE_URL}/customer/search`, {
+        params: {
+          hotelName,
+          address,
+          checkinDate,
+          checkoutDate,
+          hotelRating: `${minRating}-5`,
+          numberOfPeople,
+          page: newPage
+        }
+      });
+
+      setHotels(response.data.hotels);
+      setTotalPages(response.data.totalPages);
       setPage(newPage);
       setShowHotels(true);
     } catch (error) {
@@ -175,6 +180,7 @@ export const HomePage = () => {
   return (
     <>
       <CustomNavbar />
+      <CustomNavbar />
       <CustomBanner />
       <CustomSlide />
       <LottieComponent />
@@ -190,6 +196,7 @@ export const HomePage = () => {
         <div className="col-md-2">
           <CustomInput
             type="text"
+            label="HOTEL NAME"
             placeHolder="Name"
             value={hotelName}
             onChange={(e) => setHotelName(e.target.value)}
@@ -197,6 +204,7 @@ export const HomePage = () => {
         </div>
         <div className="col-md-2">
           <CustomInput
+            label="ADDRESS"
             type="text"
             placeHolder="Address"
             value={address}
@@ -277,40 +285,50 @@ export const HomePage = () => {
               </div>
             ) : (
               showHotels && (
-                <motion.div className="row">
-                  {hotels.length > 0 ? (
-                    hotels.map((hotelData) => {
-                      const hotel = hotelData.hotel || hotelData;
-                      return (
-                        <motion.div
-                          key={hotel._id.toString()}
-                          className="col-md-6 mb-4"
-                          initial={{ opacity: 0, y: 50 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 1 }}
-                          viewport={{ once: true, amount: 0.3 }}
-                        >
-                          <Card className='card-search-hotel' style={{ width: '100%' }}>
-                            <Card.Img variant="top" src={hotel.imageUrl || 'default_image_url'} />
-                            <Card.Body>
-                              <Card.Title>{hotel.hotelName}</Card.Title>
-                              <Card.Text>{hotel.description}</Card.Text>
-                              <Card.Text>Rating: {hotel.rating}</Card.Text>
-                              <Card.Text>Address: {hotel.address}</Card.Text>
-                            </Card.Body>
-                          </Card>
-                        </motion.div>
-                      );
-                    })
-                  ) : (
-                    <div className='alert alert-danger'>
-                      <p className='text-center'>Not found any hotel with that information</p>
-                    </div>
+                <motion.div
+                  className="row"
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                >
+                  {hotels.length > 0 ? (hotels.map((hotelData) => {
+                    const hotel = hotelData.hotel || hotelData;
+                    return (
+                      <motion.div
+                        key={hotel._id.toString()}
+                        className="col-md-3 mb-4"
+                        initial={{ opacity: 0, y: 50 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        viewport={{ once: true, amount: 0.8 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.8 }}
+                      >
+                        <Card className='card-search-hotel' style={{ width: '100%' }}>
+                          {/* <Card.Img variant="top" src={hotel.imageUrl || 'default_image_url'} /> */}
+                          <Card.Img variant="top" className='img-img-fluid' src={hotel.images} />
+                          <Card.Body>
+                            <Card.Title><h2 className='fw-bold text-center'>{hotel.hotelName}</h2></Card.Title>
+                            <Card.Text className='text-muted'><Badge style={{ backgroundColor: "#6499E9" }}>Description </Badge> {hotel.description}</Card.Text>
+                            <Card.Text><Badge style={{ backgroundColor: "#6499E9" }}>Rating</Badge>⭐ Rating: {hotel.rating}</Card.Text>
+                            <Card.Text><Badge style={{ backgroundColor: "#6499E9" }}>Address</Badge>  Address: {hotel.address}</Card.Text>
+                          </Card.Body>
+                          <div className="d-flex justify-content-start mx-3 mb-3">
+                            <ButtonGroup>
+                              <Button variant="outline-dark" className="mx-1">Booking Now</Button>
+                              <Button variant="outline-dark">Add Favorite</Button>
+                            </ButtonGroup>
+                          </div>
+                        </Card>
+                      </motion.div>
+                    );
+                  })) : (
+                    <div className='alert alert-danger'><p className='text-center'>Not found any hotel with that information</p></div>
                   )}
                 </motion.div>
               )
             )}
-
             {showHotels && totalPages > 1 && (
               <div className="d-flex justify-content-center mt-4">
                 <Button
@@ -318,9 +336,9 @@ export const HomePage = () => {
                   onClick={() => handlePageChange(page - 1)}
                   disabled={page === 1}
                 >
-                  Previous
+                  <IoIosArrowDropleft size={35} />
                 </Button>
-                <span className="mx-3 fs-5 fw-bold">
+                <span className="mx-3 fs-6 fw-bold align-content-center">
                   Page {page} of {totalPages}
                 </span>
                 <Button
@@ -328,7 +346,7 @@ export const HomePage = () => {
                   onClick={() => handlePageChange(page + 1)}
                   disabled={page === totalPages}
                 >
-                  Next
+                  <IoIosArrowDropright size={35} />
                 </Button>
               </div>
             )}
@@ -548,44 +566,4 @@ export const HomePage = () => {
     </>
   );
 };
-
-const StarRating = ({ value, onChange }) => {
-  const [hoverValue, setHoverValue] = useState(null);
-
-  const handleClick = (index) => {
-    onChange(index + 1);
-  };
-
-  const handleMouseEnter = (index) => {
-    setHoverValue(index + 1);
-  };
-
-  const handleMouseLeave = () => {
-    setHoverValue(null);
-  };
-
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-      <Badge className='fw-4 fs-5' style={{ backgroundColor: '#6499E9' }}>Filter By Star</Badge>
-      {[...Array(5)].map((_, index) => (
-        <>
-          <span
-            key={index}
-            style={{
-              fontSize: '30px',
-              color: (hoverValue || value) > index ? '#FFD700' : '#ccc',
-              transition: 'color 0.3s ease, transform 0.2s ease',
-              margin: '0 5px',
-              transform: (hoverValue || value) > index ? 'scale(1.2)' : 'scale(1)',
-            }}
-            onClick={() => handleClick(index)}
-            onMouseEnter={() => handleMouseEnter(index)}
-            onMouseLeave={handleMouseLeave}
-          >
-            ★
-          </span>
-        </>
-      ))}
-    </div>
-  );
-};
+}

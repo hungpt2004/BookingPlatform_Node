@@ -1,9 +1,9 @@
 import { Check, X } from "lucide-react";
+import ProgressBar from 'react-bootstrap/ProgressBar';
+import Badge from 'react-bootstrap/Badge';
 
-// eslint-disable-next-line react/prop-types
 const PasswordCriteria = ({ password }) => {
   const criteria = [
-    // eslint-disable-next-line react/prop-types
     { label: "At least 6 characters", met: password.length >= 6 },
     { label: "Contains uppercase letter", met: /[A-Z]/.test(password) },
     { label: "Contains lowercase letter", met: /[a-z]/.test(password) },
@@ -13,14 +13,14 @@ const PasswordCriteria = ({ password }) => {
 
   return (
     <div className="mt-2 space-y-1">
-      {criteria.map((item) => (
-        <div key={item.label} className="flex items-center text-xs">
+      {criteria.map((item, index) => (
+        <div key={index} className="d-flex align-items-center text-xs">
           {item.met ? (
-            <Check className="size-4 text-blue-500 mr-2" />
+            <Check className="size-4 text-success mr-2" />
           ) : (
-            <X className="size-4 text-gray-500 mr-2" />
+            <X className="size-4 text-muted mr-2" />
           )}
-          <span className={item.met ? "text-blue-500" : "text-gray-400"}>
+          <span className={item.met ? "text-success" : "text-muted"}>
             {item.label}
           </span>
         </div>
@@ -29,7 +29,6 @@ const PasswordCriteria = ({ password }) => {
   );
 };
 
-// eslint-disable-next-line react/prop-types
 const PasswordStrengthMeter = ({ password }) => {
   const getStrength = (pass) => {
     let strength = 0;
@@ -42,14 +41,13 @@ const PasswordStrengthMeter = ({ password }) => {
   const strength = getStrength(password);
 
   const getColor = (strength) => {
-    if (strength === 0) return "bg-red-500";
-    if (strength === 1) return "bg-red-400";
-    if (strength === 2) return "bg-yellow-500";
-    if (strength === 3) return "bg-yellow-400";
-    return "bg-blue-500"; // Changed from green-500
+    if (strength === 0) return "danger";
+    if (strength === 1) return "warning";
+    if (strength === 2) return "warning";
+    if (strength === 3) return "info";
+    return "success"; // Changed from green-500
   };
 
-  // Rest of the component remains the same
   const getStrengthText = (strength) => {
     if (strength === 0) return "Very Weak";
     if (strength === 1) return "Weak";
@@ -60,23 +58,23 @@ const PasswordStrengthMeter = ({ password }) => {
 
   return (
     <div className="mt-2">
-      <div className="flex justify-between items-center mb-1">
-        <span className="text-xs text-gray-400">Password strength</span>
-        <span className="text-xs text-gray-400">
+      <div className="d-flex justify-content-between align-items-center mb-1">
+        <span className="text-xs text-muted">Password strength</span>
+        <Badge pill variant="secondary" className="text-xs">
           {getStrengthText(strength)}
-        </span>
+        </Badge>
       </div>
 
-      <div className="flex space-x-1">
+      <ProgressBar className="flex space-x-1">
         {[...Array(4)].map((_, index) => (
-          <div
+          <ProgressBar
             key={index}
-            className={`h-1 w-1/4 rounded-full transition-colors duration-300 
-                ${index < strength ? getColor(strength) : "bg-gray-600"}
-              `}
+            now={index < strength ? 25 : 0}
+            variant={getColor(strength)}
+            className="w-25 rounded-0 transition-colors duration-300"
           />
         ))}
-      </div>
+      </ProgressBar>
       <PasswordCriteria password={password} />
     </div>
   );

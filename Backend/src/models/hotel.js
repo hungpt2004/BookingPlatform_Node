@@ -46,6 +46,10 @@ const hotelSchema = new Schema(
         required: true
       },
     ],
+    
+    //Thêm mảng lưu trữ hình ảnh
+    
+
   },
   { versionKey: false }
 );

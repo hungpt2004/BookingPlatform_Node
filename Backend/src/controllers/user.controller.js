@@ -1,5 +1,6 @@
 const asyncHandler = require('../middlewares/asyncHandler')
 const User = require('../models/user')
+const { AUTH } = require('../utils/constantMessage')
 
 exports.getAllUser = asyncHandler(async (req, res) => {
 
@@ -8,15 +9,34 @@ exports.getAllUser = asyncHandler(async (req, res) => {
    if(users.length === 0) {
       return res.status(404).json({
          error: true,
-         message: "No users found"
+         message: AUTH.USER_NOT_FOUND
       });
    }
 
    return res.status(200).json({
       error: false,
       users,
-      message: "Get all user success"
+      message: AUTH.GET_SUCCESS
    })
 
 })
 
+exports.getCurrentUser = asyncHandler(async(req, res) => {
+
+   const user = req.user;
+
+
+   if(!user){
+      return res.status(403).json({
+         error: true, 
+         message: AUTH.INVALID_TOKEN
+      })
+   }
+
+   return res.status(200).json({
+      error: false,
+      user,
+      messsage: AUTH.GET_SUCCESS
+   })
+
+})

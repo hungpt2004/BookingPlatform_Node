@@ -4,7 +4,7 @@ export const statusColors = {
    "BOOKED": "primary",      // Màu xanh lam cho trạng thái BOOKED
    "COMPLETED": "info",      // Màu xanh da trời cho trạng thái COMPLETED
    "PENDING": "secondary",   // Màu xám cho trạng thái PENDING
-   "CANCELED": "danger",     // Màu đỏ cho trạng thái CANCELED
+   "CANCELLED": "danger",     // Màu đỏ cho trạng thái CANCELED
    "NOT PAID": "dark",       // Màu đen cho trạng thái NOT PAID
    "ALL": "light"            // Màu sáng cho trạng thái ALL
 };
@@ -15,7 +15,7 @@ export const statusText = {
    "BOOKED": "BOOKED",
    "COMPLETED": "COMPLETED",
    "PENDING": "PENDING",
-   "CANCELED": "CANCELED",
+   "CANCELLED": "CANCELLED",
    "NOT PAID": "NOT PAID",
    "ALL": "ALL"
 };
@@ -27,6 +27,6 @@ export const dataStatus = [
    "BOOKED",
    "COMPLETED",
    "PENDING",
-   "CANCELED",
+   "CANCELLED",
    "NOT PAID"
 ];

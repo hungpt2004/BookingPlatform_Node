@@ -1,6 +1,7 @@
 const Hotel = require("../models/hotel");
 const Room = require("../models/room");
 const Reservation = require("../models/reservation");
+const { HOTEL } = require("../utils/constantMessage");
 
 exports.searchAndFilterHotels = async (req, res) => {
   try {
@@ -86,12 +87,16 @@ exports.searchAndFilterHotels = async (req, res) => {
     const paginatedHotels = finalHotels.slice(startIndex, endIndex);
 
     return res.status(200).json({
+      error: false,
       hotels: paginatedHotels,
       totalPages: Math.ceil(finalHotels.length / limit),
       currentPage: Number(page),
+      message: HOTEL.SUCCESS
     });
   } catch (error) {
-    console.error("Error fetching hotels:", error);
-    res.status(500).json({ message: "Error fetching hotels", error: error.message });
+    res.status(500).json({
+      error: true,
+      message: error
+    });
   }
 };

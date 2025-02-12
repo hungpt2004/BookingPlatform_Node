@@ -8,12 +8,13 @@ export const CustomToast = () => {
       autoClose={2000}
       hideProgressBar={false}
       newestOnTop={true}
-      closeOnClick
+      closeOnClick={false}
+      closeButton={false}
       rtl={false}
       pauseOnFocusLoss
       pauseOnHover
       transition={Flip}
-      style={{ fontSize: "15px", borderBottomColor: "red" }} // Custom style
+      style={{ fontSize: "15px", borderBottomColor: "red" }}
     />
   );
 };

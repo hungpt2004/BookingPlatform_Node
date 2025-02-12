@@ -46,6 +46,8 @@ const UserSchema = new Schema(
       },
     ], // Mảng các khách sạn yêu thích (tham chiếu đến Hotel)
 
+    //MẢNG BUSSINESS DOCUMENT
+
     isVerified: { type: Boolean, default: false },
     resetPasswordToken: String,
     resetPasswordExpiresAt: Date,
