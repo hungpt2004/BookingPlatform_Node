@@ -1,0 +1,16 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Great+Vibes&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Liter&display=swap');
+
+* {
+   font-family: 'Liter', sans-serif;
+}
+
+h1:hover {
+   color: #6499E9;
+   transition: ease-in 0.3s;
+   transform: scale(1.1);
+}
+
+h1 {
+   transition: ease-in 0.3s;
+}

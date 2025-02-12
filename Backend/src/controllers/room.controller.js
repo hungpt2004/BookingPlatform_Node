@@ -1,6 +1,7 @@
 const Room = require("../models/room.js");
 const Hotel = require("../models/hotel.js");
 const RoomFacility = require("../models/roomFacility");
+const Reservation = require("../models/reservation.js");
 const asyncHandler = require("../middlewares/asyncHandler.js");
 
 exports.createRoom = asyncHandler(async (req, res, next) => {
@@ -44,7 +45,9 @@ exports.getAllRoom = asyncHandler(async (req, res, next) => {
 
 exports.getRoomByHotelId = asyncHandler(async (req, res, next) => {
     const { hotelId } = req.params;
+    const { checkInDate, checkOutDate, numberOfPeople } = req.query;
 
+    // Validate required parameters
     if (!hotelId) {
         return res.status(400).json({
             error: true,
@@ -52,24 +55,80 @@ exports.getRoomByHotelId = asyncHandler(async (req, res, next) => {
         });
     }
 
-    // Find room related to hotelId
-    const rooms = await Room.find({ hotel: hotelId }).populate('hotel');
-    ;
-
-    if (rooms.length === 0) {
-        return res.status(404).json({
+    if (!checkInDate || !checkOutDate || !numberOfPeople) {
+        return res.status(400).json({
             error: true,
-            message: "No rooms found for this hotel",
+            message: "Missing required query parameters: checkInDate, checkOutDate, or numberOfPeople",
         });
     }
 
-    return res.status(200).json({
-        error: false,
-        message: "Rooms fetched successfully",
-        rooms,
-    });
-});
+    // Validate date format (optional but recommended)
+    const isValidDate = (date) => !isNaN(new Date(date).getTime());
+    if (!isValidDate(checkInDate) || !isValidDate(checkOutDate)) {
+        return res.status(400).json({
+            error: true,
+            message: "Invalid date format. Please use ISO format (YYYY-MM-DD)",
+        });
+    }
 
+    // Validate numberOfPeople is a positive number
+    if (isNaN(numberOfPeople) || numberOfPeople <= 0) {
+        return res.status(400).json({
+            error: true,
+            message: "Number of people must be a positive number",
+        });
+    }
+
+    try {
+        // Find rooms related to hotelId and filter based on availability
+        const rooms = await Room.find({
+            hotel: hotelId,
+            capacity: { $gte: numberOfPeople }, // Ensure room can accommodate the number of people
+        }).populate('hotel');
+
+        if (rooms.length === 0) {
+            return res.status(404).json({
+                error: true,
+                message: "No rooms found for this hotel that meet the criteria",
+            });
+        }
+
+        // Additional filtering for availability for booking
+        const availableRooms = await Promise.all(rooms.map(async (room) => {
+            const bookings = await Reservation.find({
+                room: room._id,
+                $or: [
+                    { checkInDate: { $lt: new Date(checkOutDate) } },
+                    { checkOutDate: { $gt: new Date(checkInDate) } },
+                ],
+            });
+
+            // Calculate available quantity
+            const bookedQuantity = bookings.reduce((sum, booking) => sum + booking.quantity, 0);
+            const availableQuantity = room.quantity - bookedQuantity;
+
+            return {
+                ...room.toObject(),
+                availableQuantity,
+            };
+        }));
+
+        // Filter out rooms with no availability
+        const filteredRooms = availableRooms.filter(room => room.availableQuantity > 0);
+
+        return res.status(200).json({
+            error: false,
+            message: "Rooms fetched successfully",
+            rooms: filteredRooms,
+        });
+    } catch (error) {
+        console.error("Error fetching rooms:", error);
+        return res.status(500).json({
+            error: true,
+            message: "Internal server error",
+        });
+    }
+});
 // Create a room facility
 exports.createRoomFacility = asyncHandler(async (req, res) => {
     const { roomId } = req.params; // Get the room ID from the request

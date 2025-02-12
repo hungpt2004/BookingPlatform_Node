@@ -4,10 +4,11 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Card } from 'react-bootstrap';
 import { Badge } from 'react-bootstrap';
+import { generateShortCutName } from '../../utils/GenerateShortName';
 
-function CustomNavbar() {
+function CustomNavbar({user}) {
   return (
-    <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
+    <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary sticky-top">
       <Container className='d-flex align-items-center justify-content-center'>
         <Navbar.Brand className='fs-2' style={{ color: 'dodgerblue' }} href="#home">Travelofy</Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
@@ -17,12 +18,12 @@ function CustomNavbar() {
             <Nav.Link eventKey={2} href="#memes">Achievements</Nav.Link>
           </Nav>
           <Nav>
-            <Nav.Link href="#">Home</Nav.Link>
+            <Nav.Link href="/home">Home</Nav.Link>
             <Nav.Link href="#">About</Nav.Link>
             <NavDropdown title="Service" id="collapsible-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Favorite List</NavDropdown.Item>
               <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.2">Transaction History</NavDropdown.Item>
+              <NavDropdown.Item href="/transaction">Transaction History</NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item href="#action/3.3">Information</NavDropdown.Item>
             </NavDropdown>
@@ -37,9 +38,11 @@ function CustomNavbar() {
                   textAlign: 'center',
                 }}
               >
+                {/* {generateShortCutName(user.name)} */}
                 HP
               </Card>
-              <NavDropdown title="Pham Trong Hung" id="collapsible-nav-dropdown">
+              {/* <NavDropdown title={user.name} id="collapsible-nav-dropdown"> */}
+               <NavDropdown title='Hung' id="collapsible-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Setting</NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item href="#action/3.1">Owner Account</NavDropdown.Item>

@@ -1,14 +1,13 @@
-const express = require('express');
+const express = require("express");
 const UserRouter = express.Router();
-const UserController = require('../controllers/user.controller')
-const SearchController = require('../controllers/searchfilter')
-const ReservationController = require('../controllers/reservation.controller')
+const UserController = require("../controllers/user.controller");
+const SearchController = require("../controllers/searchfilter");
+const {protect} = require("../controllers/authenticate.controller");
+const authController = require("./../controllers/authenticate.controller");
+const router = express.Router();
 
 UserRouter.get("/get-all-user", UserController.getAllUser);
-UserRouter.post("/create-user", UserController.createUser);
 UserRouter.get("/search", SearchController.searchAndFilterHotels);
-UserRouter.post("/add-favorite-hotel", UserController.addFavoriteHotel);
-UserRouter.get("/get-favorite-hotels/:userId", UserController.getFavoriteHotels);
-UserRouter.delete("/remove-favorite-hotel", UserController.removeFavoriteHotel);
-UserRouter.post("/booking", ReservationController.createBooking);
+UserRouter.get("/current-user", protect, UserController.getCurrentUser)
+
 module.exports = UserRouter;

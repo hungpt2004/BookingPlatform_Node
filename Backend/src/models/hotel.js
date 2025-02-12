@@ -23,7 +23,7 @@ const hotelSchema = new Schema(
     services: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Service",
+        ref: "HotelService",
       },
     ],
     facility: [
@@ -46,6 +46,10 @@ const hotelSchema = new Schema(
         required: true
       },
     ],
+    
+    //Thêm mảng lưu trữ hình ảnh
+    
+
   },
   { versionKey: false }
 );

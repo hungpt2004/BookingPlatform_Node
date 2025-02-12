@@ -3,6 +3,11 @@ const connectDB = require('./src/database_config/mongo_config')
 const cors = require('cors')
 const UserRouter = require('./src/routes/user.route');
 const HotelRouter = require('./src/routes/hotel.route');
+const ReservationRouter = require('./src/routes/reservation.route');
+const PaymentRouter = require('./src/routes/payment.route');
+const authenticateRoute = require('./src/routes/authenticate.route');
+const BookingRouter = require('./src/routes/booking.route');
+const FavoriteRouter = require('./src/routes/favorite.route');
 const RoomRouter = require('./src/routes/room.route');
 require("dotenv").config();
 
@@ -18,11 +23,25 @@ app.use(
 );
 
 
+app.use("/customer", UserRouter)
+
 //Middleware Routing
-app.use("/user", UserRouter);
+app.use("/user", authenticateRoute);
 
 //Hotel
 app.use("/hotel", HotelRouter);
+
+//Reservation
+app.use("/reservation", ReservationRouter);
+
+//Payment
+app.use("/payment", PaymentRouter)
+
+//Booking
+app.use("/booking", BookingRouter);
+
+//Favorite
+app.use("/favorite", FavoriteRouter);
 
 //Room
 app.use("/room", RoomRouter);
