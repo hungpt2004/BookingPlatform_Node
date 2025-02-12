@@ -1,5 +1,7 @@
 const Hotel = require("../models/hotel");
-const Room = require("../models/room")
+const Room = require("../models/room");
+const Reservation = require("../models/reservation");
+const { HOTEL } = require("../utils/constantMessage");
 
 exports.searchAndFilterHotels = async (req, res) => {
   try {
@@ -8,9 +10,12 @@ exports.searchAndFilterHotels = async (req, res) => {
       address,
       checkinDate,
       checkoutDate,
-      priceRange,
+      hotelRating,
       numberOfPeople,
+      page = 1, 
+      limit = 8, 
     } = req.query;
+
     let query = {};
 
     if (hotelName) {
@@ -21,14 +26,18 @@ exports.searchAndFilterHotels = async (req, res) => {
       query.address = { $regex: address, $options: "i" };
     }
 
-    if (priceRange) {
-      const [minRating, maxRating] = priceRange.split("-").map(Number);
+    if (hotelRating) {
+      const [minRating, maxRating] = hotelRating.split("-").map(Number);
+      if (isNaN(minRating) || isNaN(maxRating)) {
+        return res.status(400).json({ error: true, message: "Invalid price range" });
+      }
       query.rating = { $gte: minRating, $lte: maxRating };
     }
 
-    const hotels = await Hotel.find(query);
-    const filteredHotelsByCapacity = await Promise.all(
-      hotels.map(async (hotel) => {
+    const allHotels = await Hotel.find(query);
+
+    const filteredByCapacity = await Promise.all(
+      allHotels.map(async (hotel) => {
         const rooms = await Room.find({ hotel: hotel._id });
         const availableRooms = rooms.filter(
           (room) => room.capacity >= Number(numberOfPeople)
@@ -37,11 +46,25 @@ exports.searchAndFilterHotels = async (req, res) => {
       })
     );
 
-    const hotelsWithCapacity = filteredHotelsByCapacity.filter(
+    const hotelsWithCapacity = filteredByCapacity.filter(
       (hotel) => hotel.availableRooms.length > 0
     );
-
+    let finalHotels = hotelsWithCapacity;
     if (checkinDate && checkoutDate) {
+      if (checkinDate > checkoutDate) {
+        return res.status(400).json({
+          error: true,
+          message: "CheckInDate cannot be before CheckOutDate",
+        });
+      }
+
+      if (new Date(checkoutDate) < new Date()) {
+        return res.status(400).json({
+          error: true,
+          message: "CheckOutDate cannot be in the past",
+        });
+      }
+
       const reservedRooms = await Reservation.find({
         checkInDate: { $lt: new Date(checkoutDate) },
         checkOutDate: { $gt: new Date(checkinDate) },
@@ -49,27 +72,31 @@ exports.searchAndFilterHotels = async (req, res) => {
 
       const availableHotels = hotelsWithCapacity.map((hotel) => {
         const availableRooms = hotel.availableRooms.filter(
-          (room) => !reservedRooms.includes(room._id.toString())
+          (room) => !reservedRooms.some(reservedRoom => reservedRoom.equals(room._id))
         );
         return { hotel: hotel.hotel, availableRooms };
       });
 
-      const finalFilteredHotels = availableHotels.filter(
+      finalHotels = availableHotels.filter(
         (hotel) => hotel.availableRooms.length > 0
       );
-      return res.status(200).json(finalFilteredHotels);
     }
 
-    return res.json({
-        error: false,
-        hotelsWithCapacity,
-        message:'Search successfully'
-    })
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    const paginatedHotels = finalHotels.slice(startIndex, endIndex);
 
+    return res.status(200).json({
+      error: false,
+      hotels: paginatedHotels,
+      totalPages: Math.ceil(finalHotels.length / limit),
+      currentPage: Number(page),
+      message: HOTEL.SUCCESS
+    });
   } catch (error) {
     res.status(500).json({
       error: true,
-      message: "Error when fetch data",
+      message: error
     });
   }
 };

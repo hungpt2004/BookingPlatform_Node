@@ -2,6 +2,8 @@ const User = require("../models/user");
 const catchAsync = require("../utils/catchAsync");
 const cloudinary = require("../utils/cloudinary");
 const fs = require("fs");
+const { AUTH } = require('../utils/constantMessage');
+const asyncHandler = require('../middlewares/asyncHandler');
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find();
@@ -133,3 +135,22 @@ exports.deleteUser = (req, res) => {
     message: "This route is not yet defined!",
   });
 };
+exports.getCurrentUser = asyncHandler(async (req, res) => {
+
+  const user = req.user;
+
+
+  if (!user) {
+    return res.status(403).json({
+      error: true,
+      message: AUTH.INVALID_TOKEN
+    })
+  }
+
+  return res.status(200).json({
+    error: false,
+    user,
+    messsage: AUTH.GET_SUCCESS
+  })
+
+})

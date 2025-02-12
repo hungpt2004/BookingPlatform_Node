@@ -7,26 +7,21 @@ exports.getALlReservation = asyncHandler(async (req, res) => {
   let page = parseInt(req.query.page) || 1;
 
   //Get user
-  //const user = req.user.user;
-
-  //Get all reservation sort with total price increase
-  //   const reservations = await Reservation.find({ user: user }).sort({
-  //     totalPrice: -1,
-  //   });
+  const user = req.user;
 
   const totalPageReservations = await Reservation.countDocuments();
   const totalPage = Math.ceil(totalPageReservations / perPage);
-  const reservations = await Reservation.find()
+  const reservations = await Reservation.find({ user: user.id })
     .sort({ totalPrice: -1 })
     .skip((page - 1) * perPage)
     .limit(perPage);
 
-  //   if (!user) {
-  //     return res.status(500).json({
-  //       error: true,
-  //       message: "Authenticated user failed",
-  //     });
-  //   }
+  if (!user) {
+    return res.status(500).json({
+      error: true,
+      message: "Authenticated user failed",
+    });
+  }
 
   if (reservations.length === 0) {
     return res.status(404).json({
@@ -48,12 +43,20 @@ exports.getALlReservation = asyncHandler(async (req, res) => {
 
 exports.getRoomByReservationId = asyncHandler(async (req, res) => {
   //user
+  const user = req.user;
 
   const { reservationId } = req.params;
 
-  const reservation = await Reservation.findOne({
-    _id: reservationId,
-  }).populate("rooms");
+  if (!user) {
+    return res.status(500).json({
+      error: true,
+      message: "Authenticated user failed",
+    });
+  }
+
+  const reservation = await Reservation.findOne(
+    {_id: reservationId, user: user.id},
+  ).populate("rooms");
 
   if (reservation.rooms.length === 0) {
     return res.status(404).json({
@@ -71,12 +74,21 @@ exports.getRoomByReservationId = asyncHandler(async (req, res) => {
 
 exports.getHotelByReservationId = asyncHandler(async (req, res) => {
   //user
-  const { reservationId } = req.params;
-  const reservation = await Reservation.findOne({
-    _id: reservationId,
-  }).populate("hotel");
+  const user = req.user;
 
-  // console.log(reservation);
+  const { reservationId } = req.params;
+
+  if (!user) {
+    return res.status(500).json({
+      error: true,
+      message: "Authenticated user failed",
+    });
+  }
+
+  const reservation = await Reservation.findOne(
+    {_id: reservationId, user: user.id}
+  ).populate("hotel");
+
 
   if (!reservation) {
     return res.status(404).json({
@@ -95,7 +107,10 @@ exports.getHotelByReservationId = asyncHandler(async (req, res) => {
 exports.getReservationByStatus = asyncHandler(async (req, res) => {
   const { status } = req.query;
   const perPage = 6;
-  const page = parseInt(req.query.page) || 1; // Fix: Get 'page' from query params
+  const page = parseInt(req.query.page) || 1;
+  const currentUser = req.user;
+
+  console.log(`user ${currentUser.id}`)
 
   console.log(`Page ${page}`);
 
@@ -107,7 +122,16 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   }
 
   let query = status === "ALL" ? {} : { status }; // If "ALL", return all reservations
-  let totalPageReservations = await Reservation.countDocuments(query); // Fix: Await countDocuments
+  let totalPageReservations = await Reservation.countDocuments({ ...query, user: currentUser.id }); 
+
+  //Gộp filter và projection
+  //Filter là điều kiện lọc dữ liệu khi truy vấn MongoDB
+  //Projection là DS các trường sẽ trả về VD: {age: 1, name: 0} 
+  //1 là trường trả về
+  //0 là trường ẩn đi 
+
+  //Câu lệnh filter cùng trong {}
+  //Nếu là điều kiện 2 sẽ bị hiểu là Projection
 
   if (totalPageReservations === 0) {
     return res.status(404).json({
@@ -116,12 +140,14 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
     });
   }
 
-  let totalPages = Math.ceil(totalPageReservations / perPage); // Fix: Calculate total pages correctly
+  //Lấy số nguyên các trang
+  let totalPages = Math.ceil(totalPageReservations / perPage); 
 
-  const reservations = await Reservation.find(query)
-    .populate('hotel')
-    .sort({ totalPrice: -1 }) // Sort by total price
-    .skip((page - 1) * perPage) // Fix: Apply pagination correctly
+  const reservations = await Reservation.find(
+    { ...query, user: currentUser.id }
+  )
+    .sort({ totalPrice: -1 }) 
+    .skip((page - 1) * perPage) 
     .limit(perPage);
 
   return res.status(200).json({
@@ -134,7 +160,6 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
     message: `Get reservations by '${status}' successfully`,
   });
 });
-
 
 //automatic update status of reservations
 const autoUpdateReservationStatus = asyncHandler(async () => {
@@ -156,7 +181,6 @@ const autoUpdateReservationStatus = asyncHandler(async () => {
 });
 
 //setinterval auto run after each minutes
-// cron.schedule("* * * * *", () => {
-//   console.log("THIS FUNCTION AUTO UPDATE EVERY MINUTES");
-//   autoUpdateReservationStatus();
-// });
+cron.schedule("* * * * *", () => {
+  autoUpdateReservationStatus();
+});

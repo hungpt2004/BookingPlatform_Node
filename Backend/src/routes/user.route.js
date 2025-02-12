@@ -29,5 +29,6 @@ UserRouter.put(
   "/update-avatar/:id",
    authenticateToken,
   avatarController.updateAvatar
-);
+);UserRouter.get("/current-user", protect, UserController.getCurrentUser)
+
 module.exports = UserRouter;

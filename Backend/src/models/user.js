@@ -32,6 +32,7 @@ const UserSchema = new Schema(
         ref: "Hotel",
       },
     ], // Mảng các khách sạn yêu thích (tham chiếu đến Hotel)
+ 
 
     image: {
       public_ID: {
@@ -43,6 +44,7 @@ const UserSchema = new Schema(
         required: true,
       },
     },//avatar
+    //MẢNG BUSSINESS DOCUMENT
     isVerified: { type: Boolean, default: false },
     resetPasswordToken: String,
     resetPasswordExpiresAt: Date,

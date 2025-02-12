@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { BASE_URL } from "../../utils/Constant";
-import axios from "axios";
 import { HashLoader } from "react-spinners";
 import CustomNavbar from "../../components/navbar/CustomNavbar";
 import { Pagination, Row } from "react-bootstrap";
@@ -9,6 +7,8 @@ import { Badge, Button, Card } from "react-bootstrap";
 import { formatDate } from "../../utils/FormatDatePrint";
 import { dataStatus, statusColors, statusText } from "./DataStatus";
 import FeedbackModal from "../../components/feedback/Feedback";
+import axiosInstance from "../../utils/AxiosInstance";
+
 export const HistoryTransaction = () => {
   const [status, setStatus] = useState("ALL");
   const [loading, setLoading] = useState(false);
@@ -27,15 +27,12 @@ export const HistoryTransaction = () => {
     setPage(1); // Reset về trang đầu khi thay đổi trạng thái
   };
 
-  const fetchDataReservation = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(
-        `${BASE_URL}/reservation/search-status`,
-        {
-          params: { status, page },
-        }
-      );
+   const fetchDataReservation = async () => {
+      setLoading(true);
+      try {
+         const response = await axiosInstance.get(`/reservation/search-status`, {
+            params: { status, page }
+         });
 
       if (response.data && response.data.reservations) {
         setReservations(response.data.reservations);
@@ -51,18 +48,16 @@ export const HistoryTransaction = () => {
     }
   };
 
-  const fetchHotelFromReservation = async (reservationId) => {
-    try {
-      const response = await axios.get(
-        `${BASE_URL}/reservation/hotel/${reservationId}`
-      );
-      if (response.data && response.data.hotel) {
-        return response.data.hotel; // Return the hotel data
+   const fetchHotelFromReservation = async (reservationId) => {
+      try {
+         const response = await axiosInstance.get(`/reservation/hotel/${reservationId}`);
+         if (response.data && response.data.hotel) {
+            return response.data.hotel; // Return the hotel data
+         }
+      } catch (error) {
+         setErr(error.message);
       }
-    } catch (error) {
-      setErr(error.message);
-    }
-  };
+   };
 
   useEffect(() => {
     // Fetch hotels for all reservations after fetching reservation data
