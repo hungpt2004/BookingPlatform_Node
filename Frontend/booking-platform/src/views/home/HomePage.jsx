@@ -7,8 +7,6 @@ import LottieComponent from '../../components/lottie/LottieComponent';
 import { Badge, Button, Card, Image, Form, InputGroup, ButtonGroup } from 'react-bootstrap';
 import { motion } from 'framer-motion';  // Import motion
 import './HomePage.css';
-import { FiMinus, FiPlus } from 'react-icons/fi';
-import ImageNotFound from '../../assets/svg/notfound.jpg'
 import { BASE_URL } from '../../utils/Constant';
 import axios from 'axios';
 import { CustomBanner } from '../../components/banner/CustomBanner';
@@ -35,6 +33,44 @@ export const HomePage = () => {
   const [addressError, setAddressError] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [vietCities, setVietCities] = useState([]);
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await axios.get(
+          `http://api.geonames.org/searchJSON?country=VN&featureClass=P&maxRows=100&username=hahohi`
+        );
+        if (response.data.geonames) {
+          const vietnameseNameMapping = {
+            "Ho Chi Minh City": "Hồ Chí Minh",
+            "Hanoi": "Hà Nội",
+            "Da Nang": "Đà Nẵng",
+            "Haiphong": "Hải Phòng",
+            "Can Tho": "Cần Thơ",
+            "Nha Trang": "Nha Trang",
+            "Hue": "Huế",
+            "Vung Tau": "Vũng Tàu",
+            "Da Lat": "Đà Lạt",
+            "Phu Quoc": "Phú Quốc",
+            "Hoi An": "Hội An",
+            "Qui Nhon": "Quy Nhơn"
+          };
+  
+          const transformedCities = response.data.geonames.map(city => ({
+            ...city,
+            toponymName: vietnameseNameMapping[city.toponymName] || city.toponymName,
+          }));
+  
+          setVietCities(transformedCities);
+        }
+      } catch (error) {
+        console.error('Error fetching Vietnamese cities:', error);
+      }
+    };
+
+    fetchCities();
+  }, []);
 
   const validateDates = () => {
     const today = new Date().toISOString().split('T')[0];
@@ -124,9 +160,6 @@ export const HomePage = () => {
     );
   };
 
-
-  const fetchHotels = async (newPage = 1) => {
-    if (!validateDates()) return;
   const fetchHotels = async (newPage = 1) => {
     if (!validateDates()) return;
     setLoading(true);
@@ -152,7 +185,9 @@ export const HomePage = () => {
     } catch (error) {
       console.error('Error fetching hotels:', error);
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000)
     }
   };
 
@@ -163,8 +198,8 @@ export const HomePage = () => {
       return;
     }
     setAddressError('');
-    setPage(1); 
-    fetchHotels(1); 
+    setPage(1);
+    fetchHotels(1);
   };
 
   const handlePageChange = (newPage) => {
@@ -172,14 +207,12 @@ export const HomePage = () => {
     fetchHotels(newPage);
   };
 
-
   // useEffect(() => {
   //   fetchHotels();
   // }, [hotelName, address, checkinDate, checkoutDate, minRating, numberOfPeople]);
 
   return (
     <>
-      <CustomNavbar />
       <CustomNavbar />
       <CustomBanner />
       <CustomSlide />
@@ -203,57 +236,64 @@ export const HomePage = () => {
           />
         </div>
         <div className="col-md-2">
-          <CustomInput
-            label="ADDRESS"
-            type="text"
-            placeHolder="Address"
-            value={address}
-            onChange={(e) => {
-              setAddress(e.target.value);
-              if (e.target.value.trim()) setAddressError('');
-            }}
-            error={addressError}
-          />
-        </div>
-        <div className="col-md-4">
-          <div className="date-picker-group">
-            <div className="date-input-container">
-              <CustomDateValidator
-                type="date"
-                placeholder="Check-in Date"
-                value={checkinDate}
-                min={new Date().toISOString().split('T')[0]}
-                onChange={(e) => {
-                  setCheckinDate(e.target.value);
-                  if (checkoutDate && e.target.value > checkoutDate) {
-                    setCheckoutDate('');
-                  }
-                }}
-                label="Check-in"
-                error={checkInError}
-              />
-              <CustomDateValidator
-                type="date"
-                placeholder="Check-out Date"
-                value={checkoutDate}
-                min={checkinDate || new Date().toISOString().split('T')[0]}
-                onChange={(e) => setCheckoutDate(e.target.value)}
-                label="Check-out"
-                error={checkOutError}
-              />
-            </div>
+          <div className="mb-3">
+            <label className="form-label">City</label>
+            <select
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className="form-select"
+            >
+              <option value="">Select a city</option>
+              {vietCities.map((city) => (
+                <option key={city.geonameId} value={city.toponymName}>
+                {city.toponymName}
+              </option>              
+              ))}
+            </select>
+            {addressError && (
+              <div className="invalid-feedback d-block">
+                {addressError}
+              </div>
+            )}
           </div>
         </div>
-        <div className="col-md-2 d-flex align-items-center">
-          <Button variant="outline-secondary" onClick={handleDecrement} disabled={numberOfPeople <= 1}>
-            <FiMinus />
-          </Button>
-          <span className="mx-3 fs-5 fw-bold">{numberOfPeople}</span>
-          <Button variant="outline-secondary" onClick={handleIncrement}>
-            <FiPlus />
-          </Button>
+        <div className='col-md-2'>
+          <CustomDateValidator
+            type="date"
+            placeholder="Check-in Date"
+            value={checkinDate}
+            min={new Date().toISOString().split('T')[0]}
+            onChange={(e) => {
+              setCheckinDate(e.target.value);
+              if (checkoutDate && e.target.value > checkoutDate) {
+                setCheckoutDate('');
+              }
+            }}
+            label="CHECK IN DATE"
+            error={checkInError}
+          />
         </div>
-        <div className="col-md-2 d-flex align-items-center">
+        <div className='col-md-2'>
+          <CustomDateValidator
+            type="date"
+            placeholder="Check-out Date"
+            value={checkoutDate}
+            min={checkinDate || new Date().toISOString().split('T')[0]}
+            onChange={(e) => setCheckoutDate(e.target.value)}
+            label="CHECK OUT DATE"
+            error={checkOutError}
+          />
+        </div>
+        <div className="col-md-2">
+          <CustomInput
+            type="number"
+            label="NUMBER OF PEOPLES"
+            placeHolder="Number's People"
+            value={numberOfPeople}
+            onChange={(e) => setNumberOfPeople(e.target.value)}
+          />
+        </div>
+        <div className="col-md-2">
           <Button
             variant="primary"
             onClick={handleSearch}
@@ -353,6 +393,7 @@ export const HomePage = () => {
           </div>
         </div>
       </div>
+
       {/* News */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -566,4 +607,3 @@ export const HomePage = () => {
     </>
   );
 };
-}

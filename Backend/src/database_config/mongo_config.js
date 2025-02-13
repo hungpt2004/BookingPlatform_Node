@@ -3,7 +3,7 @@ require('dotenv').config();
 
 // const mongoURL = process.env.MNHAT_URL;
 
-const mongoURL = "mongodb+srv://haonudechimlac:EQcA2jqEVmQCmUUQ@mydb.dyiwq.mongodb.net/TravelofyDatabase";
+const mongoURL = process.env.MONGO_URL;
 // const mongoURL = "mongodb://localhost:27017/BookingDatabase";
 
 const connectDB = async () => {
