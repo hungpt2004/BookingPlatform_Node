@@ -1,7 +1,6 @@
 const User = require("../models/user");
 const catchAsync = require("../utils/catchAsync");
 const cloudinary = require("../utils/cloudinary");
-const fs = require("fs");
 const { AUTH } = require('../utils/constantMessage');
 const asyncHandler = require('../middlewares/asyncHandler');
 
@@ -17,19 +16,32 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is not yet defined!",
-  });
-};
-exports.createUser = (req, res) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is not yet defined!",
-  });
-};
+exports.getUser = catchAsync(async (req, res, next) => {
+  const userId = req.user?.id; // Lấy ID từ token đã giải mã trong middleware
 
+  if (!userId) {
+    return res.status(403).json({
+      status: "fail",
+      message: "Unauthorized: No user ID found",
+    });
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({
+      status: "fail",
+      message: "User not found",
+    });
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: { user },
+  });
+});
+
+//update user
 exports.updateUser = catchAsync(async (req, res, next) => {
   const userId = req.user.id; // Chỉ lấy ID từ token, không từ params
   const updates = {};
@@ -68,7 +80,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 });
 
 //update avatar
-exports.updateAvatar = async (req, res) => {
+exports.updateAvatar = catchAsync(async (req, res) => {
   console.log("Route hit!");
   try {
     const userId = req.user?.id || req.body.id; // Kiểm tra ID từ token hoặc body
@@ -106,10 +118,7 @@ exports.updateAvatar = async (req, res) => {
       width: 150, // Resize ảnh (tùy chỉnh)
       crop: "scale", // Crop ảnh (tùy chỉnh)
     });
-    // Xóa file tạm sau khi upload xong
-    // fs.unlink(tempFilePath, (err) => {
-    //   if (err) console.error("Error deleting temp file:", err);
-    // });
+
     // Cập nhật user với ảnh mới
     user.image = {
       public_ID: uploadResult.public_id, // Sửa đúng biến
@@ -126,7 +135,7 @@ exports.updateAvatar = async (req, res) => {
     console.error("Error updating Image:", error);
     res.status(500).json({ message: "Server error" });
   }
-};
+});
 
 
 exports.deleteUser = (req, res) => {
@@ -135,6 +144,7 @@ exports.deleteUser = (req, res) => {
     message: "This route is not yet defined!",
   });
 };
+
 exports.getCurrentUser = asyncHandler(async (req, res) => {
 
   const user = req.user;
@@ -153,4 +163,4 @@ exports.getCurrentUser = asyncHandler(async (req, res) => {
     messsage: AUTH.GET_SUCCESS
   })
 
-})
+});

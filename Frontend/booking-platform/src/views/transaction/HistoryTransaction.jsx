@@ -20,19 +20,18 @@ export const HistoryTransaction = () => {
   const [totalPages, setTotalPages] = useState(1); // Thêm state tổng số trang
   const [showFeedback, setShowFeedback] = useState(false);
   const [selectedReservationId, setSelectedReservationId] = useState(null);
-  const [feedbackData, setFeedbackData] = useState({});
   const handleChangeStatus = (newStatus) => {
     setStatus(newStatus);
     setActiveStatus(newStatus);
     setPage(1); // Reset về trang đầu khi thay đổi trạng thái
   };
 
-   const fetchDataReservation = async () => {
-      setLoading(true);
-      try {
-         const response = await axiosInstance.get(`/reservation/search-status`, {
-            params: { status, page }
-         });
+  const fetchDataReservation = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(`/reservation/search-status`, {
+        params: { status, page }
+      });
 
       if (response.data && response.data.reservations) {
         setReservations(response.data.reservations);
@@ -48,16 +47,16 @@ export const HistoryTransaction = () => {
     }
   };
 
-   const fetchHotelFromReservation = async (reservationId) => {
-      try {
-         const response = await axiosInstance.get(`/reservation/hotel/${reservationId}`);
-         if (response.data && response.data.hotel) {
-            return response.data.hotel; // Return the hotel data
-         }
-      } catch (error) {
-         setErr(error.message);
+  const fetchHotelFromReservation = async (reservationId) => {
+    try {
+      const response = await axiosInstance.get(`/reservation/hotel/${reservationId}`);
+      if (response.data && response.data.hotel) {
+        return response.data.hotel; // Return the hotel data
       }
-   };
+    } catch (error) {
+      setErr(error.message);
+    }
+  };
 
   useEffect(() => {
     // Fetch hotels for all reservations after fetching reservation data
@@ -80,6 +79,10 @@ export const HistoryTransaction = () => {
     fetchDataReservation();
   }, [status, page]);
 
+  // Add this function to handle feedback submission
+  const handleFeedbackSubmitted = () => {
+    fetchDataReservation(); // Refresh the list
+  };
   return (
     <>
       <CustomNavbar />
@@ -191,19 +194,7 @@ export const HistoryTransaction = () => {
                                   Cancel
                                 </Button>
                               )}
-                              {item.status === "COMPLETED" && (
-                                <Button
-                                  className="mb-1"
-                                  variant="outline-primary"
-                                  onClick={() => {
-                                    setShowFeedback(true)
-                                    setSelectedReservationId(item._id);
-                                    setFeedbackData({})
-                                  }}
-                                >
-                                  Feedback
-                                </Button>
-                              )}
+                              
                               <Button className="" variant="outline-dark">
                                 View Details
                               </Button>
@@ -230,6 +221,7 @@ export const HistoryTransaction = () => {
           // Add this prop
         }}
         reservationId={selectedReservationId}
+        onFeedbackSubmitted={handleFeedbackSubmitted}
       />
     </>
   );

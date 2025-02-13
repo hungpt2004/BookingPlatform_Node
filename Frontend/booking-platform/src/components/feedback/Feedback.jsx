@@ -1,38 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import PropTypes from "prop-types";
 import axiosInstance from '../utils/AxiosInstance';
 import { toast } from 'react-toastify';
 
-export default function FeedbackModal({ show, onClose, reservationId, }) {
+export default function FeedbackModal({ show, onClose, reservationId, onFeedbackSubmitted }) {
     const [content, setContent] = useState("");
     const [rating, setRating] = useState(5);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [feedbackExists, setFeedbackExists] = useState(false); // Kiểm tra có feedback chưa
-    const [feedbackId, setFeedbackId] = useState([]); // ID của feedback nếu có
-
-    useEffect(() => {
-        if (reservationId) {
-            fetchFeedback();
-        }
-    }, [reservationId]);
-
-    const fetchFeedback = async () => {
-        try {
-            const response = await axiosInstance.get(`/feedback/get/${reservationId}`);
-            if (response.data && response.data.feedback) {
-                setContent(response.data.feedback.content);
-                setRating(response.data.feedback.rating);
-                setFeedbackExists(true);
-                setFeedbackId(response.data.feedback._id);
-            } else {
-                setFeedbackExists(false);
-            }
-        } catch (err) {
-            setFeedbackExists(false);
-            console.error(err);
-        }
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -43,23 +18,15 @@ export default function FeedbackModal({ show, onClose, reservationId, }) {
         setIsSubmitting(true);
 
         try {
-            if (feedbackExists) {
-                // Update feedback nếu đã tồn tại
-                await axiosInstance.patch(`/feedback/update/${feedbackId}`, {
-                    
-                    content: content.trim(),
-                    rating: Number(rating),
-                });
-                console.log(feedbackId),
-                toast.success("Feedback updated successfully!");
-            } else {
-                // Tạo feedback mới
-                await axiosInstance.post(`/feedback/create/${reservationId}`, {
-                    content: content.trim(),
-                    rating: Number(rating),
-                });
-                toast.success("Feedback submitted successfully!");
-            }
+            await axiosInstance.post(`/feedback/create/${reservationId}`, {
+                content: content.trim(),
+                rating: Number(rating),
+            });
+            toast.success("Feedback submitted successfully!");
+            // Reset form values
+            setContent("");
+            setRating(5);
+            onFeedbackSubmitted();
             onClose();
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to submit feedback");
@@ -68,11 +35,17 @@ export default function FeedbackModal({ show, onClose, reservationId, }) {
         }
     };
 
+    // Reset form when modal is opened
+    const handleShow = () => {
+        setContent("");
+        setRating(5);
+    };
+
     return (
-        <Modal show={show} onHide={onClose}>
+        <Modal show={show} onHide={onClose} onShow={handleShow}>
             <Form onSubmit={handleSubmit}>
                 <Modal.Header closeButton>
-                    <Modal.Title>{feedbackExists ? "Update Feedback" : "Leave Feedback"}</Modal.Title>
+                    <Modal.Title>Leave Feedback</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form.Group className="mb-3">
@@ -107,7 +80,7 @@ export default function FeedbackModal({ show, onClose, reservationId, }) {
                         Cancel
                     </Button>
                     <Button variant="primary" type="submit" disabled={isSubmitting}>
-                        {isSubmitting ? "Processing..." : feedbackExists ? "Update Feedback" : "Submit Feedback"}
+                        {isSubmitting ? "Processing..." : "Submit Feedback"}
                     </Button>
                 </Modal.Footer>
             </Form>
@@ -119,5 +92,5 @@ FeedbackModal.propTypes = {
     show: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     reservationId: PropTypes.string.isRequired,
-
+    onFeedbackSubmitted: PropTypes.func.isRequired,
 };

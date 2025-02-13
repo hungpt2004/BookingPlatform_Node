@@ -49,22 +49,20 @@ exports.createFeedback = async (req, res) => {
         .json({ message: "Reservation chưa hoàn thành hoặc không tồn tại." });
     }
 
-    // if (reservation.status !== "CHECKED OUT") {
-    //   return res.status(400).json({ message: "Reservation chưa hoàn tất check-out." });
-    // }
-    // Tạo feedback mới
     const feedback = new Feedback({
-      user: userId,                  // ObjectId of user
-      reservation: reservationId,    // ObjectId of reservation
-      hotel: reservation.hotel,      // ObjectId of hotel from reservation
-      content,              // String content
-      rating: parseInt(rating),      // Number rating
-      createdAt: new Date()         // Current timestamp
+      user: userId,                 
+      reservation: reservationId,    
+      hotel: reservation.hotel,      
+      content,              
+      rating: parseInt(rating),     
+      createdAt: new Date(),
+      // status: reservationId.status
     });
-
+    console.log(feedback)
     await feedback.save();
     // Cập nhật trạng thái reservation thành "COMPLETED"
     reservation.status = "COMPLETED";
+    console.log('CHECK', reservation.status)
     await reservation.save();
     res
       .status(201)

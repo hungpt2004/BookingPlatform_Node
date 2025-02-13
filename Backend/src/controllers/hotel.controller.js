@@ -71,10 +71,7 @@ exports.getHotelDetailById = asyncHandler(async (req, res) => {
     rooms: listCurrentHotelRoom,
     message: "Get hotel data success",
   });
-    error: false,
-    hotels,
-    message: "Get all owned hotel";
-  });
+});
 
 
 
