@@ -70,3 +70,4 @@ exports.getHotelDetailById = asyncHandler(async (req, res) => {
     message: "Get hotel data success",
   });
 });
+
