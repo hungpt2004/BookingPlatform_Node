@@ -87,6 +87,8 @@ function CustomNavbar() {
                     <NavDropdown.Item href="#action/3.1">Owner Account</NavDropdown.Item>
                     <NavDropdown.Divider />
                     <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
+                    <NavDropdown.Divider />
+                    <NavDropdown.Item href="/feedback">Feedback</NavDropdown.Item>
                   </NavDropdown>
                 </>
               ) : (

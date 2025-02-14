@@ -50,20 +50,20 @@ exports.createFeedback = async (req, res) => {
     }
 
     const feedback = new Feedback({
-      user: userId,                 
-      reservation: reservationId,    
-      hotel: reservation.hotel,      
-      content,              
-      rating: parseInt(rating),     
+      user: userId,
+      reservation: reservationId,
+      hotel: reservation.hotel,
+      content,
+      rating: parseInt(rating),
       createdAt: new Date(),
-      // status: reservationId.status
     });
     console.log(feedback)
     await feedback.save();
     // Cập nhật trạng thái reservation thành "COMPLETED"
-    reservation.status = "COMPLETED";
-    console.log('CHECK', reservation.status)
-    await reservation.save();
+    await reservation.updateOne(
+      { _id: reservationId },
+      { $set: { status: "COMPLETED" } }
+    )
     res
       .status(201)
       .json({ message: "Feedback đã được gửi thành công!", feedback });
@@ -127,20 +127,16 @@ exports.deleteFeedback = asyncHandler(async (req, res) => {
 });
 
 //get feedback by user_id
-exports.getFeedbackByUserAndReservation = asyncHandler(async (req, res) => {
+exports.getFeedbackByUser = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const { reservationId } = req.params;
-
   try {
-    const feedback = await Feedback.findOne({ user: userId, reservation: reservationId });
-
+    const feedback = await Feedback.find({ user: userId });
     if (!feedback) {
       return res.status(404).json({
         error: true,
-        message: "No feedback found for this reservation",
+        message: "No feedback found ",
       });
     }
-
     return res.status(200).json({
       error: false,
       feedback,

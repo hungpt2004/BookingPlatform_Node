@@ -5,5 +5,6 @@ const { authenticateToken } = require("../utils/authenticateToken"); // Middlewa
 
 router.post("/create/:reservationId", authenticateToken, feedbackController.createFeedback);
 router.patch("/update/:feedbackId", authenticateToken, feedbackController.updateFeedback);
-router.get("/get/:reservationId", authenticateToken, feedbackController.getFeedbackByUserAndReservation);
+router.get("/get", authenticateToken, feedbackController.getFeedbackByUser);
+router.delete("/delete/:feedbackId", authenticateToken, feedbackController.deleteFeedback);
 module.exports = router;
