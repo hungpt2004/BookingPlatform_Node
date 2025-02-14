@@ -35,10 +35,7 @@ const BookingStepTwo = () => {
                 </Card.Header>
                 <Card.Body>
                     <ListGroup variant="flush">
-                        {/* User and Hotel Details */}
-                        <ListGroup.Item>
-                            <strong>User ID:</strong> {userId}
-                        </ListGroup.Item>
+                        {/* Hotel Details */}
                         <ListGroup.Item>
                             <strong>Hotel ID:</strong> {hotelId}
                         </ListGroup.Item>

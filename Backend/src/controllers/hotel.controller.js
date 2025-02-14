@@ -42,7 +42,6 @@ exports.getOwnedHotels = asyncHandler(async (req, res) => {
 
 exports.getHotelDetailById = asyncHandler(async (req, res) => {
   const { hotelId } = req.params;
-  const userId = req.user;
 
   if (!hotelId) {
     return res.status(404).json({
@@ -68,7 +67,6 @@ exports.getHotelDetailById = asyncHandler(async (req, res) => {
     error: false,
     hotel: currentHotel,
     rooms: listCurrentHotelRoom,
-    userId,
     message: "Get hotel data success",
   });
 

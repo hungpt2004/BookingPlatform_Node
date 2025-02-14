@@ -81,16 +81,25 @@ exports.getRoomByHotelId = asyncHandler(async (req, res, next) => {
 
     try {
         // Find rooms related to hotelId and filter based on availability
-        const rooms = await Room.find({
-            hotel: hotelId,
-            capacity: { $gte: numberOfPeople }, // Ensure room can accommodate the number of people
-        }).populate('hotel');
+        const rooms = await Room.find({ hotel: hotelId }).populate('hotel');
 
         if (rooms.length === 0) {
             return res.status(404).json({
                 error: true,
                 message: "No rooms found for this hotel that meet the criteria",
             });
+        }
+
+        // Calculate total hotel capacity
+        const totalHotelCapacity = rooms.reduce((total, room) => {
+            return total + (room.capacity * room.quantity);
+        }, 0);
+
+        if (numberOfPeople > totalHotelCapacity) {
+            return res.status(400).json({
+                error: true,
+                message: `Number of people: (${numberOfPeople}) exceeds the total hotel capacity (${totalHotelCapacity})`,
+            })
         }
 
         // Additional filtering for availability for booking

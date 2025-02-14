@@ -9,7 +9,7 @@ const Booking = ({
     checkInDate,
     checkOutDate,
     numberOfPeople,
-    userId
+    userId,
 }) => {
     const [selectedRooms, setSelectedRooms] = useState({});
     const [loading, setLoading] = useState(true);
@@ -89,6 +89,7 @@ const Booking = ({
             }));
 
 
+
         const bookingData = {
             userId,
             hotelId,
@@ -103,6 +104,8 @@ const Booking = ({
 
         navigate('/booking-step2', { state: bookingData });
     };
+
+    const validDate = checkInDate === checkOutDate
 
     return (
         <div className="container mt-4">
@@ -159,7 +162,7 @@ const Booking = ({
                                                 variant="outline-secondary"
                                                 size="sm"
                                                 onClick={() => incrementRoomQuantity(room._id, room.quantity)}
-                                                disabled={(selectedRooms[room._id] || 0) >= room.quantity}
+                                                disabled={(selectedRooms[room._id] || 0) >= room.quantity || validDate}
                                             >
                                                 +
                                             </Button>
@@ -185,7 +188,7 @@ const Booking = ({
                 <Button
                     variant="primary"
                     onClick={handleContinueBooking}
-                    disabled={Object.keys(selectedRooms).length === 0}
+                    disabled={Object.keys(selectedRooms).length === 0 || validDate}
                     size="lg"
                 >
                     Continue to Payment

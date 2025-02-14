@@ -5,7 +5,7 @@ const Reservation = require('../models/reservation')
 
 
 exports.createBooking = asyncHandler(async (req, res) => {
-    const userId = req.user;
+    const userId = req.user._id;
     const { hotelId, roomId, checkInDate, checkOutDate } = req.body;
 
     try {
@@ -34,10 +34,9 @@ exports.createBooking = asyncHandler(async (req, res) => {
 
         // Validate that the user already booked the room
         const userBooked = await Reservation.find({
-            rooms: { $in: roomId },
             hotel: hotelId,
             user: userId,
-            status: { $nin: ["CANCELLED", "COMPLETED", "CHECKED_OUT"] },
+            status: { $nin: ["CANCELLED", "COMPLETED", "CHECKED_OUT", "CHECKED_IN"] },
         }).populate("rooms").select("rooms")
 
 
@@ -99,7 +98,7 @@ exports.createBooking = asyncHandler(async (req, res) => {
             checkInDate,
             checkOutDate,
             totalPrice,
-            status: "BOOKED", // Default status
+            status: "NOT PAID", // Default status
         });
 
         // // Save the reservation to the database

@@ -25,6 +25,7 @@ export const HotelDetailPage = () => {
     const [capacityError, setCapacityError] = useState('');
     const [availabilityError, setAvailabilityError] = useState('');
     const [userId, setUserId] = useState(null); // State to store userId
+    const [validDate, setValidDate] = useState(true); // State to store date validity
 
     // Add this function to handle the search validation
     const handleSearch = async () => {
@@ -100,6 +101,8 @@ export const HotelDetailPage = () => {
                 newErrors.checkOut = 'Check-out date cannot be in the past';
             } else if (checkInDate && value < checkInDate) {
                 newErrors.checkOut = 'Check-out cannot be before check-in';
+            } else if (checkOutDate && value === checkInDate) {
+                newErrors.checkOut = 'Check-out cannot be same date as check-in';
             } else {
                 newErrors.checkOut = '';
             }
@@ -144,8 +147,9 @@ export const HotelDetailPage = () => {
     }, []);
 
 
-    console.log(`Dữ liệu hotel : ${currentHotel}`);
-    console.log(`ID khách sạn : ${id}`);
+    // console.log(`Dữ liệu hotel : ${currentHotel}`);
+    // console.log(`ID khách sạn : ${id}`);
+    console.log(`Dữ liệu currentHotel?.capacity : ${currentHotel?.capacity}`);
     // Log every property of currentHotel once it's set
     useEffect(() => {
         if (currentHotel) {
@@ -234,7 +238,7 @@ export const HotelDetailPage = () => {
                                     value={numberOfPeople}
                                     min={1}
                                     onChange={(e) => {
-                                        const value = Math.max(1, Math.min(currentHotel?.capacity || 10, e.target.value));
+                                        const value = Math.max(1, Math.min(100, e.target.value));
                                         setNumberOfPeople(value);
                                     }}
                                 />
@@ -249,8 +253,6 @@ export const HotelDetailPage = () => {
                         </div>
 
                     </div>
-
-
                     <Booking
                         setOpen={setOpen}
                         hotelId={id}
@@ -259,6 +261,7 @@ export const HotelDetailPage = () => {
                         numberOfPeople={numberOfPeople}
                         userId={userId}
                         key={`${checkInDate}-${checkOutDate}-${numberOfPeople}`} // Add key to force re-render
+                        isValidDate={validDate}
                     />
                 </>
             )}

@@ -4,8 +4,7 @@ const asyncHandler = require('../middlewares/asyncHandler')
 
 
 exports.addFavoriteHotel = asyncHandler(async (req, res) => {
-
-   const userId = req.user;
+   const userId = req.user._id;
 
    const { hotelId } = req.body;
 
@@ -55,7 +54,7 @@ exports.addFavoriteHotel = asyncHandler(async (req, res) => {
 
 // Get all favorite hotels of a user
 exports.getFavoriteHotels = asyncHandler(async (req, res) => {
-   const userId = req.user;
+   const userId = req.user._id;
 
    console.log(userId);
    // Validate input
@@ -85,7 +84,7 @@ exports.getFavoriteHotels = asyncHandler(async (req, res) => {
 
 // Remove a hotel from user's favorites
 exports.removeFavoriteHotel = asyncHandler(async (req, res) => {
-   const userId = req.user;
+   const userId = req.user._id;
 
    const { hotelId } = req.body;
 
