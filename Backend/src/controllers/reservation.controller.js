@@ -55,7 +55,7 @@ exports.getRoomByReservationId = asyncHandler(async (req, res) => {
   }
 
   const reservation = await Reservation.findOne(
-    {_id: reservationId, user: user.id},
+    { _id: reservationId, user: user.id },
   ).populate("rooms");
 
   if (reservation.rooms.length === 0) {
@@ -86,7 +86,7 @@ exports.getHotelByReservationId = asyncHandler(async (req, res) => {
   }
 
   const reservation = await Reservation.findOne(
-    {_id: reservationId, user: user.id}
+    { _id: reservationId, user: user.id }
   ).populate("hotel");
 
 
@@ -122,7 +122,7 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   }
 
   let query = status === "ALL" ? {} : { status }; // If "ALL", return all reservations
-  let totalPageReservations = await Reservation.countDocuments({ ...query, user: currentUser.id }); 
+  let totalPageReservations = await Reservation.countDocuments({ ...query, user: currentUser.id });
 
   //Gộp filter và projection
   //Filter là điều kiện lọc dữ liệu khi truy vấn MongoDB
@@ -133,7 +133,7 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   //Câu lệnh filter cùng trong {}
   //Nếu là điều kiện 2 sẽ bị hiểu là Projection
 
-  if (totalPageReservations === 0) {
+  if (totalPageReservations < 0) {
     return res.status(404).json({
       error: true,
       message: "No reservations found",
@@ -141,13 +141,14 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   }
 
   //Lấy số nguyên các trang
-  let totalPages = Math.ceil(totalPageReservations / perPage); 
+  let totalPages = Math.ceil(totalPageReservations / perPage);
 
   const reservations = await Reservation.find(
     { ...query, user: currentUser.id }
   )
-    .sort({ totalPrice: -1 }) 
-    .skip((page - 1) * perPage) 
+    .populate('hotel')
+    .sort({ totalPrice: -1 })
+    .skip((page - 1) * perPage)
     .limit(perPage);
 
   return res.status(200).json({
@@ -168,19 +169,23 @@ const autoUpdateReservationStatus = asyncHandler(async () => {
   const reservations = await Reservation.find();
 
   for (const r of reservations) {
+
+    if (r.status === "COMPLETED" || r.status === "CHECKED OUT") continue;
+
     //1. Update from Booked to CheckIn
-    if (currentDate < r.checkInDate) r.status = "CHECKED IN";
+    // if (currentDate < r.checkInDate) r.status = "CHECKED IN";
 
-    //2. Update from CheckIn to CheckOut
-    if (currentDate > r.checkOutDate) r.status = "CHECKED OUT";
+    // //2. Update from CheckIn to CheckOut
+    // if (currentDate > r.checkOutDate) r.status = "CHECKED OUT";
 
-    await Reservation.updateOne({ _id: r._id }, { $set: { status: r.status } });
+
+    // await Reservation.updateOne({ _id: r._id }, { $set: { status: r.status } });
 
     // console.log(`Updated status for note ID ${r._id} to ${r.status}`);
   }
 });
 
-//setinterval auto run after each minutes
+// setinterval auto run after each minutes
 cron.schedule("* * * * *", () => {
-  autoUpdateReservationStatus();
+  // autoUpdateReservationStatus();
 });

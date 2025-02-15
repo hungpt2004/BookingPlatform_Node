@@ -3,12 +3,13 @@ import { BASE_URL } from "../../utils/Constant";
 import axios from "axios";
 import { HashLoader } from "react-spinners";
 import CustomNavbar from "../../components/navbar/CustomNavbar";
-import { Pagination, Row } from "react-bootstrap";
+import { Pagination, Row, Spinner } from "react-bootstrap";
 import "./HistoryTransaction.css";
 import { Badge, Button, Card } from "react-bootstrap";
 import { formatDate } from "../../utils/FormatDatePrint";
 import { dataStatus, statusColors, statusText } from "./DataStatus";
 import axiosInstance from "../../utils/AxiosInstance";
+import FeedbackModal from "../../components/feedback/FeedbackModal";
 
 export const HistoryTransaction = () => {
    const [status, setStatus] = useState("ALL");
@@ -19,12 +20,15 @@ export const HistoryTransaction = () => {
    const [hotels, setHotels] = useState({});
    const [page, setPage] = useState(1);
    const [totalPages, setTotalPages] = useState(1); // Thêm state tổng số trang
+   const [showFeedback, setShowFeedback] = useState(false);
+   const [selectedReservationId, setSelectedReservationId] = useState(null);
 
    const handleChangeStatus = (newStatus) => {
       setStatus(newStatus);
       setActiveStatus(newStatus);
-      setPage(1); // Reset về trang đầu khi thay đổi trạng thái
+      setPage(1);
    };
+
 
    const fetchDataReservation = async () => {
       setLoading(true);
@@ -34,6 +38,7 @@ export const HistoryTransaction = () => {
          });
 
          if (response.data && response.data.reservations) {
+            console.log(response.data)
             setReservations(response.data.reservations);
             setTotalPages(response.data.totalPages || 1);
             setErr("");
@@ -47,33 +52,9 @@ export const HistoryTransaction = () => {
       }
    };
 
-   const fetchHotelFromReservation = async (reservationId) => {
-      try {
-         const response = await axiosInstance.get(`/reservation/hotel/${reservationId}`);
-         if (response.data && response.data.hotel) {
-            return response.data.hotel; // Return the hotel data
-         }
-      } catch (error) {
-         setErr(error.message);
-      }
-   };
-
    useEffect(() => {
-      // Fetch hotels for all reservations after fetching reservation data
-      const fetchHotels = async () => {
-         const hotelData = {};
-         for (let reservation of reservations) {
-            const hotel = await fetchHotelFromReservation(reservation._id);
-            if (hotel) {
-               hotelData[reservation._id] = hotel; // Store hotel data by reservationId
-            }
-         }
-         setHotels(hotelData);
-      };
-      if (reservations.length > 0) {
-         fetchHotels();
-      }
-   }, [reservations]);
+      fetchDataReservation();
+   }, [status, page]);
 
    useEffect(() => {
       fetchDataReservation();
@@ -129,20 +110,19 @@ export const HistoryTransaction = () => {
                               </Pagination>
                            </div>
                            <div className="row">
-                              {reservations.map((item, index) => {
-                                 const hotel = hotels[item._id]; // Get hotel by reservationId
+                              {reservations.length > 0 ? (reservations.map((item, index) => {
                                  return <div key={index} className={`
                                     ${reservations.length === 1
-                                      ? "col-md-12"
-                                      : reservations.length === 2
-                                      ? "col-md-6"
-                                      : "col-md-4"
+                                       ? "col-md-12"
+                                       : reservations.length === 2
+                                          ? "col-md-6"
+                                          : "col-md-4"
                                     }`
-                                  }>
+                                 }>
                                     <Card className="card-search-hotel p-3 m-3">
-                                       <Card.Title className="text-center">{hotel.hotelName || "Unknown Hotel"}</Card.Title>
+                                       <Card.Title className="text-center">{item.hotel.hotelName || "Unknown Hotel"}</Card.Title>
                                        <Card.Body>
-                                          <p>📍 Address: {hotel.address || "N/A"}</p>
+                                          <p>📍 Address: {item.hotel.address || "N/A"}</p>
                                           <p>🗓️ Check In: {formatDate(item.checkInDate, "DD/MM/YYYY")}</p>
                                           <p>🗓️ Check Out: {formatDate(item.checkOutDate, "DD/MM/YYYY")}</p>
                                           <p>💰 Price: {item.totalPrice}$</p>
@@ -151,8 +131,16 @@ export const HistoryTransaction = () => {
                                           </Badge>
                                        </Card.Body>
                                        <Row className="m-2">
-                                       {item.status === "CHECKED OUT" && (
-                                             <Button className="mb-1" variant="outline-primary">
+                                          {item.status === "CHECKED OUT" && (
+                                             <Button
+                                                className="mb-1"
+                                                variant="outline-primary"
+                                                onClick={() => {
+                                                   setShowFeedback(true)
+                                                   setSelectedReservationId(item._id);
+                                                   console.log("reservation", item._id);
+                                                }}
+                                             >
                                                 Feedback
                                              </Button>
                                           )}
@@ -165,17 +153,25 @@ export const HistoryTransaction = () => {
                                              View Details
                                           </Button>
                                        </Row>
-                                    </Card>
-                                 </div>
-                              })}
-                           </div>
-                        </div>
+                                    </Card >
+                                 </div >
+                              })) : <p className="alert alert-danger w-100">No have any transaction</p>}
+                           </div >
+                        </div >
                      </>
                   )}
-                  <p>{err}</p>
-               </div>
-            </div>
-         </div>
+               </div >
+            </div >
+         </div >
+         <FeedbackModal
+            show={showFeedback}
+            onClose={() => {
+               setShowFeedback(false);
+               setSelectedReservationId(null);
+               // Add this prop
+            }}
+            reservationId={selectedReservationId}
+         />
       </>
    );
 };

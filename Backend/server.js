@@ -8,6 +8,7 @@ const PaymentRouter = require('./src/routes/payment.route');
 const authenticateRoute = require('./src/routes/authenticate.route');
 const BookingRouter = require('./src/routes/booking.route');
 const FavoriteRouter = require('./src/routes/favorite.route');
+const FeedbackRouter = require('./src/routes/feedback.route');
 const RoomRouter = require('./src/routes/room.route');
 require("dotenv").config();
 
@@ -22,6 +23,8 @@ app.use(
   })
 );
 
+
+app.use("/customer", UserRouter)
 
 app.use("/customer", UserRouter)
 
@@ -43,8 +46,11 @@ app.use("/booking", BookingRouter);
 //Favorite
 app.use("/favorite", FavoriteRouter);
 
+//Feedback
+app.use("/feedback", FeedbackRouter)
+
 //Room
-app.use("/room", RoomRouter);
+app.use('/room', RoomRouter)
 
 //Connect Mongo Config
 connectDB();

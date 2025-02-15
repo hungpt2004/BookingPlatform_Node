@@ -12,6 +12,7 @@ const CustomInput = ({ label, type, value, onChange, placeHolder, min, max }) =>
             min={min}
             max={max}
             onChange={onChange}
+            required
          />
       </>
    );

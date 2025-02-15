@@ -9,7 +9,7 @@ const Booking = ({
     checkInDate,
     checkOutDate,
     numberOfPeople,
-    userId,
+    userId
 }) => {
     const [selectedRooms, setSelectedRooms] = useState({});
     const [loading, setLoading] = useState(true);
@@ -87,7 +87,6 @@ const Booking = ({
                 pricePerRoom: room.price,
                 totalPrice: room.price * selectedRooms[room._id],
             }));
-
 
 
         const bookingData = {

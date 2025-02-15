@@ -8,4 +8,5 @@ RoomRouter.get("/get-all-room", RoomController.getAllRoom);
 RoomRouter.get("/get-room-by-hotel/:hotelId", RoomController.getRoomByHotelId);
 RoomRouter.post("/create-facility/:roomId", RoomController.createRoomFacility);
 RoomRouter.get("/get-facility/:roomId", RoomController.getRoomFacilitiesByRoomId);
+
 module.exports = RoomRouter;

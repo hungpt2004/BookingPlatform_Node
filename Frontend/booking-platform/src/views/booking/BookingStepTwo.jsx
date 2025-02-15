@@ -19,7 +19,6 @@ const BookingStepTwo = () => {
     }
 
     const {
-        userId,
         hotelId,
         checkInDate,
         checkOutDate,

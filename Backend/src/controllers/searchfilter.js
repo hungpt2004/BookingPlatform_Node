@@ -12,8 +12,8 @@ exports.searchAndFilterHotels = async (req, res) => {
       checkoutDate,
       hotelRating,
       numberOfPeople,
-      page = 1, 
-      limit = 8, 
+      page = 1,
+      limit = 4,
     } = req.query;
 
     let query = {};

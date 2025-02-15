@@ -21,8 +21,9 @@ const UserSchema = new Schema(
       select: false,
     },
     createOn: { type: Date, default: new Date().getTime() },
-    cmnd: { type: String, require: true },
+    cmnd: { type: String },
     updatedAt: { type: Date, default: new Date().getTime() },
+    avatar: { type: String, required: true, default: 'https://picsum.photos/600/400?random=1' },
     role: {
       type: String,
       enum: ['CUSTOMER', 'ADMIN', 'OWNER'],

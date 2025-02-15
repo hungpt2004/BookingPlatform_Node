@@ -5,7 +5,7 @@ import CustomSlide from '../../components/slide/CustomSlide';
 import { HashLoader } from 'react-spinners';
 import CustomInput from '../../components/input/CustomInput';
 import LottieComponent from '../../components/lottie/LottieComponent';
-import { Badge, Button, Card, Image, Form, InputGroup, ButtonGroup } from 'react-bootstrap';
+import { Badge, Button, Card, Image, Form, InputGroup, ButtonGroup, Row, Col } from 'react-bootstrap';
 import { motion } from 'framer-motion';  // Import motion
 import './HomePage.css';
 import { BASE_URL } from '../../utils/Constant';
@@ -19,6 +19,10 @@ import MapComponent from '../../components/map/MapComponent';
 import { IoIosArrowDropright, IoIosArrowDropleft } from "react-icons/io";
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import axiosInstance from '../../utils/AxiosInstance';
+import HotelCard from '../../components/card/HotelCard';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+
 
 export const HomePage = () => {
   const navigate = useNavigate();
@@ -72,6 +76,8 @@ export const HomePage = () => {
       console.error('Error toggling favorite:', error);
     }
   };
+
+  // CHECK VALIDATE
   const validateDates = () => {
     const today = new Date().toISOString().split('T')[0];
     let isValid = true;
@@ -82,6 +88,14 @@ export const HomePage = () => {
     if (checkinDate) {
       if (checkinDate < today) {
         setCheckInError('Check-in date cannot be in the past');
+        toast.success('Check-in date cannot be in the past', {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
         isValid = false;
       }
 
@@ -106,8 +120,7 @@ export const HomePage = () => {
     return isValid;
   };
 
-
-
+  // INPUT CHECK VALID DATE
   const CustomDateValidator = ({ label, error, ...props }) => (
     <div className="mb-0">
       {label && <label className="form-label">{label}</label>}
@@ -119,6 +132,7 @@ export const HomePage = () => {
     </div>
   );
 
+  // RENDER STARTING
   const StarRating = ({ value, onChange }) => {
     const [hoverValue, setHoverValue] = useState(null);
 
@@ -160,7 +174,7 @@ export const HomePage = () => {
     );
   };
 
-
+  // GET DATA HOTELS
   const fetchHotels = async (newPage = 1) => {
     if (!validateDates()) return;
     setLoading(true);
@@ -193,20 +207,27 @@ export const HomePage = () => {
   };
 
 
-  const handleSearch = () => {
-    if (!address.trim()) {
-      setAddressError('Please enter your destination.');
-      return;
-    }
-    setAddressError('');
-    setPage(1);
-    fetchHotels(1);
-  };
+  // const handleSearch = () => {
+  //   if (!address.trim()) {
+  //     setAddressError('Please enter your destination.');
+  //     return;
+  //   }
+  //   setAddressError('');
+  //   setPage(1);
+  //   fetchHotels(1);
+  // };
 
   const handlePageChange = (newPage) => {
     if (newPage < 1 || newPage > totalPages) return;
     fetchHotels(newPage);
   };
+
+
+  // GO TO DETAILS PAGE
+  const goToDetail = (hotelId) => {
+    navigate(`/hotel-detail/${hotelId}`);
+  }
+
 
   useEffect(() => {
     fetchHotels();
@@ -316,41 +337,15 @@ export const HomePage = () => {
                     return (
                       <motion.div
                         key={hotel._id.toString()}
-                        className="col-md-3 mb-4"
+                        className="col-md-12 mb-4"
                         initial={{ opacity: 0, y: 50 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                         viewport={{ once: true, amount: 0.8 }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.8 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.95 }}
                       >
-                        <Card className='card-search-hotel' style={{ width: '100%' }}>
-                          {/* <Card.Img variant="top" src={hotel.imageUrl || 'default_image_url'} /> */}
-                          <Card.Img variant="top" className='img-img-fluid' src={hotel.images} />
-                          <Card.Body>
-                            <Card.Title><h2 className='fw-bold text-center'>{hotel.hotelName}</h2></Card.Title>
-                            <Card.Text className='text-muted'><Badge style={{ backgroundColor: "#6499E9" }}>Description </Badge> {hotel.description}</Card.Text>
-                            <Card.Text><Badge style={{ backgroundColor: "#6499E9" }}>Rating</Badge>⭐ Rating: {hotel.rating}</Card.Text>
-                            <Card.Text><Badge style={{ backgroundColor: "#6499E9" }}>Address</Badge>  Address: {hotel.address}</Card.Text>
-                          </Card.Body>
-                          <div className="d-flex justify-content-start mx-3 mb-3">
-                            <ButtonGroup>
-                              <Button
-                                variant="outline-dark"
-                                className="mx-1"
-                                onClick={() => navigate(`/hotel-details/${hotel._id}?checkin=${checkinDate}&checkout=${checkoutDate}&guests=${numberOfPeople}`)}
-                              >
-                                Check Availability
-                              </Button>
-                              <Button
-                                variant={favorites.includes(hotel._id) ? "danger" : "outline-danger"}
-                                onClick={() => toggleFavorite(hotel._id)}
-                              >
-                                {favorites.includes(hotel._id) ? <FaHeart /> : <FaRegHeart />}
-                              </Button>
-                            </ButtonGroup>
-                          </div>
-                        </Card>
+                        <HotelCard hotel={hotel} goToDetail={() => goToDetail(hotel._id)} />
                       </motion.div>
                     );
                   })) : (
