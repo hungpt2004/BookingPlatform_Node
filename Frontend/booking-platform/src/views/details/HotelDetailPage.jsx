@@ -5,9 +5,16 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import axios from "axios";
 import { BASE_URL } from "../../utils/Constant";
-import { Container, Image, Spinner, Button } from "react-bootstrap"; // Thêm Spinner từ Bootstrap
+import { Card, Col, Container, Image, ListGroup, ListGroupItem, Row, Spinner, Carousel, Modal, Placeholder } from "react-bootstrap";
+import { MdLocationPin } from "react-icons/md";
+import "swiper/css/navigation";
+import Rating from "../../components/animation/HotelRating";
+import { animate, motion } from "framer-motion"; // Thêm framer-motion cho hiệu ứng chuyển động
+import './HotelDetailPage.css'
+import { RatingConsider } from "../../utils/RatingConsider";
 import Booking from "../../views/booking/BookingPage";
 import CustomInput from "../../components/input/CustomInput";
+
 
 const dataFacility = [
    "Wi-Fi miễn phí",
@@ -17,6 +24,14 @@ const dataFacility = [
    "Nhà hàng",
    "Trung tâm thể hình"
 ]
+
+const amenities = [
+   { icon: "🚭", text: "Phòng không hút thuốc" },
+   { icon: "📶", text: "WiFi nhanh miễn phí (414 Mbps)" },
+   { icon: "🅿️", text: "Chỗ đỗ xe miễn phí" },
+   { icon: "🔥", text: "Hệ thống sưởi" },
+   { icon: "❄️", text: "Điều hòa nhiệt độ" },
+];
 
 export const HotelDetailPage = () => {
    const [currentHotel, setCurrentHotel] = useState(null);
