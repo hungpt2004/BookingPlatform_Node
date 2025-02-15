@@ -9,6 +9,15 @@ import { Container, Image, Spinner, Button } from "react-bootstrap"; // Thêm Sp
 import Booking from "../../views/booking/BookingPage";
 import CustomInput from "../../components/input/CustomInput";
 
+const dataFacility = [
+   "Wi-Fi miễn phí",
+   "Hồ bơi",
+   "Bãi đỗ xe",
+   "Dịch vụ phòng 24/7",
+   "Nhà hàng",
+   "Trung tâm thể hình"
+]
+
 export const HotelDetailPage = () => {
    const [currentHotel, setCurrentHotel] = useState(null);
    const [error, setError] = useState("");

@@ -10,7 +10,6 @@ import BookingStepTwo from "./views/booking/BookingStepTwo"
 import { HotelDetailPage } from "./views/details/HotelDetailPage"
 import ForgotPasswordPage from "./views/forgot_password/ForgotPasswordPage"
 import ResetPasswordPage from "./views/reset_password/ResetPasswordPage"
-import BookingStepTwo from "./views/booking/BookingStepTwo"
 
 function App() {
 
@@ -26,7 +25,6 @@ function App() {
         <Route path="/hotel-detail/:id" element={<HotelDetailPage />} />
         <Route path="/forgot" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-        <Route path="/booking-step2/" element={<BookingStepTwo />} />
       </Routes>
     </Router>
   )

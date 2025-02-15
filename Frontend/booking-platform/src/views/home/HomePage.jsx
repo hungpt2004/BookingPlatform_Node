@@ -21,7 +21,6 @@ import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import axiosInstance from '../../utils/AxiosInstance';
 import HotelCard from '../../components/card/HotelCard';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
 
 
 export const HomePage = () => {
