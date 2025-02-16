@@ -4,7 +4,7 @@ import CustomSlide from '../../components/slide/CustomSlide';
 import { HashLoader } from 'react-spinners';
 import CustomInput from '../../components/input/CustomInput';
 import LottieComponent from '../../components/lottie/LottieComponent';
-import { Badge, Button, Card, Image, Form, InputGroup, ButtonGroup, Row, Col } from 'react-bootstrap';
+import { Badge, Button, Card, Image, Form, InputGroup, ButtonGroup, Row, Col, Spinner } from 'react-bootstrap';
 import { motion } from 'framer-motion';  // Import motion
 import './HomePage.css';
 import { BASE_URL } from '../../utils/Constant';
@@ -34,11 +34,51 @@ export const HomePage = () => {
   const [checkInError, setCheckInError] = useState('');
   const [checkOutError, setCheckOutError] = useState('');
   const [addressError, setAddressError] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [numberGuestError, setNumberGuestError] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [vietCities, setVietCities] = useState([]);
   const navigate = useNavigate();
 
   // CHECK VALIDATE
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await axios.get(
+          `http://api.geonames.org/searchJSON?country=VN&featureClass=P&maxRows=100&username=hahohi`
+        );
+        if (response.data.geonames) {
+          const vietnameseNameMapping = {
+            "Ho Chi Minh City": "Hồ Chí Minh",
+            "Hanoi": "Hà Nội",
+            "Da Nang": "Đà Nẵng",
+            "Haiphong": "Hải Phòng",
+            "Can Tho": "Cần Thơ",
+            "Nha Trang": "Nha Trang",
+            "Hue": "Huế",
+            "Vung Tau": "Vũng Tàu",
+            "Da Lat": "Đà Lạt",
+            "Phu Quoc": "Phú Quốc",
+            "Hoi An": "Hội An",
+            "Qui Nhon": "Quy Nhơn"
+          };
+
+          const transformedCities = response.data.geonames.map(city => ({
+            ...city,
+            toponymName: vietnameseNameMapping[city.toponymName] || city.toponymName,
+          }));
+
+          setVietCities(transformedCities);
+        }
+      } catch (error) {
+        console.error('Error fetching Vietnamese cities:', error);
+      }
+    };
+
+    fetchCities();
+  }, []);
+
   const validateDates = () => {
     const today = new Date().toISOString().split('T')[0];
     let isValid = true;
@@ -49,14 +89,6 @@ export const HomePage = () => {
     if (checkinDate) {
       if (checkinDate < today) {
         setCheckInError('Check-in date cannot be in the past');
-        toast.success('Check-in date cannot be in the past', {
-          position: "top-center",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
         isValid = false;
       }
 
@@ -81,7 +113,8 @@ export const HomePage = () => {
     return isValid;
   };
 
-  // INPUT CHECK VALID DATE
+
+
   const CustomDateValidator = ({ label, error, ...props }) => (
     <div className="mb-0">
       {label && <label className="form-label">{label}</label>}
@@ -93,7 +126,6 @@ export const HomePage = () => {
     </div>
   );
 
-  // RENDER STARTING
   const StarRating = ({ value, onChange }) => {
     const [hoverValue, setHoverValue] = useState(null);
 
@@ -135,7 +167,6 @@ export const HomePage = () => {
     );
   };
 
-  // GET DATA HOTELS 
   const fetchHotels = async (newPage = 1) => {
     if (!validateDates()) return;
     setLoading(true);
@@ -167,16 +198,20 @@ export const HomePage = () => {
     }
   };
 
+  const goToDetail = (hotelId) => {
+    navigate(`/hotel-detail/${hotelId}`);
+  }
 
-  // const handleSearch = () => {
-  //   if (!address.trim()) {
-  //     setAddressError('Please enter your destination.');
-  //     return;
-  //   }
-  //   setAddressError('');
-  //   setPage(1);
-  //   fetchHotels(1);
-  // };
+  const handleSearch = () => {
+    if (!address.trim()) {
+      setAddressError('Please enter your destination.');
+      return;
+    }
+    setAddressError('');
+    setPage(1);
+    fetchHotels(1);
+  };
+  
 
   const handlePageChange = (newPage) => {
     if (newPage < 1 || newPage > totalPages) return;
@@ -184,15 +219,9 @@ export const HomePage = () => {
   };
 
 
-  // GO TO DETAILS PAGE
-  const goToDetail = (hotelId) => {
-    navigate(`/hotel-detail/${hotelId}`);
-  }
-
-
-  useEffect(() => {
-    fetchHotels();
-  }, [hotelName, address, checkinDate, checkoutDate, minRating, numberOfPeople]);
+  // useEffect(() => {
+  //   fetchHotels();
+  // }, [hotelName, address, checkinDate, checkoutDate, minRating, numberOfPeople]);
 
   return (
     <>
@@ -219,13 +248,26 @@ export const HomePage = () => {
           />
         </div>
         <div className="col-md-2">
-          <CustomInput
-            label="ADDRESS"
-            type="text"
-            placeHolder="Address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-          />
+          <div className="">
+            <label className="form-label">CITY</label>
+            <select
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className="form-select"
+            >
+              <option value="">Select a city</option>
+              {vietCities.map((city) => (
+                <option key={city.geonameId} value={city.toponymName}>
+                {city.toponymName}
+              </option>              
+              ))}
+            </select>
+            {addressError && (
+              <div className="invalid-feedback d-block">
+                {addressError}
+              </div>
+            )}
+          </div>
         </div>
         <div className='col-md-2'>
           <CustomDateValidator
@@ -264,6 +306,15 @@ export const HomePage = () => {
           />
         </div>
       </div>
+      <div className="d-flex justify-content-center mt-4">
+          <Button
+            va="primary"
+            onClick={handleSearch}
+            disabled={loading}
+          >
+            {loading ? <Spinner animation="border" style={{ width: 20, height: 20 }} role="status" /> : 'Search'}
+          </Button>
+        </div>
       <div className="container-fluid">
         <div className="row mx-5 mt-5">
           <div className="col-md-3">

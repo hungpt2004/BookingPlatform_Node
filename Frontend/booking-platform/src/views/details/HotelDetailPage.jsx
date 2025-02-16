@@ -118,6 +118,7 @@ export const HotelDetailPage = () => {
       </div>
    );
 
+   //Get Current Hotel
    const getCurrentHotelDetail = async () => {
       setLoading(true)
       try {
@@ -134,7 +135,7 @@ export const HotelDetailPage = () => {
       } finally {
          setTimeout(() => {
             setLoading(false);
-         }, 1000);
+         }, 100);
       }
    };
 
@@ -212,7 +213,6 @@ export const HotelDetailPage = () => {
          {loading ? (
             <div className="text-center mt-5">
                <Spinner animation="border" variant="primary" />
-               <p>Loading hotel details...</p>
             </div>
          ) : error ? (
             <p className="text-danger">{error}</p>
@@ -355,7 +355,7 @@ export const HotelDetailPage = () => {
                         <Row>
                            {dataFacility.map((item, index) => {
                               return (
-                                 <Col className="mb-5" xs={2}>
+                                 <Col className="mb-5" xs={2} key={index}>
                                     <Card className="card-facility">
                                        <Card.Text style={{ fontSize: 14 }} className="text-center p-2 fw-bold">{item}</Card.Text>
                                     </Card>
@@ -384,7 +384,7 @@ export const HotelDetailPage = () => {
                   <Row className="m-0 p-0 mt-4">
                      {amenities.map((item, index) => {
                         return (
-                           <Col className="mb-5" xs={2}>
+                           <Col className="mb-5" xs={2} key={index}>
                               <Card className="card-facility">
                                  <Card.Text style={{ fontSize: 14 }} className="text-center p-2 fw-bold">{item.icon} {item.text}</Card.Text>
                               </Card>

@@ -10,7 +10,7 @@ const RoomSchema = new Schema({
   images: [{ type: String, required: true}],
   quantity: {type: Number, required: true},
   hotel: { type: Schema.Types.ObjectId, ref: 'Hotel', required: true },
-  beds: [{
+  bed: [{
     _id: false,
     bed: { type: Schema.Types.ObjectId, ref: 'Bed', required: true },
     quantity: { type: Number, required: true }
