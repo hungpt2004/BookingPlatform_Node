@@ -24,10 +24,7 @@ exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
   ]);
 
   if (listFeedback.length === 0) {
-    return res.status(401).json({
-      error: true,
-      message: "No have any feedback",
-    });
+    return res.send("No have any feedback")
   }
 
   return res.status(200).json({
@@ -201,25 +198,23 @@ exports.getFeedbackByUserAndReservation = asyncHandler(async (req, res) => {
 });
 
 const calculateAvgRatingHotel = async (hotelId) => {
-    //Tinh va update rating khach san 
-    //Tong so feedback cua hotel
-    const totalFeedbackHotel = await Feedback.find({hotel: hotelId}).countDocuments();
-    console.log("TONG FEEDBACK CUA KHACH SAN ", totalFeedbackHotel)
+  // Sử dụng aggregate để tính trung bình rating
+  const result = await Feedback.aggregate([
+      { $match: { hotel: hotelId } }, // Lọc feedback theo hotelId
+      { 
+          $group: { 
+              _id: "$hotel", 
+              avgRating: { $avg: "$rating" }, // Tính trung bình rating
+              totalFeedbacks: { $sum: 1 } // Đếm số feedback
+          } 
+      }
+  ]);
 
-    if(totalFeedbackHotel <=  0) return;
+  if (result.length === 0) return 0; // Nếu không có feedback, trả về 0
 
-    //Tinh tong rating hien tai
-    const feedbacks = await Feedback.find({hotel: hotelId});
-    var totalValueRating = 0;
-    for(const t in feedbacks){
-      totalValueRating += feedbacks[t].rating;
-    }
-    console.log(`Total Value Rating: ${totalValueRating}`)
+  const avgValueRating = Number(result[0].avgRating.toFixed(1));
+  console.log(`Average Rating Updated: ${avgValueRating}`);
 
-    //Tinh lai avg rating
-    const avgValueRating = Number((totalValueRating/totalFeedbackHotel).toFixed(1));
-    console.log(`Avarage Rating Update: ${avgValueRating}`)
+  return avgValueRating;
+};
 
-    return avgValueRating;
-    
-}

@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Card, Button, ListGroup, Badge } from "react-bootstrap";
+import axiosInstance from "../../utils/AxiosInstance";
+import { formatCurrencyVND } from "../../utils/FormatPricePrint";
+import { formatDate } from "../../utils/FormatDatePrint";
 
 const BookingStepTwo = () => {
     const { state: bookingData } = useLocation();
     const navigate = useNavigate();
+    const [currentHotel, setCurrentHotel] = useState({})
+    const [item, setItem] = useState([]);
+
 
     // If no booking data is provided, render a message and a back button.
     if (!bookingData) {
@@ -20,11 +26,31 @@ const BookingStepTwo = () => {
 
     const {
         hotelId,
+        totalRooms, //Tổng số phòng
         checkInDate,
         checkOutDate,
         totalPrice,
         roomDetails,
+        roomIds
     } = bookingData;
+
+    console.log(`Debug Selected Room: ${totalRooms}`)
+
+    const payment = async () => {
+        try {
+            const response = await axiosInstance.post('/payment/create-payment-link', {
+                amount: totalPrice,
+                rooms: roomDetails,
+                hotelId: hotelId,
+                roomIds: roomIds
+            });
+
+            // Redirect in frontend
+            window.location.href = response.data.checkoutUrl;
+        } catch (error) {
+            console.error("Payment error:", error);
+        }
+    };
 
     return (
         <Container className="mt-5">
@@ -47,14 +73,14 @@ const BookingStepTwo = () => {
                                     <li key={index} className="mb-2">
                                         <div className="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <strong>{room.roomType}</strong>
+                                                <strong>{room.roomId} - {room.roomType}</strong>
                                                 <br />
                                                 <small className="text-muted">
-                                                    Quantity: {room.quantity} | Price per room: ${room.pricePerRoom}
+                                                    Quantity: {room.quantity} | Price per room: {formatCurrencyVND(room.pricePerRoom)}
                                                 </small>
                                             </div>
-                                            <Badge bg="info" className="fs-6">
-                                                ${room.totalPrice}
+                                            <Badge bg="" className="fs-6 text-dark">
+                                                {formatCurrencyVND(room.totalPrice)}
                                             </Badge>
                                         </div>
                                     </li>
@@ -65,18 +91,18 @@ const BookingStepTwo = () => {
                         {/* Dates */}
                         <ListGroup.Item>
                             <strong>Check-in Date:</strong>{" "}
-                            {new Date(checkInDate).toLocaleDateString()}
+                            {formatDate(new Date(checkInDate))}
                         </ListGroup.Item>
                         <ListGroup.Item>
                             <strong>Check-out Date:</strong>{" "}
-                            {new Date(checkOutDate).toLocaleDateString()}
+                            {formatDate(new Date(checkOutDate))}
                         </ListGroup.Item>
 
                         {/* Total Price */}
                         <ListGroup.Item className="d-flex justify-content-between align-items-center">
                             <strong>Total Price:</strong>
                             <Badge bg="success" className="fs-5 p-2">
-                                ${totalPrice.toLocaleString()}
+                                {formatCurrencyVND(totalPrice)}
                             </Badge>
                         </ListGroup.Item>
                     </ListGroup>
@@ -88,9 +114,9 @@ const BookingStepTwo = () => {
                         </Button>
                         <Button
                             variant="success"
-                            onClick={() => navigate("/payment", { state: bookingData })}
+                            onClick={() => payment()}
                         >
-                            Proceed to Payment
+                            Payment
                         </Button>
                     </div>
                 </Card.Body>

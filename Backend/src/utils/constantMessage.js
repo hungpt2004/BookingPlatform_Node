@@ -29,5 +29,11 @@ module.exports = {
   FEEDBACK: {
     NOT_FOUND: "No feedback found.",
     INVALID_STATUS: "Invalid feedback status.",
-  }
+  },
+  ROOM: {
+    NOT_FOUND: "No room found.",
+    INVALID_ID: "Invalid id !",
+    SUCCESS: "Get bed success"
+  },
 };
+

@@ -7,6 +7,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Card } from 'react-bootstrap';
 import { useAuthStore } from '../../store/authStore';
+import { generateShortCutName } from '../../utils/GenerateShortName';
 
 function CustomNavbar() {
   const [user, setUser] = useState(null);
@@ -86,7 +87,7 @@ function CustomNavbar() {
                       />
                     ) : (
                       <span style={{ fontSize: '20px', lineHeight: '50px', color: 'white' }}>
-                        {user.name.charAt(0).toUpperCase()}
+                        {generateShortCutName(user.name.charAt(0).toUpperCase())}
                       </span>
                     )}
                   </Card>
