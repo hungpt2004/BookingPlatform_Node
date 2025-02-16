@@ -17,7 +17,6 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import MapComponent from '../../components/map/MapComponent';
 import { IoIosArrowDropright, IoIosArrowDropleft } from "react-icons/io";
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import axiosInstance from '../../utils/AxiosInstance';
 import HotelCard from '../../components/card/HotelCard';
 import { toast } from 'react-toastify';
