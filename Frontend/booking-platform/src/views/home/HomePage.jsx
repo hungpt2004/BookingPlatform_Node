@@ -19,7 +19,6 @@ import MapComponent from '../../components/map/MapComponent';
 import { IoIosArrowDropright, IoIosArrowDropleft } from "react-icons/io";
 import axiosInstance from '../../utils/AxiosInstance';
 import HotelCard from '../../components/card/HotelCard';
-import { toast } from 'react-toastify';
 
 
 export const HomePage = () => {
@@ -40,6 +39,7 @@ export const HomePage = () => {
   const [numberGuestError, setNumberGuestError] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [vietCities, setVietCities] = useState([]);
   const [favorites, setFavorites] = useState([]);
 
   // Fetch user's favorites on component mount
@@ -76,7 +76,6 @@ export const HomePage = () => {
       console.error('Error toggling favorite:', error);
     }
   };
-  const [vietCities, setVietCities] = useState([]);
 
   // CHECK VALIDATE
   useEffect(() => {
@@ -236,7 +235,7 @@ export const HomePage = () => {
   };
 
   const goToDetail = (hotelId) => {
-    navigate(`/hotel-detail/${hotelId}`);
+    navigate(`/hotel-detail/${hotelId}?checkin=${checkinDate}&checkout=${checkoutDate}&guests=${numberOfPeople}`);
   }
 
   const handleSearch = () => {
@@ -394,7 +393,12 @@ export const HomePage = () => {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        <HotelCard hotel={hotel} goToDetail={() => goToDetail(hotel._id)} />
+                        <HotelCard
+                          hotel={hotel}
+                          goToDetail={() => goToDetail(hotel._id)}
+                          isFavorite={favorites.includes(hotel._id)}
+                          toggleFavorite={toggleFavorite}
+                        />
                       </motion.div>
                     );
                   })) : (

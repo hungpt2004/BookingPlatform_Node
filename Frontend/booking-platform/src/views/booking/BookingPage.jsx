@@ -22,7 +22,7 @@ const Booking = ({
     const [bed, setBed] = useState([])
     const [quantity, setQuantity] = useState([])
     const [loadingBeds, setLoadingBeds] = useState(false);
-    const [openModal, setOpenModal] = useState(false)
+    const [capacityError, setCapacityError] = useState(null);
     const navigate = useNavigate();
 
 
@@ -127,6 +127,13 @@ const Booking = ({
         }
     }, [hotelId, checkInDate, checkOutDate, numberOfPeople]);
 
+    const calculateTotalCapacity = () => {
+        return rooms.reduce((total, room) => {
+            const quantity = selectedRooms[room._id] || 0;
+            return total + (room.capacity * quantity);
+        }, 0);
+    }
+
     const incrementRoomQuantity = (roomId, maxQuantity) => {
         setSelectedRooms(prev => {
             const current = prev[roomId] || 0;
@@ -162,6 +169,19 @@ const Booking = ({
     //Confirm Booking And Go to Payment
     const handleContinueBooking = async () => {
         if (Object.keys(selectedRooms).length === 0) return;
+
+        const totalCapacity = calculateTotalCapacity();
+        // const totalRooms = Object.values(selectedRooms).reduce((acc, curr) => acc + curr, 0);
+
+        if (totalCapacity < numberOfPeople) {
+            setCapacityError(`You still need  to  fit ${numberOfPeople - totalCapacity} more people`);
+            return;
+        }
+
+        // if (totalRooms > 1 && totalCapacity > numberOfPeople) {
+        //     setCapacityError(`You have exceeded the required number of people`);
+        //     return;
+        // }
 
         // Prepare room details with quantities and prices
         const roomDetails = rooms
@@ -221,8 +241,15 @@ const Booking = ({
                 </Alert>
             )}
 
+            {capacityError && (
+                <Alert variant="danger" className="mt-3">
+                    {capacityError}
+                </Alert>
+            )}
+
             {!loading && !error && (
                 <div className="table-responsive">
+
                     <Table striped bordered className="align-middle">
                         <thead>
                             <tr className="text-center fs-4 bg-primary">

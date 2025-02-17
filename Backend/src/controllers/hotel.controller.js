@@ -69,34 +69,35 @@ exports.getHotelDetailById = asyncHandler(async (req, res) => {
     rooms: listCurrentHotelRoom,
     message: "Get hotel data success",
   });
+});
 
-  exports.getTopHotel = asyncHandler(async (req, res) => {
-    const hotels = await Hotel.find().sort({ rating: -1 }).limit(5);
+exports.getTopHotel = asyncHandler(async (req, res) => {
+  const hotels = await Hotel.find().sort({ rating: -1 }).limit(5);
 
-    return res.status(200).json({
-      error: false,
-      hotels,
-      message: HOTEL.SUCCESS,
+  return res.status(200).json({
+    error: false,
+    hotels,
+    message: HOTEL.SUCCESS,
+  });
+});
+
+exports.getTotalReservationByHotelId = asyncHandler(async (req, res) => {
+
+  const { hotelId } = req.params;
+
+  if (!hotelId) {
+    return res.status(500).json({
+      error: true,
+      message: HOTEL.INVALID_ID,
     });
+  }
+
+  const totalReservations = await Reservation.countDocuments({ hotel: hotelId });
+
+  return res.status(200).json({
+    error: false,
+    totalReservations,
+    message: HOTEL.SUCCESS,
   });
 
-  exports.getTotalReservationByHotelId = asyncHandler(async (req, res) => {
-
-    const { hotelId } = req.params;
-
-    if (!hotelId) {
-      return res.status(500).json({
-        error: true,
-        message: HOTEL.INVALID_ID,
-      });
-    }
-
-    const totalReservations = await Reservation.countDocuments({ hotel: hotelId });
-
-    return res.status(200).json({
-      error: false,
-      totalReservations,
-      message: HOTEL.SUCCESS,
-    });
-
-  });
+});

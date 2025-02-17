@@ -3,13 +3,7 @@ import { Card, Row, Col, Badge, Button } from "react-bootstrap";
 import { FaMapMarkerAlt, FaBed, FaHeart, FaThumbsUp } from "react-icons/fa";
 import { CiStar } from "react-icons/ci";
 
-const HotelCard = ({ hotel, goToDetail }) => {
-
-  const [isFavorite, setIsFavorite] = useState(false);
-
-  const addToFavorite = () => {
-    setIsFavorite(!isFavorite);
-  }
+const HotelCard = ({ hotel, goToDetail, isFavorite, toggleFavorite }) => {
 
   return (
     <Card className="p-3 shadow-sm border rounded-3">
@@ -27,7 +21,7 @@ const HotelCard = ({ hotel, goToDetail }) => {
               backgroundColor: 'rgba(0, 0, 0, 0.3)' // Kết hợp với màu tối
             }}
           ></div>
-          <div 
+          <div
             className="position-absolute top-0 end-0 m-3"
             style={{
               backdropFilter: 'blur(4px)',
@@ -40,7 +34,10 @@ const HotelCard = ({ hotel, goToDetail }) => {
               className=""
               color={isFavorite ? "red" : "white"}
               size={24}
-              onClick={() => addToFavorite()}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFavorite(hotel._id);
+              }}
             />
           </div>
         </Col>
