@@ -25,6 +25,15 @@ module.exports = {
      SUCCESS: "Get hotel data success",
      CHECK_IN_DATE: "CheckInDate cannot be before CheckOutDate",
      CHECK_OUT_DATE: "CheckOutDate cannot be in the past"
-   }
+   },
+   FEEDBACK: {
+     NOT_FOUND: "No feedback found.",
+     INVALID_STATUS: "Invalid feedback status.",
+   },
+   ROOM: {
+    NOT_FOUND: "No room found.",
+    INVALID_ID: "Invalid id !",
+    SUCCESS: "Get bed success"
+   },
  };
  

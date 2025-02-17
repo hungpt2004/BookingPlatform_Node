@@ -12,6 +12,18 @@ router.use(authController.protect);
 
 HotelRouter.get("/get-all-hotel", HotelController.getAllHotels); //customer
 HotelRouter.get("/get-owned-hotel", protect, HotelController.getOwnedHotels); //owned
-HotelRouter.get("/get-hotel-detail/:hotelId", HotelController.getHotelDetailById)
+
+HotelRouter.get(
+  "/total/:hotelId",
+  HotelController.getTotalReservationByHotelId
+);
+
+HotelRouter.get(
+  "/get-hotel-detail/:hotelId",
+  HotelController.getHotelDetailById
+);
+
+HotelRouter.get("/top-hotel", HotelController.getTopHotel);
+
 
 module.exports = HotelRouter;

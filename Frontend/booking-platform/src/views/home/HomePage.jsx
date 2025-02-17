@@ -4,7 +4,7 @@ import CustomSlide from '../../components/slide/CustomSlide';
 import { HashLoader } from 'react-spinners';
 import CustomInput from '../../components/input/CustomInput';
 import LottieComponent from '../../components/lottie/LottieComponent';
-import { Badge, Button, Card, Image, Form, InputGroup, ButtonGroup } from 'react-bootstrap';
+import { Badge, Button, Card, Image, Form, InputGroup, ButtonGroup, Row, Col, Spinner } from 'react-bootstrap';
 import { motion } from 'framer-motion';  // Import motion
 import './HomePage.css';
 import { BASE_URL } from '../../utils/Constant';
@@ -16,6 +16,9 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import MapComponent from '../../components/map/MapComponent';
 import { IoIosArrowDropright, IoIosArrowDropleft } from "react-icons/io";
+import HotelCard from '../../components/card/HotelCard';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 
 export const HomePage = () => {
@@ -31,10 +34,14 @@ export const HomePage = () => {
   const [checkInError, setCheckInError] = useState('');
   const [checkOutError, setCheckOutError] = useState('');
   const [addressError, setAddressError] = useState('');
+  const [nameError, setNameError] = useState('');
+  const [numberGuestError, setNumberGuestError] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [vietCities, setVietCities] = useState([]);
+  const navigate = useNavigate();
 
+  // CHECK VALIDATE
   useEffect(() => {
     const fetchCities = async () => {
       try {
@@ -56,12 +63,12 @@ export const HomePage = () => {
             "Hoi An": "Hội An",
             "Qui Nhon": "Quy Nhơn"
           };
-  
+
           const transformedCities = response.data.geonames.map(city => ({
             ...city,
             toponymName: vietnameseNameMapping[city.toponymName] || city.toponymName,
           }));
-  
+
           setVietCities(transformedCities);
         }
       } catch (error) {
@@ -191,6 +198,9 @@ export const HomePage = () => {
     }
   };
 
+  const goToDetail = (hotelId) => {
+    navigate(`/hotel-detail/${hotelId}`);
+  }
 
   const handleSearch = () => {
     if (!address.trim()) {
@@ -201,6 +211,7 @@ export const HomePage = () => {
     setPage(1);
     fetchHotels(1);
   };
+  
 
   const handlePageChange = (newPage) => {
     if (newPage < 1 || newPage > totalPages) return;
@@ -236,8 +247,8 @@ export const HomePage = () => {
           />
         </div>
         <div className="col-md-2">
-          <div className="mb-3">
-            <label className="form-label">City</label>
+          <div className="">
+            <label className="form-label">CITY</label>
             <select
               value={address}
               onChange={(e) => setAddress(e.target.value)}
@@ -293,16 +304,16 @@ export const HomePage = () => {
             onChange={(e) => setNumberOfPeople(e.target.value)}
           />
         </div>
-        <div className="col-md-2">
+      </div>
+      <div className="d-flex justify-content-center mt-4">
           <Button
-            variant="primary"
+            va="primary"
             onClick={handleSearch}
             disabled={loading}
           >
-            {loading ? 'Searching...' : 'Search'}
+            {loading ? <Spinner animation="border" style={{ width: 20, height: 20 }} role="status" /> : 'Search'}
           </Button>
         </div>
-      </div>
       <div className="container-fluid">
         <div className="row mx-5 mt-5">
           <div className="col-md-3">
@@ -337,30 +348,15 @@ export const HomePage = () => {
                     return (
                       <motion.div
                         key={hotel._id.toString()}
-                        className="col-md-3 mb-4"
+                        className="col-md-12 mb-4"
                         initial={{ opacity: 0, y: 50 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                         viewport={{ once: true, amount: 0.8 }}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.8 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.95 }}
                       >
-                        <Card className='card-search-hotel' style={{ width: '100%' }}>
-                          {/* <Card.Img variant="top" src={hotel.imageUrl || 'default_image_url'} /> */}
-                          <Card.Img variant="top" className='img-img-fluid' src={hotel.images} />
-                          <Card.Body>
-                            <Card.Title><h2 className='fw-bold text-center'>{hotel.hotelName}</h2></Card.Title>
-                            <Card.Text className='text-muted'><Badge style={{ backgroundColor: "#6499E9" }}>Description </Badge> {hotel.description}</Card.Text>
-                            <Card.Text><Badge style={{ backgroundColor: "#6499E9" }}>Rating</Badge>⭐ Rating: {hotel.rating}</Card.Text>
-                            <Card.Text><Badge style={{ backgroundColor: "#6499E9" }}>Address</Badge>  Address: {hotel.address}</Card.Text>
-                          </Card.Body>
-                          <div className="d-flex justify-content-start mx-3 mb-3">
-                            <ButtonGroup>
-                              <Button variant="outline-dark" className="mx-1">Booking Now</Button>
-                              <Button variant="outline-dark">Add Favorite</Button>
-                            </ButtonGroup>
-                          </div>
-                        </Card>
+                        <HotelCard hotel={hotel} goToDetail={() => goToDetail(hotel._id)} />
                       </motion.div>
                     );
                   })) : (
