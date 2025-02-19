@@ -21,7 +21,7 @@ const UserSchema = new Schema(
       select: false,
     },
     createOn: { type: Date, default: new Date().getTime() },
-    cmnd: { type: String },
+    cmnd: { type: String, default: "N/A" },
     updatedAt: { type: Date, default: new Date().getTime() },
     phone: { type: String, default: "N/A" },
     address: { type: String, default: "N/A" },

@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { FiCamera } from "../../assets/icons/vander";
 
 export default function CustomerProfileSetting() {
-  const [user, setUser] = useState(null);
+
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [avatar, setAvatar] = useState(null);
@@ -15,7 +15,10 @@ export default function CustomerProfileSetting() {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-
+  const [name, setName] = useState("");
+  const [cmnd, setCmnd] = useState("");
+  const [id, setId] = useState("");
+  const [email, setEmail] = useState("");
   useEffect(() => {
     fetchCurrentUser();
   }, []);
@@ -27,9 +30,13 @@ export default function CustomerProfileSetting() {
       setPhone(userData.phone || "");
       setAddress(userData.address || "");
       setAvatar(userData.image?.url || null);
-      setUser(userData);
+      setName(userData.name || "");
+      setCmnd(userData.cmnd || "");
+      setId(userData._id);
+      setEmail(userData.email);
     } catch (error) {
       toast.error("Error fetching user data");
+      console.log(error);
     }
   };
   // Handle profile update
@@ -39,7 +46,8 @@ export default function CustomerProfileSetting() {
     const updates = {};
     if (phone) updates.phone = phone;
     if (address) updates.address = address;
-
+    if (name) updates.name = name;
+    if (cmnd) updates.cmnd = cmnd;
     if (Object.keys(updates).length === 0) {
       toast.error("No data provided for update");
       return;
@@ -72,7 +80,7 @@ export default function CustomerProfileSetting() {
 
     setIsUploadingAvatar(true);
     try {
-      const response = await axiosInstance.put(`/customer/update-avatar/${user.id}`, formData, {
+      const response = await axiosInstance.put(`/customer/update-avatar/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         }
@@ -89,7 +97,7 @@ export default function CustomerProfileSetting() {
       setIsUploadingAvatar(false);
     }
   };
-  
+
 
   if (isLoading) {
     return (
@@ -128,7 +136,7 @@ export default function CustomerProfileSetting() {
               </button>
             </div>
             <div className="ms-3 mb-0">
-              <h5 className="mb-1">{"Mr: " + user?.name || "User Name"}</h5>
+              <h5 className="mb-1">{"Mr: " + name || "User Name"}</h5>
             </div>
           </div>
         </div>
@@ -140,13 +148,52 @@ export default function CustomerProfileSetting() {
           <form onSubmit={handleUpdateProfile}>
             <h5>Personal Detail :</h5>
             <div className="row mt-4">
+              {/* 1 module update */}
+              <div className="col-md-6">
+                <div className="mb-3">
+                  <label className="form-label fw-semibold">Name:</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={name || ""}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="col-md-6">
+                <div className="mb-3">
+                  <label className="form-label fw-semibold">Email</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={email}
+                    disabled={true}
+                  />
+                </div>
+              </div>
+
+              <div className="col-md-6">
+                <div className="mb-3">
+                  <label className="form-label fw-semibold">Cmnd:</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={cmnd || ""}
+                    pattern="[0-9]{12}"
+                    onChange={(e) => setCmnd(e.target.value)}
+                  />
+                </div>
+              </div>
+
               <div className="col-md-6">
                 <div className="mb-3">
                   <label className="form-label fw-semibold">Phone:</label>
                   <input
                     type="text"
                     className="form-control"
-                    value={phone}
+                    value={phone || ""}
+                    pattern="[0-9]{4}-[0-9]{3}-[0-9]{3}"
                     onChange={(e) => setPhone(e.target.value)}
                   />
                 </div>
@@ -158,14 +205,13 @@ export default function CustomerProfileSetting() {
                   <input
                     type="text"
                     className="form-control"
-                    value={address}
+                    value={address || ""}
                     onChange={(e) => setAddress(e.target.value)}
                   />
                 </div>
               </div>
-              <div className="col-12">
-                {/* <button type="submit" className="btn btn-primary">Save Changes</button> */}
 
+              <div className="col-12">
                 <button
                   type="submit"
                   className="btn btn-primary"

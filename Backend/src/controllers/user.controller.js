@@ -48,6 +48,14 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
     updates.address = req.body.address;
   }
 
+  if (req.body.name) {
+    updates.name = req.body.name;
+  }
+
+  if (req.body.cmnd) {
+    updates.cmnd = req.body.cmnd;
+  }
+  
   if (Object.keys(updates).length === 0) {
     return res.status(500).json({
       status: "fail",
