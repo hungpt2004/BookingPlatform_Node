@@ -4,6 +4,7 @@
   background-color: white;
   transition: ease-in 0.2s;
   border-color: white;
+  width: 100%;
 }
 
 .card-search-hotel:hover {

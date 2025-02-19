@@ -13,7 +13,7 @@ exports.searchAndFilterHotels = async (req, res) => {
       hotelRating,
       numberOfPeople,
       page = 1, 
-      limit = 8, 
+      limit = 4, 
     } = req.query;
 
     let query = {};

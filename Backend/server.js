@@ -7,6 +7,11 @@ const ReservationRouter = require('./src/routes/reservation.route');
 const PaymentRouter = require('./src/routes/payment.route');
 const authenticateRoute = require('./src/routes/authenticate.route');
 const FeedbackRouter = require('./src/routes/feedback.route');
+<<<<<<< HEAD
+=======
+const RoomRouter = require('./src/routes/room.route');
+const BedRouter = require('./src/routes/bed.route');
+>>>>>>> main
 require("dotenv").config();
 const fileupload = require("express-fileupload");
 const app = express(); //Create server
@@ -40,6 +45,15 @@ app.use("/payment", PaymentRouter);
 //Feedback
 
 app.use("/feedback", FeedbackRouter);
+
+//Feedback
+app.use("/feedback", FeedbackRouter)
+
+//Room
+app.use('/room', RoomRouter)
+
+//Bed
+app.use('/bed', BedRouter)
 
 //Connect Mongo Config
 connectDB();

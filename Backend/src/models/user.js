@@ -8,11 +8,21 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    email: {
+      type: String,
+      required: [true, 'Email is required!'],
+      unique: true,
+      lowercase: true,
+      validate: [validator.isEmail, 'Please provide a valid email!'],
+    },
+    password: {
+      type: String,
+      required: [true, 'Password is required!'],
+      select: false,
+    },
     createOn: { type: Date, default: new Date().getTime() },
+    cmnd: { type: String },
     updatedAt: { type: Date, default: new Date().getTime() },
-    cmnd: { type: String, require: true },
     phone: { type: String, default: "N/A" },
     address: { type: String, default: "N/A" },
     role: { type: String, enum: ["CUSTOMER", "ADMIN", "OWNER"], default: "CUSTOMER" },
@@ -32,7 +42,7 @@ const UserSchema = new Schema(
         ref: "Hotel",
       },
     ], // Mảng các khách sạn yêu thích (tham chiếu đến Hotel)
- 
+
     image: {
       public_ID: {
         type: String,

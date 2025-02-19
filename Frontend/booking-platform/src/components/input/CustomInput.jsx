@@ -10,6 +10,7 @@ const CustomInput = ({ label, type, value, onChange, placeHolder }) => {
             placeholder={placeHolder}
             value={value}
             onChange={onChange}
+            required
          />
       </>
    )

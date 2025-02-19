@@ -21,6 +21,7 @@ export const CustomPasswordInput = ({ label, value, onChange, placeHolder }) => 
                placeholder={placeHolder}
                value={value}
                onChange={onChange}
+               required
             />
            <InputGroup.Text onClick={() => seePassword()} style={{ cursor: 'pointer' }}>
                {showPassword ? <IoEyeSharp size={20} /> : <FaEyeSlash size={20} />}

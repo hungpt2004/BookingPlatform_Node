@@ -54,7 +54,8 @@ exports.getRoomByHotelId = asyncHandler(async (req, res, next) => {
 
     // Find room related to hotelId
     const rooms = await Room.find({ hotel: hotelId }).populate('hotel');
-    ;
+
+    //Tong so room capacity * quantity
 
     if (rooms.length === 0) {
         return res.status(404).json({

@@ -110,10 +110,6 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const currentUser = req.user;
 
-  console.log(`user ${currentUser.id}`)
-
-  console.log(`Page ${page}`);
-
   if (!status) {
     return res.status(400).json({
       error: true,
@@ -133,7 +129,7 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   //Câu lệnh filter cùng trong {}
   //Nếu là điều kiện 2 sẽ bị hiểu là Projection
 
-  if (totalPageReservations === 0) {
+  if (totalPageReservations < 0) {
     return res.status(404).json({
       error: true,
       message: "No reservations found",
@@ -146,6 +142,7 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   const reservations = await Reservation.find(
     { ...query, user: currentUser.id }
   )
+    .populate('hotel')
     .sort({ totalPrice: -1 }) 
     .skip((page - 1) * perPage) 
     .limit(perPage);
@@ -168,19 +165,23 @@ const autoUpdateReservationStatus = asyncHandler(async () => {
   const reservations = await Reservation.find();
 
   for (const r of reservations) {
+
+    if(r.status === "COMPLETED" || r.status === "CHECKED OUT") continue;
+
     //1. Update from Booked to CheckIn
-    if (currentDate < r.checkInDate) r.status = "CHECKED IN";
+    // if (currentDate < r.checkInDate) r.status = "CHECKED IN";
 
-    //2. Update from CheckIn to CheckOut
-    if (currentDate > r.checkOutDate) r.status = "CHECKED OUT";
+    // //2. Update from CheckIn to CheckOut
+    // if (currentDate > r.checkOutDate) r.status = "CHECKED OUT";
 
-    await Reservation.updateOne({ _id: r._id }, { $set: { status: r.status } });
 
-    // console.log(`Updated status for note ID ${r._id} to ${r.status}`);
+    // await Reservation.updateOne({ _id: r._id }, { $set: { status: r.status } });
+
+    console.log(`Updated status for note ID ${r._id} to ${r.status}`);
   }
 });
 
-//setinterval auto run after each minutes
+// setinterval auto run after each minutes
 cron.schedule("* * * * *", () => {
-  autoUpdateReservationStatus();
+  // autoUpdateReservationStatus();
 });

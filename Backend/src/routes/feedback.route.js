@@ -1,10 +1,17 @@
-const express = require("express");
+const express = require('express')
+const FeedbackRouter = express.Router();
+const FeedbackController = require('../controllers/feedback.controller')
+const {protect,} = require("../controllers/authenticate.controller");
+const authController = require("./../controllers/authenticate.controller");
 const router = express.Router();
-const feedbackController = require("../controllers/feedback.controller");
-const { authenticateToken } = require("../utils/authenticateToken"); // Middleware xác thực user
 
-router.post("/create/:reservationId", authenticateToken, feedbackController.createFeedback);
-router.patch("/update/:feedbackId", authenticateToken, feedbackController.updateFeedback);
-router.get("/get", authenticateToken, feedbackController.getFeedbackByUser);
-router.delete("/delete/:feedbackId", authenticateToken, feedbackController.deleteFeedback);
-module.exports = router;
+router.use(authController.protect);
+
+FeedbackRouter.get('/get-feedback-hotel/:hotelId', FeedbackController.getAllFeedBackByHotelId)
+FeedbackRouter.post('/create-feedback/:reservationId', protect, FeedbackController.createFeedback)
+FeedbackRouter.patch('/update-feedback/:feedbackId', protect, FeedbackController.updateFeedback)
+FeedbackRouter.get('/get-feeback/:reservationId', protect, FeedbackController.getFeedbackByUserAndReservation)
+FeedbackRouter.delete('/delete-feedback/:feedbackId', FeedbackController.deleteFeedback)
+
+
+module.exports = FeedbackRouter;

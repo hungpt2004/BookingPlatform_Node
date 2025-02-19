@@ -184,7 +184,7 @@ export const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await axiosInstance.patch(
-        `${API_URL}/reset-password/${token}`,
+        `${BASE_URL}/user/reset-password/${token}`,
         {
           password,
         }

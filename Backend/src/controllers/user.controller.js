@@ -1,48 +1,42 @@
+const asyncHandler = require("../middlewares/asyncHandler");
 const User = require("../models/user");
-const catchAsync = require("../utils/catchAsync");
-const cloudinary = require("../utils/cloudinary");
-const { AUTH } = require('../utils/constantMessage');
-const asyncHandler = require('../middlewares/asyncHandler');
+const { AUTH } = require("../utils/constantMessage");
 
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
+exports.getAllUser = asyncHandler(async (req, res) => {
+  const users = await User.find().sort({ createOn: -1 });
 
-  res.status(200).json({
-    status: "success",
-    results: users.length,
-    data: {
-      users,
-    },
-  });
-});
-
-exports.getUser = catchAsync(async (req, res, next) => {
-  const userId = req.user?.id; // Lấy ID từ token đã giải mã trong middleware
-
-  if (!userId) {
-    return res.status(403).json({
-      status: "fail",
-      message: "Unauthorized: No user ID found",
+  if (users.length === 0) {
+    return res.status(404).json({
+      error: true,
+      message: AUTH.USER_NOT_FOUND,
     });
   }
 
-  const user = await User.findById(userId);
+  return res.status(200).json({
+    error: false,
+    users,
+    message: AUTH.GET_SUCCESS,
+  });
+});
+
+exports.getCurrentUser = asyncHandler(async (req, res) => {
+  const user = req.user;
 
   if (!user) {
-    return res.status(404).json({
-      status: "fail",
-      message: "User not found",
+    return res.status(403).json({
+      error: true,
+      message: AUTH.INVALID_TOKEN,
     });
   }
 
-  res.status(200).json({
-    status: "success",
-    data: { user },
+  return res.status(200).json({
+    error: false,
+    user,
+    messsage: AUTH.GET_SUCCESS,
   });
 });
 
-//update user
-exports.updateUser = catchAsync(async (req, res, next) => {
+exports.updateUser = asyncHandler(async (req, res, next) => {
   const userId = req.user.id; // Chỉ lấy ID từ token, không từ params
   const updates = {};
 
@@ -80,14 +74,14 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 });
 
 //update avatar
-exports.updateAvatar = catchAsync(async (req, res) => {
+exports.updateAvatar = asyncHandler(async (req, res) => {
   console.log("Route hit!");
   try {
     const userId = req.user?.id || req.body.id; // Kiểm tra ID từ token hoặc body
     if (!userId) {
       return res.status(404).json({
         error: true,
-        message: "Unauthorized: No user ID provided"
+        message: "Unauthorized: No user ID provided",
       });
     }
 
@@ -95,14 +89,14 @@ exports.updateAvatar = catchAsync(async (req, res) => {
     if (!user) {
       return res.status(404).json({
         error: true,
-        message: "User not found"
+        message: "User not found",
       });
     }
     // Kiểm tra xem file có được gửi trong request không
     if (!req.files || !req.files.image) {
       return res.status(404).json({
         error: true,
-        message: "No file uploaded"
+        message: "No file uploaded",
       });
     }
     // **XÓA AVATAR CŨ TRÊN CLOUDINARY**
@@ -137,7 +131,6 @@ exports.updateAvatar = catchAsync(async (req, res) => {
   }
 });
 
-
 exports.deleteUser = (req, res) => {
   res.status(500).json({
     status: "error",
@@ -146,21 +139,18 @@ exports.deleteUser = (req, res) => {
 };
 
 exports.getCurrentUser = asyncHandler(async (req, res) => {
-
   const user = req.user;
-
 
   if (!user) {
     return res.status(403).json({
       error: true,
-      message: AUTH.INVALID_TOKEN
-    })
+      message: AUTH.INVALID_TOKEN,
+    });
   }
 
   return res.status(200).json({
     error: false,
     user,
-    messsage: AUTH.GET_SUCCESS
-  })
-
+    messsage: AUTH.GET_SUCCESS,
+  });
 });

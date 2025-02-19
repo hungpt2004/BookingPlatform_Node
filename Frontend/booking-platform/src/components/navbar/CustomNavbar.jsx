@@ -6,16 +6,26 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Card } from 'react-bootstrap';
+import { useAuthStore } from '../../store/authStore';
+import { generateShortCutName } from '../../utils/GenerateShortName';
 
 function CustomNavbar() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
+  const { logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    setUser(null);
+    navigate('/'); // Điều hướng về trang đăng nhập
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axiosInstance.get('/customer'); // Gọi API từ backend
-        setUser(response.data.data.user);
+        const response = await axiosInstance.get('/customer/current-user'); // Gọi API từ backend
+        setUser(response.data.user);
       } catch (error) {
         console.error('Error fetching user:', error);
       }
@@ -24,11 +34,11 @@ function CustomNavbar() {
     fetchUser();
   }, []);
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('token'); // Xóa token khi logout
-    setUser(null);
-    navigate('/login'); // Điều hướng về trang đăng nhập
-  };
+  // const handleLogout = () => {
+  //   sessionStorage.removeItem('token'); // Xóa token khi logout
+  //   setUser(null);
+  //   navigate('/'); // Điều hướng về trang đăng nhập
+  // };
 
   return (
     <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary sticky-top">
@@ -77,7 +87,7 @@ function CustomNavbar() {
                       />
                     ) : (
                       <span style={{ fontSize: '20px', lineHeight: '50px', color: 'white' }}>
-                        {user.name.charAt(0).toUpperCase()}
+                        {generateShortCutName(user.name.charAt(0).toUpperCase())}
                       </span>
                     )}
                   </Card>
@@ -87,12 +97,10 @@ function CustomNavbar() {
                     <NavDropdown.Item href="#action/3.1">Owner Account</NavDropdown.Item>
                     <NavDropdown.Divider />
                     <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
-                    <NavDropdown.Divider />
-                    <NavDropdown.Item href="/feedback">Feedback</NavDropdown.Item>
                   </NavDropdown>
                 </>
               ) : (
-                <Nav.Link href="/login">Login</Nav.Link>
+                <Nav.Link href="/">Login</Nav.Link>
               )}
             </Container>
           </Nav>
