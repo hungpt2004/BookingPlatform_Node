@@ -10,21 +10,22 @@ import BookingStepTwo from "./views/booking/BookingStepTwo"
 import { HotelDetailPage } from "./views/details/HotelDetailPage"
 import ForgotPasswordPage from "./views/forgot_password/ForgotPasswordPage"
 import ResetPasswordPage from "./views/reset_password/ResetPasswordPage"
-
+import CustomerProfileSetting from "./views/customer/CustomerProfileSetting"
 function App() {
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage/>}/>
-        <Route path="/register" element={<RegisterPage/>}/> 
-        <Route path="/home" element={<HomePage/>}/>
-        <Route path="/transaction" element={<HistoryTransaction/>}/>
-        <Route path="/verify-email" element={<EmailVerificationPage/>}/>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/transaction" element={<HistoryTransaction />} />
+        <Route path="/verify-email" element={<EmailVerificationPage />} />
         <Route path="/booking-step2" element={<BookingStepTwo />} />
         <Route path="/hotel-detail/:id" element={<HotelDetailPage />} />
         <Route path="/forgot" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+        <Route path="/update-customer" element={<CustomerProfileSetting />} />
       </Routes>
     </Router>
   )

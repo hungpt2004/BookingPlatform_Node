@@ -6,9 +6,9 @@ import "./HistoryTransaction.css";
 import { Badge, Button, Card } from "react-bootstrap";
 import { formatDate } from "../../utils/FormatDatePrint";
 import { dataStatus, statusColors, statusText } from "./DataStatus";
-import FeedbackModal from "../../components/feedback/Feedback";
-import axiosInstance from "../../utils/AxiosInstance";
 import FeedbackModal from "../../components/feedback/FeedbackModal";
+import axiosInstance from "../../utils/AxiosInstance";
+
 
 export const HistoryTransaction = () => {
    const [status, setStatus] = useState("ALL");
@@ -29,12 +29,12 @@ export const HistoryTransaction = () => {
    };
 
 
-  const fetchDataReservation = async () => {
-    setLoading(true);
-    try {
-      const response = await axiosInstance.get(`/reservation/search-status`, {
-        params: { status, page }
-      });
+   const fetchDataReservation = async () => {
+      setLoading(true);
+      try {
+         const response = await axiosInstance.get(`/reservation/search-status`, {
+            params: { status, page }
+         });
 
          if (response.data && response.data.reservations) {
             console.log(response.data)
@@ -51,34 +51,34 @@ export const HistoryTransaction = () => {
       }
    };
 
-  useEffect(() => {
-    fetchDataReservation();
-  }, [status, page]);
+   useEffect(() => {
+      fetchDataReservation();
+   }, [status, page]);
 
-  // Add this function to handle feedback submission
-  const handleFeedbackSubmitted = () => {
-    fetchDataReservation(); // Refresh the list
-  };
-  return (
-    <>
-      <CustomNavbar />
-      <div className="row mt-5 d-flex container-fluid justify-content-center align-items-start">
-        <div className="col-md-2">
-          <div className="d-flex mt-5 flex-column" style={{ color: "red" }}>
-            {dataStatus.map((item, index) => (
-              <div key={index} className="col-md-1 p-2">
-                <button
-                  className={
-                    activeStatus === item ? "btn-active" : "btn-non-active"
-                  }
-                  onClick={() => handleChangeStatus(item)}
-                >
-                  {item}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
+   // Add this function to handle feedback submission
+   const handleFeedbackSubmitted = () => {
+      fetchDataReservation(); // Refresh the list
+   };
+   return (
+      <>
+         <CustomNavbar />
+         <div className="row mt-5 d-flex container-fluid justify-content-center align-items-start">
+            <div className="col-md-2">
+               <div className="d-flex mt-5 flex-column" style={{ color: "red" }}>
+                  {dataStatus.map((item, index) => (
+                     <div key={index} className="col-md-1 p-2">
+                        <button
+                           className={
+                              activeStatus === item ? "btn-active" : "btn-non-active"
+                           }
+                           onClick={() => handleChangeStatus(item)}
+                        >
+                           {item}
+                        </button>
+                     </div>
+                  ))}
+               </div>
+            </div>
 
             <div className="col-md-8">
                <div className="d-flex justify-content-center align-items-center">
@@ -139,7 +139,6 @@ export const HistoryTransaction = () => {
                                                 onClick={() => {
                                                    setShowFeedback(true)
                                                    setSelectedReservationId(item._id);
-                                                   console.log("reservation", item._id);
                                                 }}
                                              >
                                                 Feedback

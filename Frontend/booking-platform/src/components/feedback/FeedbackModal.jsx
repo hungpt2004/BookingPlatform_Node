@@ -11,11 +11,11 @@ export default function FeedbackModal({ show, onClose, reservationId, }) {
     const [feedbackExists, setFeedbackExists] = useState(false); // Kiểm tra có feedback chưa
     const [feedbackId, setFeedbackId] = useState([]); // ID của feedback nếu có
 
-   //  useEffect(() => {
-   //      if (reservationId) {
-   //          fetchFeedback();
-   //      }
-   //  }, [reservationId]);
+    //  useEffect(() => {
+    //      if (reservationId) {
+    //          fetchFeedback();
+    //      }
+    //  }, [reservationId]);
 
     const fetchFeedback = async () => {
         try {
@@ -46,12 +46,12 @@ export default function FeedbackModal({ show, onClose, reservationId, }) {
             if (feedbackExists) {
                 // Update feedback nếu đã tồn tại
                 await axiosInstance.patch(`/feedback/update-feedback/${feedbackId}`, {
-                    
+
                     content: content.trim(),
                     rating: Number(rating),
                 });
                 console.log(feedbackId),
-                toast.success("Feedback updated successfully!");
+                    toast.success("Feedback updated successfully!");
             } else {
                 // Tạo feedback mới
                 await axiosInstance.post(`/feedback/create-feedback/${reservationId}`, {
