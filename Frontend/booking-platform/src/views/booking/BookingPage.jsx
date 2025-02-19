@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Spinner, Alert, Table, Badge, Modal } from "react-bootstrap";
+import { Button, Spinner, Alert, Table, Badge, DropdownButton, Dropdown } from "react-bootstrap";
 import axiosInstance from "../../utils/AxiosInstance";
 import axios from "axios";
 import { BASE_URL } from "../../utils/Constant";
@@ -23,6 +23,7 @@ const Booking = ({
     const [quantity, setQuantity] = useState([])
     const [loadingBeds, setLoadingBeds] = useState(false);
     const [capacityError, setCapacityError] = useState(null);
+
     const navigate = useNavigate();
 
 
@@ -255,7 +256,6 @@ const Booking = ({
                             <tr className="text-center fs-4 bg-primary">
                                 <th>Accomodation Type</th>
                                 <th>Capacity</th>
-                                <th>Available Rooms</th>
                                 <th>Price</th>
                                 <th>Quantity</th>
                             </tr>
@@ -271,29 +271,21 @@ const Booking = ({
                                         </div>
                                     </td>
                                     <td className="text-center">{room.capacity}</td>
-                                    <td className="text-center">{room.quantity}</td>
                                     <td className="text-center">{formatCurrencyVND(room.price)}</td>
                                     <td>
                                         <div className="d-flex align-items-center justify-content-center">
-                                            <Button
-                                                variant="outline-secondary"
-                                                size="sm"
-                                                className="px-3"
-                                                onClick={() => decrementRoomQuantity(room._id)}
-                                                disabled={!(selectedRooms[room._id] > 0)}
+                                            <DropdownButton
+                                                id={`dropdown-room-${index}`}
+                                                title={selectedRooms[room._id] || 1}
+                                                onSelect={(eventKey) => setSelectedRooms(prev => ({
+                                                    ...prev,
+                                                    [room._id]: parseInt(eventKey)
+                                                }))}
                                             >
-                                                -
-                                            </Button>
-                                            <span className="mx-3 fw-bold">{selectedRooms[room._id] || 0}</span>
-                                            <Button
-                                                variant="outline-secondary"
-                                                size="sm"
-                                                className="px-3"
-                                                onClick={() => incrementRoomQuantity(room._id, room.quantity)}
-                                                disabled={(selectedRooms[room._id] || 0) >= room.quantity || validDate}
-                                            >
-                                                +
-                                            </Button>
+                                                {[...Array(room.quantity + 1).keys()].slice(1).map(num => (
+                                                    <Dropdown.Item key={num} eventKey={num}>{num}</Dropdown.Item>
+                                                ))}
+                                            </DropdownButton>
 
                                         </div>
                                     </td>
