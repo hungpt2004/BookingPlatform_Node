@@ -9,7 +9,9 @@ const Reservation = require("../models/reservation");
 exports.createBooking = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
-  const { hotelId, roomId, checkInDate, checkOutDate } = req.body;
+  const { hotelId, roomId, checkInDate, checkOutDate, roomDetails } = req.body;
+  // console.log(userId, hotelId, roomId, checkInDate, checkOutDate);
+  console.log(roomDetails)
 
   try {
     // Validate required fields
@@ -78,7 +80,7 @@ exports.createBooking = asyncHandler(async (req, res) => {
 
     // Check for existing reservations that overlap dates for room or rooms
     const overlapReservations = await Reservation.find({
-      rooms: { $in: roomId },
+      "rooms.room": { $in: roomId },
       status: { $nin: ["CANCELLED", "COMPLETED", "CHECKED_OUT"] },
       $or: [
         { checkInDate: { $lte: checkOut }, checkOutDate: { $gte: checkIn } },
@@ -113,7 +115,7 @@ exports.createBooking = asyncHandler(async (req, res) => {
     const reservation = new Reservation({
       user: userId,
       hotel: hotelId,
-      rooms: roomId,
+      rooms: roomDetails.map(room => ({ room: room.roomId, quantity: room.quantity })),
       checkInDate,
       checkOutDate,
       totalPrice,
@@ -123,10 +125,11 @@ exports.createBooking = asyncHandler(async (req, res) => {
     // // Save the reservation to the database
     // await reservation.save();
 
-    // // Decrement the quantity of the booked rooms
+    // Decrement the quantity of the booked rooms
     // for (const room of rooms) {
-    //     room.quantity -= 1;
-    //     await room.save();
+    //   const detail = roomDetails.find((r) => r.roomId === room._id.toString())
+    //   room.quantity -= detail.quantity;
+    //   await room.save();
     // }
 
     res.status(201).json({

@@ -15,9 +15,15 @@ const reservationSchema = new Schema(
     },
     rooms: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Room",
-        required: true,
+        room: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Room",
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+        }
       },
     ], // Danh sách phòng được đặt
     checkInDate: {
@@ -48,7 +54,7 @@ const reservationSchema = new Schema(
     },
   },
   { timestamps: true },
-  {versionKey: false}
+  { versionKey: false }
 );
 
 module.exports = mongoose.model("Reservation", reservationSchema);

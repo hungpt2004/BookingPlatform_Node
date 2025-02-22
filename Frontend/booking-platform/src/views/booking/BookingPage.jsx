@@ -135,29 +135,6 @@ const Booking = ({
         }, 0);
     }
 
-    const incrementRoomQuantity = (roomId, maxQuantity) => {
-        setSelectedRooms(prev => {
-            const current = prev[roomId] || 0;
-            const available = rooms.find(r => r._id === roomId)?.quantity || 0;
-            return {
-                ...prev,
-                [roomId]: Math.min(current + 1, available, maxQuantity)
-            };
-        });
-    };
-
-    const decrementRoomQuantity = (roomId) => {
-        setSelectedRooms(prev => {
-            const current = prev[roomId] || 0;
-            if (current <= 0) return prev;
-            const newCount = current - 1;
-            if (newCount === 0) {
-                const { [roomId]: _, ...rest } = prev;
-                return rest;
-            }
-            return { ...prev, [roomId]: newCount };
-        });
-    };
 
     //Calculate total price
     const calculateTotalPrice = () => {
