@@ -15,9 +15,16 @@ const reservationSchema = new Schema(
     },
     rooms: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Room",
-        required: true,
+        _id: false,
+        room: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Room",
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+        }
       },
     ], // Danh sách phòng được đặt
     checkInDate: {
@@ -31,25 +38,24 @@ const reservationSchema = new Schema(
     status: {
       type: String,
       enum: [
-        "BOOKED",        // Đã đặt, trả tiền nhưng chưa check-in
-        "CHECKED IN",    // Đang ở, đã check-in
-        "CHECKED OUT",   // Đã check-out, có thể để lại phản hồi
-        "COMPLETED",     // Hoàn thành, đã phản hồi
-        "PENDING",       // Chờ xử lý hoặc xác nhận
-        "CANCELLED",     // Đã hủy
-        "NOT PAID"       // Chưa trả tiền
+        "BOOKED", // Đã đặt, trả tiền nhưng chưa check-in
+        "CHECKED IN", // Đang ở, đã check-in
+        "CHECKED OUT", // Đã check-out, có thể để lại phản hồi
+        "COMPLETED", // Hoàn thành, đã phản hồi
+        "PENDING", // Chờ xử lý hoặc xác nhận
+        "CANCELLED", // Đã hủy
+        "NOT PAID", // Chưa trả tiền
       ],
       default: "PENDING", // Mặc định là chờ xử lý
     },
     totalPrice: {
       type: Number,
       required: true,
-      default: 0
+      default: 0,
     },
   },
   { timestamps: true },
-  {versionKey: false}
+  { versionKey: false }
 );
 
 module.exports = mongoose.model("Reservation", reservationSchema);
-

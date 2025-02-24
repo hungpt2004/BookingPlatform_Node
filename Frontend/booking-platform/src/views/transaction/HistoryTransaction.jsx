@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../../utils/Constant";
-import axios from "axios";
 import { HashLoader } from "react-spinners";
 import CustomNavbar from "../../components/navbar/CustomNavbar";
 import { Pagination, Row, Spinner } from "react-bootstrap";
@@ -17,7 +16,6 @@ export const HistoryTransaction = () => {
    const [reservations, setReservations] = useState([]);
    const [activeStatus, setActiveStatus] = useState("ALL");
    const [err, setErr] = useState("");
-   const [hotels, setHotels] = useState({});
    const [page, setPage] = useState(1);
    const [totalPages, setTotalPages] = useState(1); // Thêm state tổng số trang
    const [showFeedback, setShowFeedback] = useState(false);

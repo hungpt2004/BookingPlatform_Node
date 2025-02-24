@@ -54,9 +54,10 @@ exports.getRoomByReservationId = asyncHandler(async (req, res) => {
     });
   }
 
-  const reservation = await Reservation.findOne(
-    {_id: reservationId, user: user.id},
-  ).populate("rooms");
+  const reservation = await Reservation.findOne({
+    _id: reservationId,
+    user: user.id,
+  }).populate("rooms");
 
   if (reservation.rooms.length === 0) {
     return res.status(404).json({
@@ -85,10 +86,10 @@ exports.getHotelByReservationId = asyncHandler(async (req, res) => {
     });
   }
 
-  const reservation = await Reservation.findOne(
-    {_id: reservationId, user: user.id}
-  ).populate("hotel");
-
+  const reservation = await Reservation.findOne({
+    _id: reservationId,
+    user: user.id,
+  }).populate("hotel");
 
   if (!reservation) {
     return res.status(404).json({
@@ -118,13 +119,16 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   }
 
   let query = status === "ALL" ? {} : { status }; // If "ALL", return all reservations
-  let totalPageReservations = await Reservation.countDocuments({ ...query, user: currentUser.id }); 
+  let totalPageReservations = await Reservation.countDocuments({
+    ...query,
+    user: currentUser.id,
+  });
 
   //Gộp filter và projection
   //Filter là điều kiện lọc dữ liệu khi truy vấn MongoDB
-  //Projection là DS các trường sẽ trả về VD: {age: 1, name: 0} 
+  //Projection là DS các trường sẽ trả về VD: {age: 1, name: 0}
   //1 là trường trả về
-  //0 là trường ẩn đi 
+  //0 là trường ẩn đi
 
   //Câu lệnh filter cùng trong {}
   //Nếu là điều kiện 2 sẽ bị hiểu là Projection
@@ -137,14 +141,15 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   }
 
   //Lấy số nguyên các trang
-  let totalPages = Math.ceil(totalPageReservations / perPage); 
+  let totalPages = Math.ceil(totalPageReservations / perPage);
 
-  const reservations = await Reservation.find(
-    { ...query, user: currentUser.id }
-  )
-    .populate('hotel')
-    .sort({ totalPrice: -1 }) 
-    .skip((page - 1) * perPage) 
+  const reservations = await Reservation.find({
+    ...query,
+    user: currentUser.id,
+  })
+    .populate("hotel")
+    .sort({ totalPrice: -1 })
+    .skip((page - 1) * perPage)
     .limit(perPage);
 
   return res.status(200).json({
@@ -165,8 +170,7 @@ const autoUpdateReservationStatus = asyncHandler(async () => {
   const reservations = await Reservation.find();
 
   for (const r of reservations) {
-
-    if(r.status === "COMPLETED" || r.status === "CHECKED OUT") continue;
+    if (r.status === "COMPLETED" || r.status === "CHECKED OUT") continue;
 
     //1. Update from Booked to CheckIn
     // if (currentDate < r.checkInDate) r.status = "CHECKED IN";
@@ -174,14 +178,31 @@ const autoUpdateReservationStatus = asyncHandler(async () => {
     // //2. Update from CheckIn to CheckOut
     // if (currentDate > r.checkOutDate) r.status = "CHECKED OUT";
 
-
     // await Reservation.updateOne({ _id: r._id }, { $set: { status: r.status } });
 
-    console.log(`Updated status for note ID ${r._id} to ${r.status}`);
+    console.log(`Updated status for reservation ID ${r._id} to ${r.status}`);
+  }
+});
+
+const autoDeleteNotPaidReservation = asyncHandler(async () => {
+  const currentDate = new Date();
+
+  const reservations = await Reservation.find();
+
+  for (const r of reservations) {
+    //1. Update from Booked to CheckIn
+    if (r.status === "NOT PAID") {
+      await Reservation.deleteOne(
+        { _id: r._id },
+      );
+    }
+
+    console.log(`Delete status for reservation ID ${r._id} to ${r.status}`);
   }
 });
 
 // setinterval auto run after each minutes
-cron.schedule("* * * * *", () => {
+cron.schedule("*/5 * * * *", () => {
   // autoUpdateReservationStatus();
+  // autoDeleteNotPaidReservation();
 });
