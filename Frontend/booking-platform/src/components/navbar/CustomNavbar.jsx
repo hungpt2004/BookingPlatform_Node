@@ -54,7 +54,7 @@ function CustomNavbar() {
             <Nav.Link href="/home">Home</Nav.Link>
             <Nav.Link href="#">About</Nav.Link>
             <NavDropdown title="Service" id="collapsible-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Favorite List</NavDropdown.Item>
+              <NavDropdown.Item href="/favorite-list">Favorite List</NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item href="/transaction">Transaction History</NavDropdown.Item>
               <NavDropdown.Divider />

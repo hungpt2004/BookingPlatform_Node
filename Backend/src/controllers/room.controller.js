@@ -5,7 +5,7 @@ const Reservation = require("../models/reservation.js");
 const asyncHandler = require("../middlewares/asyncHandler.js");
 
 exports.createRoom = asyncHandler(async (req, res, next) => {
-    const hotelId = req.params.hotelId;
+    const { hotelId } = req.params;
 
     // Validate if hotel exists
     const hotel = await Hotel.findById(hotelId);

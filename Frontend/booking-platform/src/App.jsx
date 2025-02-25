@@ -10,7 +10,7 @@ import { HotelDetailPage } from "./views/details/HotelDetailPage"
 import ForgotPasswordPage from "./views/forgot_password/ForgotPasswordPage"
 import ResetPasswordPage from "./views/reset_password/ResetPasswordPage"
 import { SuccessPaymentPage } from "./views/status/SuccessPaymentPage"
-
+import FavoriteHotelsList from "./views/favorite/FavoriteHotelsList"
 function App() {
 
   return (
@@ -27,6 +27,8 @@ function App() {
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/success/:id" element={<SuccessPaymentPage />} />
         <Route path="/cancel/:id" element={<SuccessPaymentPage />} />
+        <Route path="/favorite-list" element={<FavoriteHotelsList />} />
+
       </Routes>
     </Router>
   )
