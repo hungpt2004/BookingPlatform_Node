@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, Row, Col, Badge, Button } from "react-bootstrap";
 import { FaMapMarkerAlt, FaBed, FaHeart, FaThumbsUp } from "react-icons/fa";
 import { CiStar } from "react-icons/ci";
+import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 
 const HotelCard = ({ hotel, goToDetail, isFavorite, toggleFavorite }) => {
 
@@ -12,7 +13,7 @@ const HotelCard = ({ hotel, goToDetail, isFavorite, toggleFavorite }) => {
         <Col md={4} className="position-relative">
           <Card.Img
             src={hotel.images || "default_image_url"}
-            className="img-fluid rounded-3"
+            className="img-fluid rounded-3 p-2"
             style={{ objectFit: "cover", height: "100%" }}
           />
           <div
@@ -77,8 +78,8 @@ const HotelCard = ({ hotel, goToDetail, isFavorite, toggleFavorite }) => {
 
             {/* Giá phòng */}
             <div className="d-flex align-items-center mt-2">
-              <del className="text-muted me-2">VND {hotel.pricePerNight + 100}</del>
-              <h5 className="fw-bold text-dark">VND {hotel.pricePerNight}</h5>
+              <del className="text-muted me-2">{formatCurrencyVND(hotel.pricePerNight + 100)}</del>
+              <h5 className="fw-bold text-dark">{formatCurrencyVND(hotel.pricePerNight)}</h5>
             </div>
 
             {/* Nút xem phòng */}

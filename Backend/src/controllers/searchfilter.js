@@ -32,6 +32,7 @@ exports.searchAndFilterHotels = async (req, res) => {
         return res.status(400).json({ error: true, message: "Invalid price range" });
       }
       query.rating = { $gte: minRating, $lte: maxRating };
+      // query.star = { $gte: minRating, $lte: maxRating };
     }
 
     const allHotels = await Hotel.find(query);

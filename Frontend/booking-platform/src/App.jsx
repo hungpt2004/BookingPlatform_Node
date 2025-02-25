@@ -1,4 +1,3 @@
-import React from "react"
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { LoginPage } from "./views/login/LoginPage"
 import { HomePage } from "./views/home/HomePage"
@@ -10,6 +9,7 @@ import BookingStepTwo from "./views/booking/BookingStepTwo"
 import { HotelDetailPage } from "./views/details/HotelDetailPage"
 import ForgotPasswordPage from "./views/forgot_password/ForgotPasswordPage"
 import ResetPasswordPage from "./views/reset_password/ResetPasswordPage"
+import { SuccessPaymentPage } from "./views/status/SuccessPaymentPage"
 
 function App() {
 
@@ -25,6 +25,8 @@ function App() {
         <Route path="/hotel-detail/:id" element={<HotelDetailPage />} />
         <Route path="/forgot" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+        <Route path="/success/:id" element={<SuccessPaymentPage />} />
+        <Route path="/cancel/:id" element={<SuccessPaymentPage />} />
       </Routes>
     </Router>
   )

@@ -20,6 +20,15 @@ const hotelSchema = new Schema(
       type: String,
       required: true,
     },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ['ACTIVE', 'NONACTIVE'],
+      default: 'NONACTIVE',
+    },
     facilities: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -29,6 +38,10 @@ const hotelSchema = new Schema(
     rating: {
       type: Number,
       required: true,
+    },
+    star: {
+      type: Number,
+      required: true
     },
     pricePerNight: {
       type: Number,
