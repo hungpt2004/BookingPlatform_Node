@@ -94,9 +94,9 @@ export const useAuthStore = create((set) => ({
         error: null,
         isLoading: false,
       });
-      // Store token in localStorage after successful login
+      // Store token in sessionStorage after successful login
       if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
+        sessionStorage.setItem("token", response.data.token);
       }
       return response.data;
     } catch (error) {
@@ -125,7 +125,7 @@ export const useAuthStore = create((set) => ({
       });
 
       if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
+        sessionStorage.setItem("token", response.data.token);
       }
 
       return response.data;
@@ -142,8 +142,8 @@ export const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null });
     try {
       await axiosInstance.post(`${BASE_URL}/user/logout`);
-      // Clear token from localStorage
-      localStorage.removeItem("token");
+      // Clear token from sessionStorage
+      sessionStorage.removeItem("token");
       set({
         user: null,
         isAuthenticated: false,

@@ -92,7 +92,7 @@ function CustomNavbar() {
                     )}
                   </Card>
                   <NavDropdown title={user.name} id="collapsible-nav-dropdown">
-                    <NavDropdown.Item href="#action/3.1">Setting</NavDropdown.Item>
+                    <NavDropdown.Item href="/update-customer">Setting</NavDropdown.Item>
                     <NavDropdown.Divider />
                     <NavDropdown.Item href="#action/3.1">Owner Account</NavDropdown.Item>
                     <NavDropdown.Divider />

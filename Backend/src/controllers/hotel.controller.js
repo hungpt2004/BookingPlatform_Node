@@ -83,7 +83,7 @@ exports.getTopHotel = asyncHandler(async (req, res) => {
 
 exports.getTotalReservationByHotelId = asyncHandler(async (req, res) => {
 
-  const {hotelId} = req.params;
+  const { hotelId } = req.params;
 
   if (!hotelId) {
     return res.status(500).json({

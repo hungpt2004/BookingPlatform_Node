@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import CustomNavbar from '../../components/navbar/CustomNavbar';
 import CustomSlide from '../../components/slide/CustomSlide';
 import { HashLoader } from 'react-spinners';
@@ -602,5 +602,46 @@ export const HomePage = () => {
         {/* Row - 6 - 3/3 */}
       </div>
     </>
+  );
+};
+
+const StarRating = ({ value, onChange }) => {
+  const [hoverValue, setHoverValue] = useState(null);
+
+  const handleClick = (index) => {
+    onChange(index + 1);
+  };
+
+  const handleMouseEnter = (index) => {
+    setHoverValue(index + 1);
+  };
+
+  const handleMouseLeave = () => {
+    setHoverValue(null);
+  };
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+      <Badge className='fw-4 fs-5' style={{ backgroundColor: '#6499E9', borderColor: '#6499E9' }}>Filter By Star</Badge>
+      {[...Array(5)].map((_, index) => (
+        <>
+          <span
+            key={index}
+            style={{
+              fontSize: '30px',
+              color: (hoverValue || value) > index ? '#FFD700' : '#ccc',
+              transition: 'color 0.3s ease, transform 0.2s ease',
+              margin: '0 5px',
+              transform: (hoverValue || value) > index ? 'scale(1.2)' : 'scale(1)',
+            }}
+            onClick={() => handleClick(index)}
+            onMouseEnter={() => handleMouseEnter(index)}
+            onMouseLeave={handleMouseLeave}
+          >
+            ★
+          </span>
+        </>
+      ))}
+    </div>
   );
 };
