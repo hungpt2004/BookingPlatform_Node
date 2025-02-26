@@ -172,6 +172,7 @@ const Booking = ({
                 totalPrice: room.price * selectedRooms[room._id],
             }));
 
+
         const roomIds = rooms
             .filter(room => selectedRooms[room._id] > 0)
             .map(room => ({
@@ -191,7 +192,13 @@ const Booking = ({
         };
         console.log("Booking Data", bookingData);
 
-        navigate('/booking-step2', { state: bookingData });
+        try {
+            await axiosInstance.post('/payment/create-booking', bookingData);
+            console.log("Booking created successfully");
+            navigate('/booking-step2', { state: bookingData });
+        } catch (error) {
+            console.error("Error creating booking:", error);
+        }
     };
 
     const validDate = checkInDate === checkOutDate

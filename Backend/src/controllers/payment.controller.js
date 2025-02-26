@@ -62,29 +62,29 @@ exports.createBooking = asyncHandler(async (req, res) => {
     const checkOut = new Date(checkOutDate);
 
     // // Validate that the user already booked the room
-    const userBooked = await Reservation.find({
-      hotel: hotelId,
-      user: user.id,
-      status: { $nin: ["CANCELLED", "COMPLETED", "CHECKED_OUT", "CHECKED_IN"] },
-    })
-      .populate("rooms")
-      .select("rooms");
+    // const userBooked = await Reservation.find({
+    //   hotel: hotelId,
+    //   user: user.id,
+    //   status: { $nin: ["CANCELLED", "COMPLETED", "CHECKED_OUT", "CHECKED_IN"] },
+    // })
+    //   .populate("rooms")
+    //   .select("rooms");
 
-    if (userBooked.length > 0) {
-      console.log("userId", user.id);
-      console.log("userBooked", userBooked);
+    // if (userBooked.length > 0) {
+    //   console.log("userId", user.id);
+    //   console.log("userBooked", userBooked);
 
-      const bookedRoomNames = userBooked
-        .flatMap((reservation) => reservation.rooms)
-        .map((room) => room.type);
+    //   const bookedRoomNames = userBooked
+    //     .flatMap((reservation) => reservation.rooms)
+    //     .map((room) => room.type);
 
-      const uniqueNames = [...new Set(bookedRoomNames)];
+    //   const uniqueNames = [...new Set(bookedRoomNames)];
 
-      return res.status(400).json({
-        error: true,
-        message: `You already booked this room: ${uniqueNames.join(", ")}`,
-      });
-    }
+    //   return res.status(400).json({
+    //     error: true,
+    //     message: `You already booked this room: ${uniqueNames.join(", ")}`,
+    //   });
+    // }
 
     // Check for existing reservations that overlap dates
     const overlapReservations = await Reservation.find({
@@ -131,6 +131,18 @@ exports.createBooking = asyncHandler(async (req, res) => {
     //   await room.save();
     // }
     console.log(`Đã tạo thành công reservation not paid`);
+
+    setTimeout(async () => {
+      try {
+        const currentReservation = await Reservation.findById(reservation._id);
+        if (currentReservation && currentReservation.status === "NOT PAID") {
+          await Reservation.deleteOne({ _id: reservation._id });
+          console.log(`Deleted unpaid reservation ${reservation._id} after 5 minutes`);
+        }
+      } catch (error) {
+        console.error("Error during auto-deletion of unpaid reservation:", error);
+      }
+    }, 5 * 60 * 1000); // 5 minutes in milliseconds
 
     return res.status(201).json({
       error: false,
