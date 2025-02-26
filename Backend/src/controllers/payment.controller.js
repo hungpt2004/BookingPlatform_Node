@@ -132,6 +132,7 @@ exports.createBooking = asyncHandler(async (req, res) => {
     // }
     console.log(`Đã tạo thành công reservation not paid`);
 
+    // Auto-delete unpaid reservation after 5 minutes
     setTimeout(async () => {
       try {
         const currentReservation = await Reservation.findById(reservation._id);
@@ -142,7 +143,7 @@ exports.createBooking = asyncHandler(async (req, res) => {
       } catch (error) {
         console.error("Error during auto-deletion of unpaid reservation:", error);
       }
-    }, 5 * 60 * 1000); // 5 minutes in milliseconds
+    }, 3 * 60 * 60 * 1000); // 3 hours in milliseconds
 
     return res.status(201).json({
       error: false,
