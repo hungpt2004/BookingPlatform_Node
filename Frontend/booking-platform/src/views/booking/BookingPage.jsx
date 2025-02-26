@@ -5,6 +5,7 @@ import axiosInstance from "../../utils/AxiosInstance";
 import axios from "axios";
 import { BASE_URL } from "../../utils/Constant";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
+import { renderPersonIcon } from "../../utils/RenderPersonIcon";
 
 const Booking = ({
     setOpen,
@@ -247,19 +248,21 @@ const Booking = ({
                                             <p>1 {loadingBeds ? <Spinner animation="border" size="sm" /> : bed[index]?.name || "N/A"}</p>
                                         </div>
                                     </td>
-                                    <td className="text-center">{room.capacity}</td>
+                                    <td className="text-center">{renderPersonIcon(room.capacity)}</td>
                                     <td className="text-center">{formatCurrencyVND(room.price)}</td>
                                     <td>
                                         <div className="d-flex align-items-center justify-content-center">
                                             <DropdownButton
+                                                variant="outline-dark"
                                                 id={`dropdown-room-${index}`}
-                                                title={selectedRooms[room._id] || 1}
+                                                aria-placeholder="Select quantity"
+                                                title={selectedRooms[room._id] || 0}
                                                 onSelect={(eventKey) => setSelectedRooms(prev => ({
                                                     ...prev,
                                                     [room._id]: parseInt(eventKey)
                                                 }))}
                                             >
-                                                {[...Array(room.quantity + 1).keys()].slice(1).map(num => (
+                                                {[...Array(room.quantity).keys()].slice(0).map(num => (
                                                     <Dropdown.Item key={num} eventKey={num}>{num}</Dropdown.Item>
                                                 ))}
                                             </DropdownButton>

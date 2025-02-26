@@ -470,19 +470,19 @@ export const HotelDetailPage = () => {
                <h4 className="px-5 fw-bold mt-3">Hạng mục</h4>
 
                <p className="fw-bold px-5 mb-1">Đánh giá 5 {"(⭐)"} 1.400<span className="text-muted"> total feedback</span></p>
-               <ProgressBar animated className="mx-5" variant="primary" now={60}/>
+               <ProgressBar className="mx-5" variant="primary" now={60} />
 
                <p className="fw-bold px-5 mb-1">Đánh giá 4 {"(⭐)"} </p>
-               <ProgressBar animated className="mx-5" variant="primary" now={50} />
+               <ProgressBar className="mx-5" variant="primary" now={50} />
 
                <p className="fw-bold px-5 mb-1">Đánh giá 3 {"(⭐)"} </p>
-               <ProgressBar animated className="mx-5" variant="primary" now={40} />
+               <ProgressBar className="mx-5" variant="primary" now={40} />
 
                <p className="fw-bold px-5 mb-1">Đánh giá 2 {"(⭐)"} </p>
-               <ProgressBar animated className="mx-5" variant="primary" now={30} />
+               <ProgressBar className="mx-5" variant="primary" now={30} />
 
                <p className="fw-bold px-5 mb-1">Đánh giá 1 {"(⭐)"} </p>
-               <ProgressBar animated className="mx-5" variant="primary" now={10} />
+               <ProgressBar className="mx-5" variant="primary" now={10} />
 
                <br></br>
 

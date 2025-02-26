@@ -23,6 +23,7 @@ import { CustomToast } from '../../components/toast/CustomToast';
 // Animation
 import UseTime from './UseTime.jsx';
 import DragBox from '../../components/animation/DragBox.jsx';
+import { motion } from 'framer-motion';  // Import motion
 
 export const LoginPage = () => {
    const [email, setEmail] = useState("");
@@ -114,13 +115,19 @@ export const LoginPage = () => {
                         backgroundColor: 'rgba(0, 0, 0, 0.3)' // Kết hợp với màu tối
                      }}
                   ></div>
-                  <div 
-                     className='position-absolute translate-middle text-light text-center top-50 start-50'
-                     style={{backgroundColor: 'rgba(0, 0, 0, 0.5)', padding: '20px', borderRadius: '10px'}}
+                  <motion.div
+                     className="position-absolute translate-middle text-light text-center top-50 start-50"
+                     style={{
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        padding: '20px',
+                        borderRadius: '10px'
+                     }}
+                     animate={{ y: [0, -10, 0] }}
+                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                   >
-                     <p className='fs-1 fw-bolder'>Welcome to Travelofy</p>
-                     <p className='fs-5 fw-medium'>Enjoy Your Blast Time</p>
-                  </div>
+                     <p className="fs-1 fw-bolder">Welcome to Travelofy</p>
+                     <p className="fs-5 fw-medium">Enjoy Your Blast Time</p>
+                  </motion.div>
                </Col>
                <Col className='justify-content-center align-content-center border-dark p-5' style={{ borderWidth: '1px', borderColor: 'black' }}>
                   <h1 className='text-center mb-5 fw-bold'>Login System</h1>
