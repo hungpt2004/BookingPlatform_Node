@@ -35,5 +35,9 @@ module.exports = {
     INVALID_ID: "Invalid id !",
     SUCCESS: "Get bed success"
    },
+   PAYMENT: {
+    SUCCESS: "Payment Success",
+    FAIL: "Payment Failed ! Check Error In Server"
+   }
  };
  

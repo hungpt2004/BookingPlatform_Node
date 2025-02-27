@@ -7,7 +7,7 @@ const hotelSchema = new Schema(
     hotelName: {
       type: String,
       required: true,
-    }, 
+    },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -20,6 +20,15 @@ const hotelSchema = new Schema(
       type: String,
       required: true,
     },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ['ACTIVE', 'NONACTIVE'],
+      default: 'NONACTIVE',
+    },
     facilities: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -30,14 +39,18 @@ const hotelSchema = new Schema(
       type: Number,
       required: true,
     },
+    star: {
+      type: Number,
+      required: true
+    },
     pricePerNight: {
       type: Number,
       required: true,
     },
     images: [
       {
-        type: String,
-        required: true
+        // public_ID: { type: String, required: true },
+        url: { type: String, required: true }
       },
     ],
     

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import CustomNavbar from '../../components/navbar/CustomNavbar';
 import CustomSlide from '../../components/slide/CustomSlide';
 import { HashLoader } from 'react-spinners';
@@ -19,6 +19,7 @@ import { IoIosArrowDropright, IoIosArrowDropleft } from "react-icons/io";
 import HotelCard from '../../components/card/HotelCard';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { newData, trendingRowFirst, trendingRowSecond } from './DataNews';
 
 
 export const HomePage = () => {
@@ -120,7 +121,7 @@ export const HomePage = () => {
       {label && <label className="form-label">{label}</label>}
       <input
         {...props}
-        className={`form-control ${error ? 'is-invalid' : ''}`}
+        className={`form-control ${error ? 'is-invalid' : ''} rounded-0 p-3`}
       />
       {error && <div className="error-message">{error}</div>}
     </div>
@@ -211,7 +212,7 @@ export const HomePage = () => {
     setPage(1);
     fetchHotels(1);
   };
-  
+
 
   const handlePageChange = (newPage) => {
     if (newPage < 1 || newPage > totalPages) return;
@@ -234,13 +235,12 @@ export const HomePage = () => {
         transition={{ duration: 1 }}
         viewport={{ once: true, amount: 0.3 }}
       >
-        <h1 className='text-center fw-bold m-5'>Search</h1>
+        <h1 className='text-center fw-bold m-5'>Your next adventure is just a search away</h1>
       </motion.div>
       <div className="row d-flex justify-content-center align-items-center">
         <div className="col-md-2">
           <CustomInput
             type="text"
-            label="HOTEL NAME"
             placeHolder="Name"
             value={hotelName}
             onChange={(e) => setHotelName(e.target.value)}
@@ -248,17 +248,16 @@ export const HomePage = () => {
         </div>
         <div className="col-md-2">
           <div className="">
-            <label className="form-label">CITY</label>
             <select
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              className="form-select"
+              className="form-select rounded-0 p-3" 
             >
               <option value="">Select a city</option>
               {vietCities.map((city) => (
                 <option key={city.geonameId} value={city.toponymName}>
-                {city.toponymName}
-              </option>              
+                  {city.toponymName}
+                </option>
               ))}
             </select>
             {addressError && (
@@ -280,7 +279,6 @@ export const HomePage = () => {
                 setCheckoutDate('');
               }
             }}
-            label="CHECK IN DATE"
             error={checkInError}
           />
         </div>
@@ -291,14 +289,12 @@ export const HomePage = () => {
             value={checkoutDate}
             min={checkinDate || new Date().toISOString().split('T')[0]}
             onChange={(e) => setCheckoutDate(e.target.value)}
-            label="CHECK OUT DATE"
             error={checkOutError}
           />
         </div>
         <div className="col-md-2">
           <CustomInput
             type="number"
-            label="NUMBER OF PEOPLES"
             placeHolder="Number's People"
             value={numberOfPeople}
             onChange={(e) => setNumberOfPeople(e.target.value)}
@@ -306,14 +302,14 @@ export const HomePage = () => {
         </div>
       </div>
       <div className="d-flex justify-content-center mt-4">
-          <Button
-            va="primary"
-            onClick={handleSearch}
-            disabled={loading}
-          >
-            {loading ? <Spinner animation="border" style={{ width: 20, height: 20 }} role="status" /> : 'Search'}
-          </Button>
-        </div>
+        <Button
+          va="primary"
+          onClick={handleSearch}
+          disabled={loading}
+        >
+          {loading ? <Spinner animation="border" style={{ width: 20, height: 20 }} role="status" /> : 'Search'}
+        </Button>
+      </div>
       <div className="container-fluid">
         <div className="row mx-5 mt-5">
           <div className="col-md-3">
@@ -332,7 +328,7 @@ export const HomePage = () => {
           <div className="col-md-9">
             {loading ? (
               <div className="d-flex justify-content-center p-5 align-items-center">
-                <HashLoader size={40} color="#6499E9" />
+                <Spinner size={40} color="#003b95" style={{color: '#003b95'}}/>
               </div>
             ) : (
               showHotels && (
@@ -390,6 +386,47 @@ export const HomePage = () => {
         </div>
       </div>
 
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.5 }}
+        viewport={{ once: true, amount: 0.3 }}
+      >
+        <h1 className='fw-bold m-5'>Trending destinations</h1>
+      </motion.div>
+
+      {/* HN / HCM */}
+      <div className="row mx-5">
+        {trendingRowFirst.map((item, index) => (
+          <div key={index} className="col-md-6 mb-1 position-relative card-container">
+            {/* Ảnh */}
+            <Image src={item.url} fluid className="w-100 card-des" style={{ borderRadius: "10px", height: '50vh', objectFit: 'cover' }} />
+
+            {/* Text hiển thị khi hover */}
+            <h3 className='position-absolute top-50 start-50 translate-middle text-white fw-bold overlay-text'>
+              {item.name}
+            </h3>
+          </div>
+        ))}
+      </div>
+
+
+      {/* DN , VT , DL */}
+      <div className='row mx-5 mt-3'>
+        {trendingRowSecond.map((item, index) => (
+          <div key={index} className="col-md-4 mb-1 position-relative card-container">
+            {/* Ảnh */}
+            <Image src={item.url} fluid className="w-100 card-des" style={{ borderRadius: "10px", height: '50vh', objectFit: 'cover' }} />
+
+            {/* Text hiển thị khi hover */}
+            <h3 className='position-absolute top-50 start-50 translate-middle text-white fw-bold overlay-text'>
+              {item.name}
+            </h3>
+          </div>
+        ))}
+      </div>
+
+
       {/* News */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -397,48 +434,69 @@ export const HomePage = () => {
         transition={{ duration: 1.5 }}
         viewport={{ once: true, amount: 0.3 }}
       >
-        <h1 className='text-center fw-bold m-5'>News Latest</h1>
+        <h1 className='fw-bold m-5'>Get inspiration for your next trip</h1>
       </motion.div>
       <motion.div
         className='row w-100 h-100 mx-4'
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.5 }}
+        transition={{ duration: 1.3 }}
         viewport={{ once: true, amount: 0.3 }}
       >
-        <div className='col-md-3'>
-          <Card className='mb-2 shadow p-2 bg-body-tertiary rounded'>
-            <Card.Body>
-              <Card.Img variant="top" src='/hotel/travel.jpg' className='mb-2' fluid style={{ width: '100%', height: '25vh' }} />
-              <Card.Title>First News Title</Card.Title>
-              <Card.Text>First news</Card.Text>
-              <Button style={{ backgroundColor: '#6499E9', borderColor: '#6499E9' }}>Read more</Button>
-            </Card.Body>
-          </Card >
-          <Card className='mb-2 shadow p-2 bg-body-tertiary rounded'>
-            <Card.Body>
-              <Card.Img variant="top" src='/hotel/travel.jpg' className='mb-2' fluid style={{ width: '100%', height: '25vh' }} />
-              <Card.Title>First News Title</Card.Title>
-              <Card.Text>First news</Card.Text>
-              <Button style={{ backgroundColor: '#6499E9', borderColor: '#6499E9' }}>Read more</Button>
-            </Card.Body>
-          </Card>
-        </div>
-        <div className='col-md-9'>
-          <Card className='mb-2 shadow p-2 bg-body-tertiary rounded'>
-            <Card.Body>
-              <Card.Img variant="top" src='/hotel/travel.jpg' className='mb-2' fluid style={{ width: '100%', height: '60vh' }} />
-              <Card.Title>First News Title</Card.Title>
-              <Card.Text>First news</Card.Text>
-              <Button style={{ backgroundColor: '#6499E9', borderColor: '#6499E9' }}>Read more</Button>
-            </Card.Body>
-          </Card>
-          <div className='d-flex align-items-center justify-content-center mt-5'>
-            <Button variant='outline-primary'>Prev</Button>
-            <p className='mx-2 text-center'>Page 1 of 3</p>
-            <Button variant='outline-primary'>Next</Button>
+        <div className='row'>
+          {/* Cột Trái - 2 Thẻ Card */}
+          <div className='col-md-6 d-flex flex-column justify-content-between'>
+            <div className='row'>
+              {newData.map((item, index) => {
+                return (
+                  <div className='col-md-6 d-flex'>
+                    <Card className='border-0 rounded flex-fill'>
+                      <Card.Body>
+                        <Card.Img
+                          variant="top"
+                          src={item.url}
+                          className='mb-2'
+                          fluid
+                          style={{ width: '100%', height: '24vh', borderRadius: '10px' }}
+                        />
+                        <Card.Title className='mt-1 fw-bold'>
+                          {item.title}
+                        </Card.Title>
+                        <Card.Text>
+                          {item.content}
+                        </Card.Text>
+                        <Button style={{ backgroundColor: '#003b95', borderColor: '#003b95' }}>
+                          Read more
+                        </Button>
+                      </Card.Body>
+                    </Card>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Cột Phải - Ảnh phải bằng chiều cao của 2 card bên trái */}
+          <div className='col-md-6 d-flex align-items-center'>
+            <Card className='m-3 border-0 rounded w-100 position-relative overflow-hidden'>
+              <Image
+                src='https://cdn.pixabay.com/photo/2019/02/11/09/42/pham-ngu-lao-3989110_1280.jpg'
+                fluid
+                style={{ width: '100%', height: 'calc(24vh * 2 + 16px)', borderRadius: '10px' }}
+              />
+              <div
+                className='position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-light'
+                style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}
+              >
+                <h2 className='fw-bold bottom-1'>Explore Da Nang</h2>
+                <p>Find the best spots for your next trip</p>
+                <Button style={{ backgroundColor: '#003b95', borderColor: '#003b95' }}>Discover Now</Button>
+              </div>
+            </Card>
           </div>
         </div>
+
+
       </motion.div>
 
       {/* About */}
@@ -457,15 +515,15 @@ export const HomePage = () => {
         transition={{ duration: 2 }}
         viewport={{ once: true, amount: 0.3 }}
       >
-        <div className='col-md-6'>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Non impedit esse cupiditate nihil eum quidem enim minus nobis tempore aperiam ab, commodi dolor optio nostrum temporibus at similique facilis adipisci?</p>
+        <div className='col-md-5 align-content-center mx-3'>
+          <p>Welcome to <span className='fw-bold' style={{color: '#003b95'}}>TRAVELOFY</span>, your go-to booking platform for hassle-free travel planning. Whether you're looking for a cozy stay, luxurious resorts, or budget-friendly accommodations, we bring you the best options at unbeatable prices.</p>
+          <p>At Travelofuy, we believe that booking your next adventure should be simple, secure, and transparent. Our platform is designed to provide:</p>
           <p>✔️ Transparent pricing with no hidden fees</p>
           <p>✔️ Secure and safe booking process</p>
           <p>✔️ Honest reviews and real images</p>
         </div>
         <div className='col-md-6'>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus iste, blanditiis molestias rerum illo, saepe quaerat recusandae quasi, iure asperiores fugiat perferendis ipsum sed ducimus soluta alias nobis numquam ex?</p>
-          <Button style={{ backgroundColor: '#6499E9', borderColor: '#6499E9' }}>Read more</Button>
+          <Image src='/hotel/about-remove.png' fluid className='w-100 object-fit-cover'/>
         </div>
       </motion.div>
 
@@ -557,7 +615,7 @@ export const HomePage = () => {
               aria-label="Enter your email"
               type='email'
             />
-            <Button style={{ backgroundColor: '#6499E9', borderColor: '#6499E9' }}>
+            <Button style={{ backgroundColor: '#003b95', borderColor: '#003b95' }}>
               Send
             </Button>
           </InputGroup>
@@ -601,5 +659,46 @@ export const HomePage = () => {
         {/* Row - 6 - 3/3 */}
       </div>
     </>
+  );
+};
+
+const StarRating = ({ value, onChange }) => {
+  const [hoverValue, setHoverValue] = useState(null);
+
+  const handleClick = (index) => {
+    onChange(index + 1);
+  };
+
+  const handleMouseEnter = (index) => {
+    setHoverValue(index + 1);
+  };
+
+  const handleMouseLeave = () => {
+    setHoverValue(null);
+  };
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+      <Badge className='fw-4 fs-5' style={{ backgroundColor: '#6499E9', borderColor: '#6499E9' }}>Filter By Star</Badge>
+      {[...Array(5)].map((_, index) => (
+        <>
+          <span
+            key={index}
+            style={{
+              fontSize: '30px',
+              color: (hoverValue || value) > index ? '#FFD700' : '#ccc',
+              transition: 'color 0.3s ease, transform 0.2s ease',
+              margin: '0 5px',
+              transform: (hoverValue || value) > index ? 'scale(1.2)' : 'scale(1)',
+            }}
+            onClick={() => handleClick(index)}
+            onMouseEnter={() => handleMouseEnter(index)}
+            onMouseLeave={handleMouseLeave}
+          >
+            ★
+          </span>
+        </>
+      ))}
+    </div>
   );
 };

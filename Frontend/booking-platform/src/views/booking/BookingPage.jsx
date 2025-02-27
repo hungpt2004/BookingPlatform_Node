@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Spinner, Alert, Table, Badge, Modal } from "react-bootstrap";
+import { Button, Spinner, Alert, Table, Badge, DropdownButton, Dropdown } from "react-bootstrap";
 import axiosInstance from "../../utils/AxiosInstance";
 import axios from "axios";
 import { BASE_URL } from "../../utils/Constant";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
+import { renderPersonIcon } from "../../utils/RenderPersonIcon";
+import dayjs from "dayjs";
 
 const Booking = ({
     setOpen,
@@ -12,7 +14,8 @@ const Booking = ({
     checkInDate,
     checkOutDate,
     numberOfPeople,
-    userId
+    userId,
+    currentHotel
 }) => {
     const [selectedRooms, setSelectedRooms] = useState({});
     const [loading, setLoading] = useState(false);
@@ -22,7 +25,9 @@ const Booking = ({
     const [bed, setBed] = useState([])
     const [quantity, setQuantity] = useState([])
     const [loadingBeds, setLoadingBeds] = useState(false);
-    const [openModal, setOpenModal] = useState(false)
+    const [capacityError, setCapacityError] = useState(null);
+    const [distanceDay, setDistanceDay] = useState(0)
+
     const navigate = useNavigate();
 
 
@@ -30,14 +35,14 @@ const Booking = ({
     // console.log("Data bed 2:", JSON.stringify(beds, null, 2));
     // console.log("Data bed detail 3:", JSON.stringify(bed, null, 2));
 
-    console.log("Data rooms 1:", rooms);
-    console.log("Data bed 2:", beds);
-    console.log("Data bed detail 3:", bed);
+    // console.log("Data rooms 1:", rooms);
+    // console.log("Data bed 2:", beds);
+    // console.log("Data bed detail 3:", bed);
 
     //Get Data Room
     const fetchRooms = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/room/get-room-by-hotel/${hotelId}`, {
+            const response = await axiosInstance.get(`/room/get-room-by-hotel/${hotelId}`, {
                 params: {
                     checkInDate,
                     checkOutDate,
@@ -127,42 +132,45 @@ const Booking = ({
         }
     }, [hotelId, checkInDate, checkOutDate, numberOfPeople]);
 
-    const incrementRoomQuantity = (roomId, maxQuantity) => {
-        setSelectedRooms(prev => {
-            const current = prev[roomId] || 0;
-            const available = rooms.find(r => r._id === roomId)?.quantity || 0;
-            return {
-                ...prev,
-                [roomId]: Math.min(current + 1, available, maxQuantity)
-            };
-        });
-    };
+    const calculateTotalCapacity = () => {
+        return rooms.reduce((total, room) => {
+            const quantity = selectedRooms[room._id] || 0;
+            return total + (room.capacity * quantity);
+        }, 0);
+    }
 
-    const decrementRoomQuantity = (roomId) => {
-        setSelectedRooms(prev => {
-            const current = prev[roomId] || 0;
-            if (current <= 0) return prev;
-            const newCount = current - 1;
-            if (newCount === 0) {
-                const { [roomId]: _, ...rest } = prev;
-                return rest;
-            }
-            return { ...prev, [roomId]: newCount };
-        });
-    };
 
     //Calculate total price
     const calculateTotalPrice = () => {
-        return rooms.reduce((total, room) => {
+        
+        //Calculate total night stay
+        const dateOut = dayjs(checkOutDate);
+        const dateIn = dayjs(checkInDate);
+        var nightTotal = dateOut.diff(dateIn, "day")
+
+        const roomTotalPrice = rooms.reduce((total, room) => {
             const quantity = selectedRooms[room._id] || 0;
             return total + (room.price * quantity);
         }, 0);
+
+        const hotelTotalPrice =  currentHotel.pricePerNight * nightTotal;
+
+        return roomTotalPrice + hotelTotalPrice
+
     };
 
     //Confirm Booking And Go to Payment
     const handleContinueBooking = async () => {
         if (Object.keys(selectedRooms).length === 0) return;
 
+        const totalCapacity = calculateTotalCapacity();
+        // const totalRooms = Object.values(selectedRooms).reduce((acc, curr) => acc + curr, 0);
+
+        if (totalCapacity < numberOfPeople) {
+            setCapacityError(`You still need  to  fit ${numberOfPeople - totalCapacity} more people`);
+            return;
+        }
+        
         // Prepare room details with quantities and prices
         const roomDetails = rooms
             .filter(room => selectedRooms[room._id] > 0) // Only include selected rooms
@@ -191,15 +199,28 @@ const Booking = ({
             roomDetails,
             roomIds
         };
+
         console.log("Booking Data", bookingData);
 
         navigate('/booking-step2', { state: bookingData });
     };
 
+    const validDate = checkInDate === checkOutDate
+
+    useEffect(() => {
+        if(checkInDate && checkOutDate){
+            const dateOut = dayjs(checkOutDate);
+            const dateInt = dayjs(checkInDate);
+            const distanceDay = dateOut.diff(dateInt, "day");
+            setDistanceDay(distanceDay)
+        }
+    }, [checkInDate, checkOutDate])
+
     return (
         <div className="p-5">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>Select Rooms</h2>
+                <h2>Select Rooms - <span className="alert alert-warning">You want to have {distanceDay} nights</span></h2>
+                <p>Price per night: {formatCurrencyVND(currentHotel.pricePerNight)}</p>
                 {/* <Button variant="secondary" onClick={() => setOpen(false)}>
                     Close
                 </Button> */}
@@ -219,14 +240,20 @@ const Booking = ({
                 </Alert>
             )}
 
+            {capacityError && (
+                <Alert variant="danger" className="mt-3">
+                    {capacityError}
+                </Alert>
+            )}
+
             {!loading && !error && (
                 <div className="table-responsive">
-                    <Table striped bordered  className="align-middle">
+
+                    <Table striped bordered className="align-middle">
                         <thead>
                             <tr className="text-center fs-4 bg-primary">
                                 <th>Accomodation Type</th>
                                 <th>Capacity</th>
-                                <th>Available Rooms</th>
                                 <th>Price</th>
                                 <th>Quantity</th>
                             </tr>
@@ -241,30 +268,25 @@ const Booking = ({
                                             <p>1 {loadingBeds ? <Spinner animation="border" size="sm" /> : bed[index]?.name || "N/A"}</p>
                                         </div>
                                     </td>
-                                    <td className="text-center">{room.capacity}</td>
-                                    <td className="text-center">{room.quantity}</td>
-                                    <td className="text-center">{formatCurrencyVND(room.price)}</td>
+                                    <td className="text-center">{renderPersonIcon(room.capacity)}</td>
+                                    <td className="text-center">{(formatCurrencyVND(room.price))}</td>
                                     <td>
                                         <div className="d-flex align-items-center justify-content-center">
-                                            <Button
-                                                variant="outline-secondary"
-                                                size="sm"
-                                                className="px-3"
-                                                onClick={() => decrementRoomQuantity(room._id)}
-                                                disabled={!(selectedRooms[room._id] > 0)}
+                                            <DropdownButton
+                                                className="rounded-0"
+                                                variant="outline-dark"
+                                                id={`dropdown-room-${index}`}
+                                                aria-placeholder="Select quantity"
+                                                title={selectedRooms[room._id] || 0}
+                                                onSelect={(eventKey) => setSelectedRooms(prev => ({
+                                                    ...prev,
+                                                    [room._id]: parseInt(eventKey)
+                                                }))}
                                             >
-                                                -
-                                            </Button>
-                                            <span className="mx-3 fw-bold">{selectedRooms[room._id] || 0}</span>
-                                            <Button
-                                                variant="outline-secondary"
-                                                size="sm"
-                                                className="px-3"
-                                                onClick={() => incrementRoomQuantity(room._id, room.quantity)}
-                                                disabled={(selectedRooms[room._id] || 0) >= room.quantity}
-                                            >
-                                                +
-                                            </Button>
+                                                {[...Array(room.quantity).keys()].slice(0).map(num => (
+                                                    <Dropdown.Item key={num} eventKey={num}>{num}</Dropdown.Item>
+                                                ))}
+                                            </DropdownButton>
 
                                         </div>
                                     </td>
@@ -288,8 +310,8 @@ const Booking = ({
                 <Button
                     variant="primary"
                     onClick={handleContinueBooking}
-                    disabled={Object.keys(selectedRooms).length === 0}
-                    className="fw-bold"
+                    disabled={Object.keys(selectedRooms).length === 0 || validDate}
+                    size="lg"
                 >
                     Continue
                 </Button>

@@ -35,19 +35,41 @@ const BookingStepTwo = () => {
         roomIds
     } = bookingData;
 
-    console.log(`Debug Selected Room: ${totalRooms}`)
+    console.log(`Detail Room Selected: ${JSON.stringify(roomDetails, null, 2)}`)
+
+    // console.log(`Debug Selected Room: ${JSON.stringify(totalRooms, null, 2)}`)
 
     const payment = async () => {
         try {
-            const response = await axiosInstance.post('/payment/create-payment-link', {
-                amount: totalPrice,
-                rooms: roomDetails,
-                hotelId: hotelId,
-                roomIds: roomIds
-            });
+
+            try {
+                const responseBooking = await axiosInstance.post('/payment/create-booking', {
+                    hotelId,
+                    roomIds,
+                    checkInDate,
+                    checkOutDate,
+                    roomDetails,
+                    totalPrice
+                });
+                if(responseBooking.data && responseBooking.data.message) {
+                    // console.log(JSON.stringify(responseBooking.data.reservation))
+                }
+            } catch (err) {
+                console.log(err)
+            }
+
+            console.log(roomIds)
+
+
+            // const responsePayment = await axiosInstance.post('/payment/create-payment-link', {
+            //     amount: totalPrice,
+            //     rooms: roomDetails,
+            //     hotelId: hotelId,
+            //     roomIds: roomIds
+            // });
     
-            // Redirect in frontend
-            window.location.href = response.data.checkoutUrl;
+            // // Redirect in frontend
+            // window.location.href = responsePayment.data.checkoutUrl;
         } catch (error) {
             console.error("Payment error:", error);
         }

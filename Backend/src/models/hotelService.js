@@ -7,12 +7,10 @@ const HotelServiceSchema = new Schema({
     ref: 'Hotel', 
     required: true 
   }, // Tham chiếu đến mô hình Hotel
-  
   name: {
     type: String,
     required: true,
   },
-  
   price: { 
     type: Number, 
     required: true 

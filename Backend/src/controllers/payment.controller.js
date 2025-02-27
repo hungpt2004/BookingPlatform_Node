@@ -5,115 +5,116 @@ const User = require("../models/user");
 const Hotel = require("../models/hotel");
 const Room = require("../models/room");
 const Reservation = require("../models/reservation");
+const { PAYMENT, RESERVATION } = require("../utils/constantMessage");
+const mongoose = require("mongoose");
 
 exports.createBooking = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
+  const user = req.user;
 
-  const { hotelId, roomId, checkInDate, checkOutDate } = req.body;
+  const { hotelId, roomIds, checkInDate, checkOutDate, roomDetails, totalPrice } = req.body;
 
   try {
     // Validate required fields
-    if (!userId || !hotelId || !roomId || !checkInDate || !checkOutDate) {
-      return res
-        .status(400)
-        .json({ error: true, message: "Missing required fields" });
+    if (!user.id || !hotelId || !roomIds || !checkInDate || !checkOutDate) {
+      return res.status(400).json({ error: true, message: "Missing required fields" });
     }
 
-    // Validate that the hotel exists
+    console.log("===== Received Booking Request =====");
+    console.log("User ID:", user.id);
+    console.log("hotelId received:", hotelId);
+    console.log("roomIds received:", roomIds);
+    console.log("checkInDate received:", checkInDate);
+    console.log("checkOutDate received:", checkOutDate);
+    console.log("roomDetails received:", roomDetails[0].roomId);
+    console.log("=====================================");
+
+    var roomsData = roomIds.map((item, index) => {
+      return (
+        console.log(item.roomId)
+      )
+    })
+
+
+    // // Convert roomIds to ObjectId array
+    const roomObjectIds = roomIds.map((id) => new mongoose.Types.ObjectId(id.roomId));
+
+    // // Validate that the hotel exists
     const hotel = await Hotel.findById(hotelId);
     if (!hotel) {
       return res.status(404).json({ error: true, message: "Hotel not found" });
     }
 
-    // Validate that the rooms exist, belong to the hotel, and have quantity > 0
+    // // Validate that the rooms exist, belong to the hotel, and have quantity > 0
     const rooms = await Room.find({
-      _id: { $in: roomId },
+      _id: { $in: roomObjectIds },
       hotel: hotelId,
       quantity: { $gt: 0 },
     });
 
-    // // Validate that the rooms exist and belong to the hotel
-    // const rooms = await Room.find({ _id: { $in: roomId }, hotel: hotelId });
-
-    // console.log(rooms.length, roomId.length);
-    if (rooms.length !== roomId.length) {
+    if (rooms.length !== roomIds.length) {
       return res.status(404).json({
         error: true,
-        message:
-          "Some rooms were not found or do not belong to the specified hotel",
+        message: "Some rooms were not found or do not belong to the specified hotel",
       });
     }
 
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
 
-    // Validate that the user already booked the room
-    const userBooked = await Reservation.find({
-      hotel: hotelId,
-      user: userId,
-      status: { $nin: ["CANCELLED", "COMPLETED", "CHECKED_OUT", "CHECKED_IN"] },
-    })
-      .populate("rooms")
-      .select("rooms");
+    // // Validate that the user already booked the room
+    // const userBooked = await Reservation.find({
+    //   hotel: hotelId,
+    //   user: user.id,
+    //   status: { $nin: ["CANCELLED", "COMPLETED", "CHECKED_OUT", "CHECKED_IN"] },
+    // })
+    //   .populate("rooms")
+    //   .select("rooms");
 
-    // Extract room names from the populated result
-    if (userBooked.length > 0) {
-      console.log("userId", userId);
-      console.log("userBooked", userBooked);
+    // if (userBooked.length > 0) {
+    //   console.log("userId", user.id);
+    //   console.log("userBooked", userBooked);
 
-      const bookedRoomNames = userBooked
-        .flatMap((reservation) => reservation.rooms)
-        .map((room) => room.type);
+    //   const bookedRoomNames = userBooked
+    //     .flatMap((reservation) => reservation.rooms)
+    //     .map((room) => room.type);
 
-      console.log("bookedRoomNames", bookedRoomNames);
+    //   const uniqueNames = [...new Set(bookedRoomNames)];
 
-      // Remove duplicates
-      const uniqueNames = [...new Set(bookedRoomNames)];
+    //   return res.status(400).json({
+    //     error: true,
+    //     message: `You already booked this room: ${uniqueNames.join(", ")}`,
+    //   });
+    // }
 
-      return res.status(400).json({
-        error: true,
-        message: `You already booked this room: ${uniqueNames.join(", ")}`,
-      });
-    }
-
-    // Check for existing reservations that overlap dates for room or rooms
+    // Check for existing reservations that overlap dates
     const overlapReservations = await Reservation.find({
-      rooms: { $in: roomId },
+      rooms: { $in: roomObjectIds },
       status: { $nin: ["CANCELLED", "COMPLETED", "CHECKED_OUT"] },
-      $or: [
-        { checkInDate: { $lte: checkOut }, checkOutDate: { $gte: checkIn } },
-      ],
+      $or: [{ checkInDate: { $lte: checkOut }, checkOutDate: { $gte: checkIn } }],
     }).populate("rooms");
 
-    // If overlapping reservations exist return error message
     if (overlapReservations.length > 0) {
       const conflictRooms = overlapReservations
         .flatMap((res) => res.rooms)
-        .filter((room) => roomId.includes(room._id.toString()))
+        .filter((room) => roomObjectIds.includes(room._id.toString()))
         .map((room) => room.type);
 
       const uniqueNames = [...new Set(conflictRooms)];
 
       return res.status(409).json({
         error: true,
-        message: `Room(s) ${uniqueNames.join(
-          ", "
-        )} are already booked during these dates.`,
+        message: `Room(s) ${uniqueNames.join(", ")} are already booked during these dates.`,
       });
     }
 
-    // Calculate the total price based on room prices and duration
-    const roomPrices = rooms.map((room) => room.price);
-    const nights =
-      (new Date(checkOutDate) - new Date(checkInDate)) / (1000 * 60 * 60 * 24);
-    const totalPrice =
-      roomPrices.reduce((sum, price) => sum + price, 0) * nights;
 
-    // Create the reservation
     const reservation = new Reservation({
-      user: userId,
+      user: user.id,
       hotel: hotelId,
-      rooms: roomId,
+      rooms: roomDetails.map((item, index) => ({
+        room: item.roomId,
+        quantity: item.quantity
+      })),
       checkInDate,
       checkOutDate,
       totalPrice,
@@ -121,26 +122,28 @@ exports.createBooking = asyncHandler(async (req, res) => {
     });
 
     // // Save the reservation to the database
-    // await reservation.save();
+    await reservation.save();
 
-    // // Decrement the quantity of the booked rooms
+    // Decrement the quantity of the booked rooms
     // for (const room of rooms) {
-    //     room.quantity -= 1;
-    //     await room.save();
+    //   const detail = roomDetails.find((r) => r.roomId === room._id.toString())
+    //   room.quantity -= detail.quantity;
+    //   await room.save();
     // }
+    
+    console.log(`Đã tạo thành công reservation not paid`);
 
-    res.status(201).json({
+    return res.status(201).json({
       error: false,
       message: "Reservation created successfully",
       reservation,
     });
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .json({ error: true, message: "Failed to create reservation" });
+    return res.status(500).json({ error: true, message: "Failed to create reservation" });
   }
 });
+
 
 const payOs = new PayOs(
   process.env.CLIENT_ID,
@@ -156,48 +159,23 @@ exports.createPaymentLink = asyncHandler(async (req, res) => {
 
   const currentReservation = await Reservation.findOne({ hotel: hotelId });
 
-  const totalReservation = await Reservation.find({
-    hotel: hotelId,
-  }).countDocuments();
-
-  console.log(roomIds);
-
-  console.log(totalReservation);
+  console.log(JSON.stringify(rooms, null, 2));
 
   const newOrder = {
     orderCode: Date.now(),
     amount: amount,
     items: rooms.map((room) => ({
-      name: String(room.name || "Unknown"),
-      price: Number(room.price) || 0,
+      name: String(room.roomName || "Unknown"),
+      price: Number(room.totalPrice) || 0,
       quantity: Number(room.quantity) || 1,
     })),
     buyerName: currentUser.name,
     buyerEmail: currentUser.email,
     buyerPhone: currentUser.phone,
-    returnUrl: `${process.env.DOMAIN_URL}/success`,
-    cancelUrl: `${process.env.DOMAIN_URL}/cancel`,
-    description: `${currentReservation._id}`.slice(0, 25), // ✅ Ensure max 25 chars
+    returnUrl: `http://localhost:5173/success/${currentReservation._id}`,
+    cancelUrl: `http://localhost:5173/cancel/${currentReservation._id}`,
+    description: `${currentReservation._id}`.slice(0, 25),
   };
-
-  //Lay tong so phong
-  //    const totalRoom = await Room.find({hotel: hotelId}).countDocuments();
-
-  //    const getCurrentRoom = await Room.findOne({_id: roomId})
-
-  //Remove quantity
-  //    for ( var s in selectedRooms ) {
-
-  //    }
-
-  //Update status reservation to BOOKED
-  //    await Reservation.updateOne(
-  //     {_id: currentReservation._id},
-  //     {$set: { status: 'BOOKED' }}
-  //    )
-
-  //    //Save reservation
-  //    currentReservation.save();
 
   var listRoomSelected = [];
   for (r in roomIds) {
@@ -209,4 +187,54 @@ exports.createPaymentLink = asyncHandler(async (req, res) => {
 
   const paymentLink = await payOs.createPaymentLink(newOrder);
   res.json({ checkoutUrl: paymentLink.checkoutUrl });
+});
+
+exports.cancelPayment = asyncHandler(async (req, res) => {
+  const currentUser = req.user;
+});
+
+exports.successPayment = asyncHandler(async (req, res) => {
+  const currentUser = req.user;
+
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(404).json({
+      error: true,
+      message: PAYMENT.FAIL,
+    });
+  }
+
+  const reservation = await Reservation.findOne({
+    _id: id,
+    user: currentUser.id,
+  });
+
+  if (!reservation) {
+    return res.status(404).json({
+      error: true,
+      message: RESERVATION.NOT_FOUND,
+    });
+  }
+
+  await Reservation.findOneAndUpdate(
+    { _id: id, user: currentUser.id },
+    { $set: { status: "BOOKED" } },
+    { new: true }
+  );
+
+  console.log(`Data reservation: ${JSON.stringify(reservation)}`);
+
+  for (let bookedRoom of reservation.rooms) {
+    const room = await Room.findById(bookedRoom.id);
+    if (room) {
+      room.quantity -= bookedRoom.quantity;
+      await room.save();
+    }
+  }
+
+  return res.status(200).json({
+    error: false,
+    message: PAYMENT.SUCCESS,
+  });
 });

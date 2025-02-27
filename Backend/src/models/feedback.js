@@ -6,7 +6,7 @@ const FeedbackSchema = new Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, //User ID
     reservation: {
       type: Schema.Types.ObjectId,
-      ref: "Reservation",
+      ref: "reservations",
       required: true,
     }, //Reservation ID
     hotel: {
