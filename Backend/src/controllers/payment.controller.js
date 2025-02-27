@@ -62,29 +62,29 @@ exports.createBooking = asyncHandler(async (req, res) => {
     const checkOut = new Date(checkOutDate);
 
     // // Validate that the user already booked the room
-    const userBooked = await Reservation.find({
-      hotel: hotelId,
-      user: user.id,
-      status: { $nin: ["CANCELLED", "COMPLETED", "CHECKED_OUT", "CHECKED_IN"] },
-    })
-      .populate("rooms")
-      .select("rooms");
+    // const userBooked = await Reservation.find({
+    //   hotel: hotelId,
+    //   user: user.id,
+    //   status: { $nin: ["CANCELLED", "COMPLETED", "CHECKED_OUT", "CHECKED_IN"] },
+    // })
+    //   .populate("rooms")
+    //   .select("rooms");
 
-    if (userBooked.length > 0) {
-      console.log("userId", user.id);
-      console.log("userBooked", userBooked);
+    // if (userBooked.length > 0) {
+    //   console.log("userId", user.id);
+    //   console.log("userBooked", userBooked);
 
-      const bookedRoomNames = userBooked
-        .flatMap((reservation) => reservation.rooms)
-        .map((room) => room.type);
+    //   const bookedRoomNames = userBooked
+    //     .flatMap((reservation) => reservation.rooms)
+    //     .map((room) => room.type);
 
-      const uniqueNames = [...new Set(bookedRoomNames)];
+    //   const uniqueNames = [...new Set(bookedRoomNames)];
 
-      return res.status(400).json({
-        error: true,
-        message: `You already booked this room: ${uniqueNames.join(", ")}`,
-      });
-    }
+    //   return res.status(400).json({
+    //     error: true,
+    //     message: `You already booked this room: ${uniqueNames.join(", ")}`,
+    //   });
+    // }
 
     // Check for existing reservations that overlap dates
     const overlapReservations = await Reservation.find({
@@ -124,6 +124,13 @@ exports.createBooking = asyncHandler(async (req, res) => {
     // // Save the reservation to the database
     await reservation.save();
 
+    // Decrement the quantity of the booked rooms
+    // for (const room of rooms) {
+    //   const detail = roomDetails.find((r) => r.roomId === room._id.toString())
+    //   room.quantity -= detail.quantity;
+    //   await room.save();
+    // }
+    
     console.log(`Đã tạo thành công reservation not paid`);
 
     return res.status(201).json({

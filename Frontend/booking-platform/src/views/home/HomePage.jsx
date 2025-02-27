@@ -121,7 +121,7 @@ export const HomePage = () => {
       {label && <label className="form-label">{label}</label>}
       <input
         {...props}
-        className={`form-control ${error ? 'is-invalid' : ''}`}
+        className={`form-control ${error ? 'is-invalid' : ''} rounded-0 p-3`}
       />
       {error && <div className="error-message">{error}</div>}
     </div>
@@ -236,13 +236,12 @@ export const HomePage = () => {
         transition={{ duration: 1 }}
         viewport={{ once: true, amount: 0.3 }}
       >
-        <h1 className='text-center fw-bold m-5'>Search</h1>
+        <h1 className='text-center fw-bold m-5'>Your next adventure is just a search away</h1>
       </motion.div>
       <div className="row d-flex justify-content-center align-items-center">
         <div className="col-md-2">
           <CustomInput
             type="text"
-            label="HOTEL NAME"
             placeHolder="Name"
             value={hotelName}
             onChange={(e) => setHotelName(e.target.value)}
@@ -250,11 +249,10 @@ export const HomePage = () => {
         </div>
         <div className="col-md-2">
           <div className="">
-            <label className="form-label">CITY</label>
             <select
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              className="form-select"
+              className="form-select rounded-0 p-3" 
             >
               <option value="">Select a city</option>
               {vietCities.map((city) => (
@@ -282,7 +280,6 @@ export const HomePage = () => {
                 setCheckoutDate('');
               }
             }}
-            label="CHECK IN DATE"
             error={checkInError}
           />
         </div>
@@ -293,14 +290,12 @@ export const HomePage = () => {
             value={checkoutDate}
             min={checkinDate || new Date().toISOString().split('T')[0]}
             onChange={(e) => setCheckoutDate(e.target.value)}
-            label="CHECK OUT DATE"
             error={checkOutError}
           />
         </div>
         <div className="col-md-2">
           <CustomInput
             type="number"
-            label="NUMBER OF PEOPLES"
             placeHolder="Number's People"
             value={numberOfPeople}
             onChange={(e) => setNumberOfPeople(e.target.value)}
@@ -334,7 +329,7 @@ export const HomePage = () => {
           <div className="col-md-9">
             {loading ? (
               <div className="d-flex justify-content-center p-5 align-items-center">
-                <HashLoader size={40} color="#6499E9" />
+                <Spinner size={40} color="#003b95" style={{color: '#003b95'}}/>
               </div>
             ) : (
               showHotels && (
@@ -471,7 +466,7 @@ export const HomePage = () => {
                         <Card.Text>
                           {item.content}
                         </Card.Text>
-                        <Button style={{ backgroundColor: '#6499E9', borderColor: '#6499E9' }}>
+                        <Button style={{ backgroundColor: '#003b95', borderColor: '#003b95' }}>
                           Read more
                         </Button>
                       </Card.Body>
@@ -496,7 +491,7 @@ export const HomePage = () => {
               >
                 <h2 className='fw-bold bottom-1'>Explore Da Nang</h2>
                 <p>Find the best spots for your next trip</p>
-                <Button style={{ backgroundColor: '#6499E9', borderColor: '#6499E9' }}>Discover Now</Button>
+                <Button style={{ backgroundColor: '#003b95', borderColor: '#003b95' }}>Discover Now</Button>
               </div>
             </Card>
           </div>
@@ -521,16 +516,15 @@ export const HomePage = () => {
         transition={{ duration: 2 }}
         viewport={{ once: true, amount: 0.3 }}
       >
-        <div className='col-md-6'>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Non impedit esse cupiditate nihil eum quidem enim minus nobis tempore aperiam ab, commodi dolor optio nostrum temporibus at similique facilis adipisci?</p>
+        <div className='col-md-5 align-content-center mx-3'>
+          <p>Welcome to <span className='fw-bold' style={{color: '#003b95'}}>TRAVELOFY</span>, your go-to booking platform for hassle-free travel planning. Whether you're looking for a cozy stay, luxurious resorts, or budget-friendly accommodations, we bring you the best options at unbeatable prices.</p>
+          <p>At Travelofuy, we believe that booking your next adventure should be simple, secure, and transparent. Our platform is designed to provide:</p>
           <p>✔️ Transparent pricing with no hidden fees</p>
           <p>✔️ Secure and safe booking process</p>
           <p>✔️ Honest reviews and real images</p>
         </div>
         <div className='col-md-6'>
-          {/* <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellendus iste, blanditiis molestias rerum illo, saepe quaerat recusandae quasi, iure asperiores fugiat perferendis ipsum sed ducimus soluta alias nobis numquam ex?</p>
-          <Button style={{ backgroundColor: '#6499E9', borderColor: '#6499E9' }}>Read more</Button> */}
-          <Image src='' />
+          <Image src='/hotel/about-remove.png' fluid className='w-100 object-fit-cover'/>
         </div>
       </motion.div>
 
@@ -622,7 +616,7 @@ export const HomePage = () => {
               aria-label="Enter your email"
               type='email'
             />
-            <Button style={{ backgroundColor: '#6499E9', borderColor: '#6499E9' }}>
+            <Button style={{ backgroundColor: '#003b95', borderColor: '#003b95' }}>
               Send
             </Button>
           </InputGroup>

@@ -60,7 +60,7 @@ const FeedbackPage = () => {
                 <Table striped bordered hover>
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>Hotel</th>
                             <th>Content</th>
                             <th>Rating</th>
                             <th>Actions</th>
@@ -85,7 +85,7 @@ const FeedbackPage = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="4" className="text-center">No feedback available</td>
+                                <td colSpan="4" className="text-center"><p className="alert alert-warning">No feedback available</p></td>
                             </tr>
                         )}
                     </tbody>

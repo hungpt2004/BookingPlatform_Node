@@ -112,7 +112,7 @@ export const HotelDetailPage = () => {
          {label && <label className="form-label">{label}</label>}
          <input
             {...props}
-            className={`form-control ${error ? 'is-invalid' : ''}`}
+            className={`form-control ${error ? 'is-invalid' : ''} rounded-0 p-3`}
          />
          {error && <div className="error-message">{error}</div>}
       </div>
@@ -463,6 +463,7 @@ export const HotelDetailPage = () => {
                   numberOfPeople={numberOfPeople}
                   userId={userId}
                   key={`${checkInDate}-${checkOutDate}-${numberOfPeople}`} // Add key to force re-render
+                  currentHotel={currentHotel}
                />
 
 

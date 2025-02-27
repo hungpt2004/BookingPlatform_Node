@@ -8,8 +8,6 @@ const asyncHandler = require("../middlewares/asyncHandler");
 exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
   const { hotelId } = req.params;
 
-  // const feedback = await Feedback.find({ hotel: hotelId });
-
   const [listFeedback, userFeeback] = await Promise.all([
     Feedback.find({ hotel: hotelId }).populate("user"),
     Feedback.find(
@@ -59,10 +57,6 @@ exports.createFeedback = async (req, res) => {
         .json({ message: "Reservation chưa hoàn thành hoặc không tồn tại." });
     }
 
-    // if (reservation.status !== "CHECKED OUT") {
-    //   return res.status(400).json({ message: "Reservation chưa hoàn tất check-out." });
-    // }
-
     // Tạo feedback mới
     const feedback = new Feedback({
       user: userId, // ObjectId of user
@@ -75,8 +69,6 @@ exports.createFeedback = async (req, res) => {
 
     await feedback.save();
     // Cập nhật trạng thái reservation thành "COMPLETED"
-
-    // reservation.status = "COMPLETED";
 
     await Reservation.updateOne(
       {_id: reservationId},
@@ -165,6 +157,7 @@ exports.deleteFeedback = asyncHandler(async (req, res) => {
     message: "Delete feedback success",
   });
 });
+
 
 //get feedback by user_id
 exports.getFeedbackByUserAndReservation = asyncHandler(async (req, res) => {

@@ -58,7 +58,7 @@ function CustomNavbar() {
               <NavDropdown.Divider />
               <NavDropdown.Item href="/transaction">Transaction History</NavDropdown.Item>
               <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.3">Information</NavDropdown.Item>
+              <NavDropdown.Item href="/feedback">My Feedback</NavDropdown.Item>
             </NavDropdown>
             <Container className="d-flex align-items-center">
               {user ? (
