@@ -20,6 +20,9 @@ const UserSchema = new Schema(
       required: [true, 'Password is required!'],
       select: false,
     },
+    phoneNumber: {
+      type: String
+    },
     createOn: { type: Date, default: new Date().getTime() },
     cmnd: { type: String },
     updatedAt: { type: Date, default: new Date().getTime() },
