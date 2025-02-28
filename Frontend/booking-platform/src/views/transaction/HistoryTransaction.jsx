@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { BASE_URL } from "../../utils/Constant";
 import { HashLoader } from "react-spinners";
 import CustomNavbar from "../../components/navbar/CustomNavbar";
 import { Pagination, Row, Spinner } from "react-bootstrap";
@@ -7,8 +6,9 @@ import "./HistoryTransaction.css";
 import { Badge, Button, Card } from "react-bootstrap";
 import { formatDate } from "../../utils/FormatDatePrint";
 import { dataStatus, statusColors, statusText } from "./DataStatus";
-import axiosInstance from "../../utils/AxiosInstance";
 import FeedbackModal from "../../components/feedback/FeedbackModal";
+import axiosInstance from "../../utils/AxiosInstance";
+
 
 export const HistoryTransaction = () => {
    const [status, setStatus] = useState("ALL");
@@ -50,14 +50,14 @@ export const HistoryTransaction = () => {
       }
    };
 
-   useEffect(() => {
-      fetchDataReservation();
-   }, [status, page]);
+   // useEffect(() => {
+   //    fetchDataReservation();
+   // }, [status, page]);
 
-   useEffect(() => {
-      fetchDataReservation();
-   }, [status, page]);
-
+   // Add this function to handle feedback submission
+   const handleFeedbackSubmitted = () => {
+      fetchDataReservation(); // Refresh the list
+   };
    return (
       <>
          <CustomNavbar />
@@ -67,7 +67,9 @@ export const HistoryTransaction = () => {
                   {dataStatus.map((item, index) => (
                      <div key={index} className="col-md-1 p-2">
                         <button
-                           className={activeStatus === item ? "btn-active" : "btn-non-active"}
+                           className={
+                              activeStatus === item ? "btn-active" : "btn-non-active"
+                           }
                            onClick={() => handleChangeStatus(item)}
                         >
                            {item}
@@ -136,7 +138,6 @@ export const HistoryTransaction = () => {
                                                 onClick={() => {
                                                    setShowFeedback(true)
                                                    setSelectedReservationId(item._id);
-                                                   console.log("reservation", item._id);
                                                 }}
                                              >
                                                 Feedback

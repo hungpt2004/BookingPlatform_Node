@@ -9,7 +9,7 @@ const User = require("../models/user");
 const AppError = require("../utils/appError");
 const asyncHandler = require("../middlewares/asyncHandler");
 const catchAsync = require("../utils/catchAsync.js");
-
+const cloudinary = require("../utils/cloudinary");
 const {
   PASSWORD_RESET_REQUEST_TEMPLATE,
   VERIFICATION_EMAIL_TEMPLATE,
@@ -71,9 +71,8 @@ const sendOTP = async (email, verificationToken) => {
 };
 
 // Signup
-exports.signup = asyncHandler(async (req, res, next) => {
+exports.signup = catchAsync(async (req, res, next) => {
   const { name, email, password } = req.body;
-
   if (!name || !email || !password) {
     return next(new AppError("Name, email, and password are required", 400));
   }
@@ -86,16 +85,42 @@ exports.signup = asyncHandler(async (req, res, next) => {
   const verificationToken = Math.floor(
     100000 + Math.random() * 900000
   ).toString();
-
-  console.log(`Verification Token: ${verificationToken}`);
-
   const hashedToken = await bcrypt.hash(verificationToken, 10);
+
+  let imageUrl = {
+    public_ID: "default_avatar_public_id", // Replace with the actual public ID if available
+    url: "https://res.cloudinary.com/dvcpy4kmm/image/upload/v1738399543/default_avatar.png", // Mặc định nếu không có ảnh
+  };
+  // Kiểm tra nếu có file avatar gửi lên
+  if (req.files && req.files.image) {
+    const image = req.files.image;
+    try {
+      // Upload avatar lên Cloudinary
+      const uploadResult = await cloudinary.uploader.upload(
+        image.tempFilePath,
+        {
+          folder: "avatars", // Lưu vào thư mục avatars trên Cloudinary
+          width: 150,
+          height: 150,
+          crop: "fill",
+        }
+      );
+
+      imageUrl = {
+        public_ID: uploadResult.public_id,
+        url: uploadResult.secure_url,
+      }; // Lấy URL ảnh
+    } catch (err) {
+      return next(new AppError("Error uploading avatar", 500));
+    }
+  }
 
   const newUser = await User.create({
     name,
     email,
     password, // Hash the password
     isVerified: false,
+    image: imageUrl,
     verificationToken: hashedToken,
     verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
   });
@@ -111,11 +136,11 @@ exports.signup = asyncHandler(async (req, res, next) => {
         id: newUser._id,
         name: newUser.name,
         email: newUser.email,
+        image: newUser.image,
       },
     },
   });
 });
-
 // Email Verification (corrected)
 exports.verifyEmail = catchAsync(async (req, res, next) => {
   const { email, otp } = req.body;

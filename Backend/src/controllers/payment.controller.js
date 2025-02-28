@@ -70,21 +70,21 @@ exports.createBooking = asyncHandler(async (req, res) => {
       .populate("rooms")
       .select("rooms");
 
-    if (userBooked.length > 0) {
-      console.log("userId", user.id);
-      console.log("userBooked", userBooked);
+    // if (userBooked.length > 0) {
+    //   console.log("userId", user.id);
+    //   console.log("userBooked", userBooked);
 
-      const bookedRoomNames = userBooked
-        .flatMap((reservation) => reservation.rooms)
-        .map((room) => room.type);
+    //   const bookedRoomNames = userBooked
+    //     .flatMap((reservation) => reservation.rooms)
+    //     .map((room) => room.type);
 
-      const uniqueNames = [...new Set(bookedRoomNames)];
+    //   const uniqueNames = [...new Set(bookedRoomNames)];
 
-      return res.status(400).json({
-        error: true,
-        message: `You already booked this room: ${uniqueNames.join(", ")}`,
-      });
-    }
+    //   return res.status(400).json({
+    //     error: true,
+    //     message: `You already booked this room: ${uniqueNames.join(", ")}`,
+    //   });
+    // }
 
     // Check for existing reservations that overlap dates
     const overlapReservations = await Reservation.find({
@@ -130,6 +130,7 @@ exports.createBooking = asyncHandler(async (req, res) => {
     //   room.quantity -= detail.quantity;
     //   await room.save();
     // }
+
     console.log(`Đã tạo thành công reservation not paid`);
 
     return res.status(201).json({

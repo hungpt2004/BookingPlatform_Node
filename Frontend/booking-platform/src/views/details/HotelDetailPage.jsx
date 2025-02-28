@@ -5,7 +5,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import axios from "axios";
 import { BASE_URL } from "../../utils/Constant";
-import { Card, Col, Container, Image, ListGroup, ListGroupItem, Row, Spinner, Carousel, Modal, Placeholder } from "react-bootstrap";
+import { Card, Col, Container, Image, ListGroup, ListGroupItem, Row, Spinner, Carousel, Modal, Placeholder, ProgressBar } from "react-bootstrap";
 import { MdLocationPin } from "react-icons/md";
 import "swiper/css/navigation";
 import Rating from "../../components/animation/HotelRating";
@@ -40,7 +40,6 @@ export const HotelDetailPage = () => {
    const [listFeedback, setListFeedback] = useState([]);
    const [showModal, setShowModal] = useState(false);
    const [selectedImage, setSelectedImage] = useState('')
-
    const { id } = useParams();
    const [open, setOpen] = useState(false);
    const [searchParams] = useSearchParams();
@@ -48,7 +47,6 @@ export const HotelDetailPage = () => {
    const [checkOutDate, setCheckOutDate] = useState('');
    const [numberOfPeople, setNumberOfPeople] = useState(1);
    const [dateErrors, setDateErrors] = useState({ checkIn: '', checkOut: '' });
-   // Add these new states at the top of HotelDetailPage
    const [capacityError, setCapacityError] = useState('');
    const [availabilityError, setAvailabilityError] = useState('');
    const [userId, setUserId] = useState(null); // State to store userId
@@ -144,7 +142,7 @@ export const HotelDetailPage = () => {
          {label && <label className="form-label">{label}</label>}
          <input
             {...props}
-            className={`form-control ${error ? 'is-invalid' : ''}`}
+            className={`form-control ${error ? 'is-invalid' : ''} rounded-0 p-3`}
          />
          {error && <div className="error-message">{error}</div>}
       </div>
@@ -219,7 +217,7 @@ export const HotelDetailPage = () => {
       if (new Date(initialCheckOut) <= new Date(initialCheckIn)) {
          initialCheckOut = new Date(initialCheckIn);
          initialCheckOut.setDate(initialCheckOut.getDate() + 1);
-         initialCheckOut = initialCheckOut.toISOString().split('T')[0];
+         initialCheckOut = initialCheckOut.toString().split('T')[0];
       }
 
       setCheckInDate(initialCheckIn);
@@ -446,7 +444,6 @@ export const HotelDetailPage = () => {
                      <div className="col-md-3">
                         <CustomDateValidator
                            type="date"
-                           label="CHECK IN DATE"
                            value={checkInDate}
                            min={new Date().toISOString().split('T')[0]}
                            onChange={(e) => handleDateChange('checkin', e.target.value)}
@@ -456,7 +453,6 @@ export const HotelDetailPage = () => {
                      <div className="col-md-3">
                         <CustomDateValidator
                            type="date"
-                           label="CHECK OUT DATE"
                            value={checkOutDate}
                            min={checkInDate || new Date().toISOString().split('T')[0]}
                            onChange={(e) => handleDateChange('checkout', e.target.value)}
@@ -494,7 +490,78 @@ export const HotelDetailPage = () => {
                   numberOfPeople={numberOfPeople}
                   userId={userId}
                   key={`${checkInDate}-${checkOutDate}-${numberOfPeople}`} // Add key to force re-render
+                  currentHotel={currentHotel}
+                  listFeedback={listFeedback}
                />
+
+
+               <h2 className="px-5 fw-bolder">Đánh giá của khách hàng</h2>
+               <h4 className="px-5 fw-bold mt-3">Hạng mục</h4>
+
+               <p className="fw-bold px-5 mb-1">Đánh giá 5 {"(⭐)"} 1.400<span className="text-muted"> total feedback</span></p>
+               <ProgressBar className="mx-5" variant="primary" now={60} />
+
+               <p className="fw-bold px-5 mb-1">Đánh giá 4 {"(⭐)"} </p>
+               <ProgressBar className="mx-5" variant="primary" now={50} />
+
+               <p className="fw-bold px-5 mb-1">Đánh giá 3 {"(⭐)"} </p>
+               <ProgressBar className="mx-5" variant="primary" now={40} />
+
+               <p className="fw-bold px-5 mb-1">Đánh giá 2 {"(⭐)"} </p>
+               <ProgressBar className="mx-5" variant="primary" now={30} />
+
+               <p className="fw-bold px-5 mb-1">Đánh giá 1 {"(⭐)"} </p>
+               <ProgressBar className="mx-5" variant="primary" now={10} />
+
+               <br></br>
+
+               <h4 className="px-5 fw-bold mt-3">Khách lưu trú ở đây thích nhất điều gì ?</h4>
+               <div className="d-flex align-items-center px-5">
+                  <Card style={{ backgroundColor: '#003b95' }}>
+                     <Card.Text className="px-3 py-2 text-light text-center">{currentHotel.rating}</Card.Text>
+                  </Card>
+                  <span className="fw-bold px-3 fs-6"> ▪️ {RatingConsider(currentHotel.rating)} ▪️ {listFeedback.length} real reviews</span>
+                  <a className="align-content-center text-primary text-decoration-underline cursor-pointer"><span>Read all reviews</span></a>
+               </div>
+               <Swiper
+                  navigation={true}
+                  allowSlideNext={true}
+                  pagination={true}
+                  slidesPerView={3}
+                  spaceBetween={10}
+                  className="mt-4"
+               >
+                  {listFeedback.length > 0
+                     ? (listFeedback.map((item, index) => {
+                        return (
+                           <SwiperSlide>
+                              <Card className="w-75 mb-5" key={index}>
+                                 <Card.Header className="border">
+                                    <div className="d-flex flex-row align-items-center">
+                                       <Image
+                                          variant="top"
+                                          className="img-fluid rounded-circle"
+                                          style={{ width: '50px', height: '50px' }}
+                                          src={item.user.avatar}
+                                          alt={item.user.name}
+                                       />
+                                       <div className="mx-3">
+                                          <Card.Title className="mb-2 fw-bold">{item.user.name}</Card.Title>
+                                          <Card.Subtitle><Rating rating={item.rating} /></Card.Subtitle>
+                                       </div>
+                                    </div>
+                                 </Card.Header>
+                                 <Card.Body>
+                                    <Card.Text>"{item.content}"</Card.Text>
+                                 </Card.Body>
+                              </Card>
+
+                           </SwiperSlide>
+                        )
+                     }))
+                     : <p className="px-5 alert text-center alert-warning">No have any feedback about {currentHotel.hotelName}</p>
+                  }
+               </Swiper>
             </>
          )}
       </>

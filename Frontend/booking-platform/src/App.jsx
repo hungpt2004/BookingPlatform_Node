@@ -11,8 +11,10 @@ import ForgotPasswordPage from "./views/forgot_password/ForgotPasswordPage"
 import ResetPasswordPage from "./views/reset_password/ResetPasswordPage"
 import { SuccessPaymentPage } from "./views/status/SuccessPaymentPage"
 import FavoriteHotelsList from "./views/favorite/FavoriteHotelsList"
-function App() {
+import CustomerProfileSetting from "./views/customer/CustomerProfileSetting"
+import FeedbackPage from './views/feedback/feedback'
 
+function App() {
   return (
     <Router>
       <Routes>
@@ -29,6 +31,8 @@ function App() {
         <Route path="/cancel/:id" element={<SuccessPaymentPage />} />
         <Route path="/favorite-list" element={<FavoriteHotelsList />} />
 
+        <Route path="/update-customer" element={<CustomerProfileSetting />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
       </Routes>
     </Router>
   )

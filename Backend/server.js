@@ -12,11 +12,13 @@ const FeedbackRouter = require('./src/routes/feedback.route');
 const RoomRouter = require('./src/routes/room.route');
 const BedRouter = require('./src/routes/bed.route');
 require("dotenv").config();
-
+const fileupload = require("express-fileupload");
 const app = express(); //Create server
-
+const path = require("path"); // 
+const fs = require("fs");
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true })); // Hỗ trợ dữ liệu form-urlencoded
+app.use(fileupload({ useTempFiles: true }));
 //Cors setting
 app.use(
   cors({
@@ -39,7 +41,11 @@ app.use("/hotel", HotelRouter);
 app.use("/reservation", ReservationRouter);
 
 //Payment
-app.use("/payment", PaymentRouter)
+app.use("/payment", PaymentRouter);
+
+//Feedback
+
+app.use("/feedback", FeedbackRouter);
 
 //Booking
 app.use("/booking", BookingRouter);
@@ -60,4 +66,13 @@ app.use('/bed', BedRouter)
 connectDB();
 
 //Listen Server
-app.listen(process.env.PORT || 8080, () => console.log("Server is running at ", process.env.PORT || 8080));
+app.listen(process.env.PORT || 8080, () =>
+  console.log("Server is running at ", process.env.PORT || 8080)
+);
+
+// Xóa thư mục `/tmp` khi server khởi động
+const tempFolder = path.join(__dirname, "tmp");
+fs.rm(tempFolder, { recursive: true, force: true }, (err) => {
+  if (err) console.error("Lỗi khi dọn dẹp thư mục tmp:", err);
+  else console.log("Đã dọn dẹp thư mục tmp");
+});

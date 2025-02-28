@@ -12,8 +12,8 @@ UserRouter.get("/get-all-user", UserController.getAllUser);
 UserRouter.get("/search", SearchController.searchAndFilterHotels);
 UserRouter.get("/current-user", protect, UserController.getCurrentUser)
 
-UserRouter.route("/:id")
-  .patch(UserController.updateUser)
+UserRouter.route("/update-profile")
+  .patch(protect, UserController.updateUser)
   .delete(UserController.deleteUser);
 
 UserRouter.put("/update-avatar/:id", protect, UserController.updateAvatar);

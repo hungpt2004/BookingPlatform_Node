@@ -72,7 +72,7 @@ exports.getHotelDetailById = asyncHandler(async (req, res) => {
 });
 
 exports.getTopHotel = asyncHandler(async (req, res) => {
-  const hotels = await Hotel.find().sort({ rating: -1 }).limit(5);
+  const hotels = await Hotel.find().sort({ rating: -1 }).limit(10);
 
   return res.status(200).json({
     error: false,

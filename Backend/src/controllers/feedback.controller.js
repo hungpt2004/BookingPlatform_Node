@@ -4,11 +4,10 @@ const Feedback = require("../models/feedback");
 const Reservation = require("../models/reservation");
 const Hotel = require('../models/hotel')
 const asyncHandler = require("../middlewares/asyncHandler");
+const { FEEDBACK } = require("../utils/constantMessage");
 
 exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
   const { hotelId } = req.params;
-
-  // const feedback = await Feedback.find({ hotel: hotelId });
 
   const [listFeedback, userFeeback] = await Promise.all([
     Feedback.find({ hotel: hotelId }).populate("user"),
@@ -35,6 +34,25 @@ exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
   });
 });
 
+exports.getTopComments = asyncHandler( async (req, res) => {
+
+  const feedbacks = await Feedback.find().populate('user').sort({ rating: -1 }).limit(5);
+
+  if(feedbacks.length <= 0) {
+    return res.status(500).json({
+      error: true,
+      message: FEEDBACK.NOT_FOUND
+    })
+  }
+
+  return res.status(200).json({
+    error: false,
+    feedbacks,
+    message: FEEDBACK.SUCCESS
+  })
+
+})
+
 exports.createFeedback = async (req, res) => {
   try {
     const { reservationId } = req.params;
@@ -59,10 +77,6 @@ exports.createFeedback = async (req, res) => {
         .json({ message: "Reservation chưa hoàn thành hoặc không tồn tại." });
     }
 
-    // if (reservation.status !== "CHECKED OUT") {
-    //   return res.status(400).json({ message: "Reservation chưa hoàn tất check-out." });
-    // }
-
     // Tạo feedback mới
     const feedback = new Feedback({
       user: userId, // ObjectId of user
@@ -75,8 +89,6 @@ exports.createFeedback = async (req, res) => {
 
     await feedback.save();
     // Cập nhật trạng thái reservation thành "COMPLETED"
-
-    // reservation.status = "COMPLETED";
 
     await Reservation.updateOne(
       {_id: reservationId},
@@ -165,6 +177,7 @@ exports.deleteFeedback = asyncHandler(async (req, res) => {
     message: "Delete feedback success",
   });
 });
+
 
 //get feedback by user_id
 exports.getFeedbackByUserAndReservation = asyncHandler(async (req, res) => {

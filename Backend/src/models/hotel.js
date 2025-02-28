@@ -7,7 +7,7 @@ const hotelSchema = new Schema(
     hotelName: {
       type: String,
       required: true,
-    }, 
+    },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -48,10 +48,11 @@ const hotelSchema = new Schema(
       required: true,
     },
     images: [
-      {
-        type: String,
-        required: true
-      },
+      // {
+      //   // public_ID: { type: String, required: true },
+      //   url: { type: String, required: true }
+      // },
+      { type: String, required: true}
     ],
     
     //Thêm mảng lưu trữ hình ảnh

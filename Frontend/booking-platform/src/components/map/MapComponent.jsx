@@ -32,7 +32,7 @@ const MapComponent = () => {
 
   return (
     <motion.div
-      className="rounded-4"
+      className="rounded-3"
       style={{ height: "300px", backgroundColor: "#e0e0e0" }}
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
