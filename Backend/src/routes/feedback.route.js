@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.use(authController.protect);
 
+FeedbackRouter.get('/top-comment', FeedbackController.getTopComments)
 FeedbackRouter.get('/get-feedback-hotel/:hotelId', FeedbackController.getAllFeedBackByHotelId)
 FeedbackRouter.post('/create-feedback/:reservationId', protect, FeedbackController.createFeedback)
 FeedbackRouter.patch('/update-feedback/:feedbackId', protect, FeedbackController.updateFeedback)

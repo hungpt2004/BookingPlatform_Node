@@ -15,7 +15,8 @@ const Booking = ({
     checkOutDate,
     numberOfPeople,
     userId,
-    currentHotel
+    currentHotel,
+    listFeedback
 }) => {
     const [selectedRooms, setSelectedRooms] = useState({});
     const [loading, setLoading] = useState(false);
@@ -197,13 +198,18 @@ const Booking = ({
             checkOutDate,
             totalPrice: calculateTotalPrice(),
             roomDetails,
-            roomIds
+            roomIds,
+            currentHotel,
+            distanceNight: distanceDay,
+            listFeedback
         };
 
         console.log("Booking Data", bookingData);
 
         navigate('/booking-step2', { state: bookingData });
     };
+
+    console.log(currentHotel)
 
     const validDate = checkInDate === checkOutDate
 

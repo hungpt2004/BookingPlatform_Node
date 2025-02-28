@@ -4,6 +4,7 @@ const Feedback = require("../models/feedback");
 const Reservation = require("../models/reservation");
 const Hotel = require('../models/hotel')
 const asyncHandler = require("../middlewares/asyncHandler");
+const { FEEDBACK } = require("../utils/constantMessage");
 
 exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
   const { hotelId } = req.params;
@@ -32,6 +33,25 @@ exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
     message: "Get all feed by hotel id success",
   });
 });
+
+exports.getTopComments = asyncHandler( async (req, res) => {
+
+  const feedbacks = await Feedback.find().populate('user').sort({ rating: -1 }).limit(5);
+
+  if(feedbacks.length <= 0) {
+    return res.status(500).json({
+      error: true,
+      message: FEEDBACK.NOT_FOUND
+    })
+  }
+
+  return res.status(200).json({
+    error: false,
+    feedbacks,
+    message: FEEDBACK.SUCCESS
+  })
+
+})
 
 exports.createFeedback = async (req, res) => {
   try {

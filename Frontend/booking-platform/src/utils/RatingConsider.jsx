@@ -9,3 +9,4 @@ export const RatingConsider = (ratingValue) => {
       return "Not Good"
    }
 } 
+

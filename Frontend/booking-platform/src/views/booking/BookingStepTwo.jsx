@@ -4,11 +4,15 @@ import { Container, Card, Button, ListGroup, Badge } from "react-bootstrap";
 import axiosInstance from "../../utils/AxiosInstance";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 import { formatDate } from "../../utils/FormatDatePrint";
+import CustomNavbar from "../../components/navbar/CustomNavbar";
+import CustomSlide from "../../components/slide/CustomSlide";
+import CustomInput from "../../components/input/CustomInput";
+import { renderStarIcon } from "../../utils/RenderPersonIcon";
+import { RatingConsider } from "../../utils/RatingConsider";
 
 const BookingStepTwo = () => {
     const { state: bookingData } = useLocation();
     const navigate = useNavigate();
-    const [currentHotel, setCurrentHotel] = useState({})
     const [item, setItem] = useState([]);
 
 
@@ -27,12 +31,16 @@ const BookingStepTwo = () => {
     const {
         userId,
         hotelId,
-        totalRooms, //Tổng số phòng
+        totalRooms,
         checkInDate,
         checkOutDate,
         totalPrice,
         roomDetails,
-        roomIds
+        roomIds,
+        currentHotel,
+        distanceNight,
+        listFeedback
+
     } = bookingData;
 
     console.log(`Detail Room Selected: ${JSON.stringify(roomDetails, null, 2)}`)
@@ -51,7 +59,7 @@ const BookingStepTwo = () => {
                     roomDetails,
                     totalPrice
                 });
-                if(responseBooking.data && responseBooking.data.message) {
+                if (responseBooking.data && responseBooking.data.message) {
                     // console.log(JSON.stringify(responseBooking.data.reservation))
                 }
             } catch (err) {
@@ -67,87 +75,109 @@ const BookingStepTwo = () => {
             //     hotelId: hotelId,
             //     roomIds: roomIds
             // });
-    
+
+
             // // Redirect in frontend
             // window.location.href = responsePayment.data.checkoutUrl;
         } catch (error) {
             console.error("Payment error:", error);
         }
     };
-    
+
     return (
-        <Container className="mt-5">
-            <Card className="shadow">
-                <Card.Header as="h5" className="bg-primary text-white">
-                    Booking Summary
-                </Card.Header>
-                <Card.Body>
-                    <ListGroup variant="flush">
-                        {/* User and Hotel Details */}
-                        <ListGroup.Item>
-                            <strong>User ID: </strong> {userId}
-                        </ListGroup.Item>
-                        <ListGroup.Item>
-                            <strong>Hotel ID:</strong> {hotelId}
-                        </ListGroup.Item>
-
-                        {/* Room Details */}
-                        <ListGroup.Item>
-                            <strong>Selected Rooms:</strong>
-                            <ul className="list-unstyled mb-0 mt-2">
-                                {roomDetails.map((room, index) => (
-                                    <li key={index} className="mb-2">
-                                        <div className="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>{room.roomId} - {room.roomType}</strong>
-                                                <br />
-                                                <small className="text-muted">
-                                                    Quantity: {room.quantity} | Price per room: {formatCurrencyVND(room.pricePerRoom)}
-                                                </small>
+        <>
+            <CustomNavbar />
+            <div className="container-fluid mt-3">
+                <div className="row w-100">
+                    <div className="col-md-8">
+                        <Card className="rounded-1 px-2">
+                            <Card.Text className="text-muted py-3" style={{ fontSize: '12px' }}>Save 10% or more on this option when you sign in with Genius, Booking.com's loyalty programme</Card.Text>
+                        </Card>
+                        <Card className="mt-2">
+                            <Card.Title className="px-2 mt-2 fw-bold" style={{ fontSize: '16px' }}>Enter your details</Card.Title>
+                            {/* Row1 */}
+                            <div className="row mt-2 px-2">
+                                <div className="col-md-6">
+                                    <label style={{ fontSize: '14px' }}>First name</label>
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" placeholder="" aria-label="Username" aria-describedby="basic-addon1" />
+                                    </div>
+                                </div>
+                                <div className="col-md-6">
+                                    <label style={{ fontSize: '14px' }}>Last name</label>
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" placeholder="" aria-label="Username" aria-describedby="basic-addon1" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="row px-2">
+                                <div className="col-md-6">
+                                    <label style={{ fontSize: '14px' }}>Email address</label>
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" placeholder="" aria-label="Username" aria-describedby="basic-addon1" />
+                                    </div>
+                                    <p className="mt-0" style={{ fontSize: '12px' }}>Confirmation email goes to this address</p>
+                                </div>
+                            </div>
+                            <div className="row px-2">
+                                <div className="col-md-6">
+                                    <label style={{ fontSize: '14px' }}>Country/region</label>
+                                    <div className="input-group mb-3">
+                                        <select className="form-control">
+                                            <option value="VN">Viet Nam</option>
+                                            <option value="US">United States</option>
+                                            <option value="UK">United Kingdom</option>
+                                            <option value="FR">France</option>
+                                            <option value="DE">Germany</option>
+                                            {/* Thêm các quốc gia khác nếu cần */}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="row px-2">
+                                <div className="col-md-6">
+                                    <label style={{ fontSize: '14px' }}>Phone number</label>
+                                    <div className="row">
+                                        <div className="col-md-4">
+                                            <div class="input-group mb-3">
+                                                <input type="text" class="form-control" value={"VN+84"} aria-describedby="basic-addon1" />
                                             </div>
-                                            <Badge bg="" className="fs-6 text-dark">
-                                                {formatCurrencyVND(room.totalPrice)}
-                                            </Badge>
                                         </div>
-                                    </li>
-                                ))}
-                            </ul>
-                        </ListGroup.Item>
-
-                        {/* Dates */}
-                        <ListGroup.Item>
-                            <strong>Check-in Date:</strong>{" "}
-                            {formatDate(new Date(checkInDate))}
-                        </ListGroup.Item>
-                        <ListGroup.Item>
-                            <strong>Check-out Date:</strong>{" "}
-                            {formatDate(new Date(checkOutDate))}
-                        </ListGroup.Item>
-
-                        {/* Total Price */}
-                        <ListGroup.Item className="d-flex justify-content-between align-items-center">
-                            <strong>Total Price:</strong>
-                            <Badge bg="success" className="fs-5 p-2">
-                                {formatCurrencyVND(totalPrice)}
-                            </Badge>
-                        </ListGroup.Item>
-                    </ListGroup>
-
-                    {/* Action Buttons */}
-                    <div className="mt-4 d-flex justify-content-between">
-                        <Button variant="secondary" onClick={() => navigate(-1)}>
-                            Back
-                        </Button>
-                        <Button
-                            variant="success"
-                            onClick={() => payment()}
-                        >
-                            Payment
-                        </Button>
+                                        <div className="col-md-8">
+                                            <div class="input-group mb-3">
+                                                <input type="text" class="form-control" placeholder="" aria-label="Username" aria-describedby="basic-addon1" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </Card>
                     </div>
-                </Card.Body>
-            </Card>
-        </Container>
+                    <div className="col-md-4">
+                        <Card className="rounded">
+                            <Card.Title className="px-2 mt-2 fs-6">Hotel {renderStarIcon(currentHotel.rating)}</Card.Title>
+                            <Card.Title className="fw-bold px-2" style={{ fontSize: '16px' }}>{currentHotel.hotelName}</Card.Title>
+                            <Card.Text className="px-2" style={{
+                                display: '-webkit-box',
+                                WebkitBoxOrient: 'vertical',
+                                WebkitLineClamp: 2,
+                                overflow: 'hidden',
+                            }}>{currentHotel.address}</Card.Text>
+                            <Card.Text className="px-2 text-success">Excellent location - {currentHotel.rating}</Card.Text>
+                            <div className="d-flex align-items-center px-2 mb-2">
+                                <Card style={{ backgroundColor: '#003b95' }}>
+                                    <Card.Text className="px-2 py-1 text-light text-center">{currentHotel.rating}</Card.Text>
+                                </Card>
+                                <span className="fw-bold px-3 fs-6">{RatingConsider(currentHotel.rating)}</span>
+                            </div>
+                        </Card>
+                        <Card className="mt-2">
+                            
+                        </Card>
+                    </div>
+                </div>
+            </div>
+        </>
     );
 };
 

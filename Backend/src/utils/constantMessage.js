@@ -29,6 +29,7 @@ module.exports = {
    FEEDBACK: {
      NOT_FOUND: "No feedback found.",
      INVALID_STATUS: "Invalid feedback status.",
+     SUCCESS: "Get feedback success",
    },
    ROOM: {
     NOT_FOUND: "No room found.",
