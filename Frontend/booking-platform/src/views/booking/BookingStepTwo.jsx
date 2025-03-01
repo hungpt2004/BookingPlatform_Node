@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Card, Button, ListGroup, DropdownButton, Dropdown } from "react-bootstrap";
 import axiosInstance from "../../utils/AxiosInstance";
@@ -16,23 +16,7 @@ const BookingStepTwo = () => {
     const navigate = useNavigate();
     const [item, setItem] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
-
-    // Toggle the dropdown
-    const handleToggle = () => {
-        setIsOpen(!isOpen);
-    };
-
-    // If no booking data is provided, render a message and a back button.
-    if (!bookingData) {
-        return (
-            <Container className="mt-5 text-center">
-                <h3>No booking data found.</h3>
-                <Button variant="primary" onClick={() => navigate(-1)}>
-                    Go Back
-                </Button>
-            </Container>
-        );
-    }
+    const [expandedRooms, setExpandedRooms] = useState([]);
 
     const {
         hotelId,
@@ -50,7 +34,58 @@ const BookingStepTwo = () => {
 
     } = bookingData;
 
-    console.log(`Detail Room Selected: ${JSON.stringify(totalRooms, null, 2)}`)
+
+    useEffect(() => {
+
+        const fetchAndExpandRooms = async () => {
+
+            try {
+                // Fetch all rooms by their IDs
+                const roomsData = await Promise.all(
+                    roomIds.map(id =>
+                        axiosInstance.get(`/room/get-room-by-id/${id.roomId}`)
+                            .then(res => res.data.room)
+                    )
+                );
+
+                // Expand rooms based on quantity
+                const expanded = [];
+                roomsData.forEach(room => {
+                    const quantity = roomQuantities[room._id];
+                    for (let i = 0; i < quantity; i++) {
+                        expanded.push({
+                            ...room,
+                            instanceId: `${room._id}-${i}` // Unique ID per instance
+                        });
+                    }
+                });
+
+                setExpandedRooms(expanded);
+            } catch (error) {
+                console.error("Error fetching rooms:", error);
+            }
+        };
+
+        fetchAndExpandRooms();
+    }, [roomIds]);
+
+    // Toggle the dropdown
+    const handleToggle = () => {
+        setIsOpen(!isOpen);
+    };
+
+    // If no booking data is provided, render a message and a back button.
+    if (!bookingData) {
+        return (
+            <Container className="mt-5 text-center">
+                <h3>No booking data found.</h3>
+                <Button variant="primary" onClick={() => navigate(-1)}>
+                    Go Back
+                </Button>
+            </Container>
+        );
+    }
+    console.log(`Detail Room Selected: ${JSON.stringify(roomIds, null, 2)}`)
 
     // console.log(`Debug Selected Room: ${JSON.stringify(totalRooms, null, 2)}`)
     // Calculate total rooms selected by summing up the quantities
@@ -58,6 +93,8 @@ const BookingStepTwo = () => {
 
     // Only show rooms that have quantity > 0
     const selectedRooms = roomDetails.filter((room) => room.quantity > 0);
+
+
 
     const generateTimeOptions = () => {
         const options = [];
@@ -116,6 +153,7 @@ const BookingStepTwo = () => {
             console.error("Payment error:", error);
         }
     };
+
 
     return (
         <>
@@ -185,7 +223,7 @@ const BookingStepTwo = () => {
                                 </div>
                             </div>
                         </Card>
-                        <RoomCards totalRooms={totalRooms} />
+                        <RoomCards roomQuantities={expandedRooms} />
                         <Card>
                             <Card.Body>
                                 <Card.Title className="fw-bold fs-5 mb-3">Your arrival time</Card.Title>

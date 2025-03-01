@@ -209,3 +209,31 @@ exports.getRoomFacilitiesByRoomId = asyncHandler(async (req, res) => {
         facilities,
     });
 });
+
+exports.getRoomById = asyncHandler(async (req, res) => {
+    const { roomId } = req.params;
+
+    if (!roomId) {
+        return res.status(400).json({
+            error: true,
+            message: "Missing required roomId",
+        });
+    }
+
+    const room = await Room.findById(roomId)
+        .populate('facilities');
+
+    if (!room) {
+        return res.status(404).json({
+            error: true,
+            message: "Room not found",
+        });
+    }
+
+    return res.status(200).json({
+        error: false,
+        message: "Room fetched successfully",
+        room,
+    });
+}
+);

@@ -4,17 +4,10 @@ import { renderPersonIcon } from "../../utils/RenderPersonIcon";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle, faUser } from '@fortawesome/free-regular-svg-icons';
 import { FaSmokingBan, FaBroom } from "react-icons/fa";
-const RoomCards = ({ totalRooms }) => {
+const RoomCards = ({ roomQuantities }) => {
     const [guestNames, setGuestNames] = useState({});
 
     // Get random facility or default to Free WiFi
-    const getRandomFacility = (facilities) => {
-        if (facilities.length === 0) return "Free WiFi";
-        // const randomIndex = Math.floor(Math.random() * facilities.length);
-        return facilities[1];
-    };
-
-    // Handle guest name input changes
     const handleGuestNameChange = (roomId, name) => {
         setGuestNames(prev => ({
             ...prev,
@@ -24,7 +17,7 @@ const RoomCards = ({ totalRooms }) => {
 
     return (
         <div className="mt-3">
-            {totalRooms.map((room) => (
+            {roomQuantities.map((room) => (
                 <Card key={room._id} className="mb-3 shadow-sm">
                     <Card.Body>
                         <Card.Title className="fs-5 fw-bold mb-3">
@@ -34,7 +27,7 @@ const RoomCards = ({ totalRooms }) => {
 
                         <Card.Text className="d-flex align-items-center mb-2">
                             <span className="text-success me-2">✓</span>
-                            <span className="text-success me-1">{getRandomFacility(room.facilities)}</span>
+                            <span className="text-success me-1">Free WiFi</span>
                             <span className="text-primary">
                                 <FontAwesomeIcon icon={faQuestionCircle} />
                             </span>
