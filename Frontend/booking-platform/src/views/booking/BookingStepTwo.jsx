@@ -42,8 +42,8 @@ const BookingStepTwo = () => {
             try {
                 // Fetch all rooms by their IDs
                 const roomsData = await Promise.all(
-                    roomIds.map(id =>
-                        axiosInstance.get(`/room/get-room-by-id/${id.roomId}`)
+                    roomIds.map(room =>
+                        axiosInstance.get(`/room/get-room-by-id/${room.roomId}`)
                             .then(res => res.data.room)
                     )
                 );
