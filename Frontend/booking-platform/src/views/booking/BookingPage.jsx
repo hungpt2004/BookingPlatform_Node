@@ -50,6 +50,7 @@ const Booking = ({
                     numberOfPeople
                 }
             });
+            // console.log("numberOfPeople:", numberOfPeople);
             console.log(response.data.rooms)
             setRooms(response.data.rooms);
             setSelectedRooms({}); // Reset selections when new results load
@@ -143,7 +144,7 @@ const Booking = ({
 
     //Calculate total price
     const calculateTotalPrice = () => {
-        
+
         //Calculate total night stay
         const dateOut = dayjs(checkOutDate);
         const dateIn = dayjs(checkInDate);
@@ -154,7 +155,7 @@ const Booking = ({
             return total + (room.price * quantity);
         }, 0);
 
-        const hotelTotalPrice =  currentHotel.pricePerNight * nightTotal;
+        const hotelTotalPrice = currentHotel.pricePerNight * nightTotal;
 
         return roomTotalPrice + hotelTotalPrice
 
@@ -171,7 +172,7 @@ const Booking = ({
             setCapacityError(`You still need  to  fit ${numberOfPeople - totalCapacity} more people`);
             return;
         }
-        
+
         // Prepare room details with quantities and prices
         const roomDetails = rooms
             .filter(room => selectedRooms[room._id] > 0) // Only include selected rooms
@@ -202,7 +203,8 @@ const Booking = ({
             roomIds,
             currentHotel,
             distanceNight: distanceDay,
-            listFeedback
+            listFeedback,
+            numberOfPeople: numberOfPeople,
         };
 
         console.log("Booking Data", bookingData);
@@ -221,7 +223,7 @@ const Booking = ({
     const validDate = checkInDate === checkOutDate
 
     useEffect(() => {
-        if(checkInDate && checkOutDate){
+        if (checkInDate && checkOutDate) {
             const dateOut = dayjs(checkOutDate);
             const dateInt = dayjs(checkInDate);
             const distanceDay = dateOut.diff(dateInt, "day");
