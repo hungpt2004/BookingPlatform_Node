@@ -3,6 +3,7 @@ const Hotel = require('../models/hotel')
 const Room = require('../models/room')
 const Reservation = require('../models/reservation')
 
+
 exports.createBooking = asyncHandler(async (req, res) => {
    const { userId, hotelId, roomId, checkInDate, checkOutDate } = req.body;
 
