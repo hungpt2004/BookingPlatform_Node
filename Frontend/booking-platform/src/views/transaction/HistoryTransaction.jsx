@@ -8,6 +8,8 @@ import { formatDate } from "../../utils/FormatDatePrint";
 import { dataStatus, statusColors, statusText } from "./DataStatus";
 import FeedbackModal from "../../components/feedback/FeedbackModal";
 import axiosInstance from "../../utils/AxiosInstance";
+import { useNavigate } from "react-router-dom";
+import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 
 
 export const HistoryTransaction = () => {
@@ -20,6 +22,7 @@ export const HistoryTransaction = () => {
    const [totalPages, setTotalPages] = useState(1); // Thêm state tổng số trang
    const [showFeedback, setShowFeedback] = useState(false);
    const [selectedReservationId, setSelectedReservationId] = useState(null);
+   const [paymentLink, setPaymentLink] = useState('')
 
    const handleChangeStatus = (newStatus) => {
       setStatus(newStatus);
@@ -32,13 +35,15 @@ export const HistoryTransaction = () => {
       setLoading(true);
       try {
          const response = await axiosInstance.get(`/reservation/search-status`, {
-            params: { status, page }
+            params: { status, page },
+            withCredentials: true
          });
 
          if (response.data && response.data.reservations) {
             console.log(response.data)
             setReservations(response.data.reservations);
             setTotalPages(response.data.totalPages || 1);
+            setPaymentLink(sessionStorage.getItem('payment_link'))
             setErr("");
          }
       } catch (error) {
@@ -54,10 +59,17 @@ export const HistoryTransaction = () => {
       fetchDataReservation();
    }, [status, page]);
 
+   useEffect(() => {
+      setTimeout(() => {
+         sessionStorage.removeItem('payment_link')
+      }, 50000)
+   }, [])
+
    // Add this function to handle feedback submission
    const handleFeedbackSubmitted = () => {
       fetchDataReservation(); // Refresh the list
    };
+
    return (
       <>
          <CustomNavbar />
@@ -122,10 +134,15 @@ export const HistoryTransaction = () => {
                                     <Card className="card-search-hotel p-3 m-3">
                                        <Card.Title className="text-center">{item.hotel.hotelName || "Unknown Hotel"}</Card.Title>
                                        <Card.Body>
-                                          <p>📍 Address: {item.hotel.address || "N/A"}</p>
-                                          <p>🗓️ Check In: {formatDate(item.checkInDate, "DD/MM/YYYY")}</p>
-                                          <p>🗓️ Check Out: {formatDate(item.checkOutDate, "DD/MM/YYYY")}</p>
-                                          <p>💰 Price: {item.totalPrice}$</p>
+                                          <p style={{
+                                             display: '-webkit-box',
+                                             WebkitBoxOrient: 'vertical',
+                                             WebkitLineClamp: 1,
+                                             overflow: 'hidden',
+                                          }}>Address: {item.hotel.address || "N/A"}</p>
+                                          <p>Check In: {formatDate(item.checkInDate, "DD/MM/YYYY")}</p>
+                                          <p>Check Out: {formatDate(item.checkOutDate, "DD/MM/YYYY")}</p>
+                                          <p>Price: {formatCurrencyVND(item.totalPrice)}</p>
                                           <Badge className="badge-status py-2 px-3" bg={statusColors[item.status]}>
                                              {statusText[item.status] || "Unknown Status"}
                                           </Badge>
@@ -143,6 +160,23 @@ export const HistoryTransaction = () => {
                                                 Feedback
                                              </Button>
                                           )}
+                                          {paymentLink ? (
+                                             (item.status === "NOT PAID" && (
+                                                <Button
+                                                   onClick={() => {
+                                                      if (paymentLink) {
+                                                         window.location.href = paymentLink;
+                                                      } else {
+                                                         alert("Payment link is not available!");
+                                                      }
+                                                   }}
+                                                   className="mb-1"
+                                                   variant="outline-warning"
+                                                >
+                                                   Continue payment
+                                                </Button>
+                                             ))
+                                          ) : null}
                                           {item.status === "BOOKED" && (
                                              <Button className="mb-1" variant="outline-danger">
                                                 Cancel

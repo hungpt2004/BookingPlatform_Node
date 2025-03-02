@@ -12,6 +12,7 @@ import ResetPasswordPage from "./views/reset_password/ResetPasswordPage"
 import { SuccessPaymentPage } from "./views/status/SuccessPaymentPage"
 import CustomerProfileSetting from "./views/customer/CustomerProfileSetting"
 import FeedbackPage from './views/feedback/feedback'
+import CancelPaymentPage from './views/status/CancelPaymentPage'
 
 function App() {
   return (
@@ -27,7 +28,7 @@ function App() {
         <Route path="/forgot" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/success/:id" element={<SuccessPaymentPage />} />
-        <Route path="/cancel/:id" element={<SuccessPaymentPage />} />
+        <Route path="/cancel/:id" element={<CancelPaymentPage />} />
         <Route path="/update-customer" element={<CustomerProfileSetting />} />
         <Route path="/feedback" element={<FeedbackPage />} />
       </Routes>

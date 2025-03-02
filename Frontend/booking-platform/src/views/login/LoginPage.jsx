@@ -130,7 +130,9 @@ export const LoginPage = () => {
                   </motion.div>
                </Col>
                <Col className='justify-content-center align-content-center border-dark p-5' style={{ borderWidth: '1px', borderColor: 'black' }}>
-                  <h1 className='text-center mb-5 fw-bold'>Login System</h1>
+                  <div className='bg-secondary rounded-5 mb-1' style={{ width: '40px', height: '40px' }}></div>
+                  <h1 className='text-start'>Travel with <span style={{ color: '#003b95' }} className='fw-bolder'>Travelofy</span></h1>
+                  <h3 className='text-start mb-3'>Join with us</h3>
                   <form onSubmit={handleLogin}>
                      <div className='d-flex align-items-center justify-content-center mb-4'>
                         <GoogleLogin
@@ -147,14 +149,21 @@ export const LoginPage = () => {
                      </div>
                      <CustomInput label="Username" type="text" value={email} placeHolder={"Enter username"} onChange={(e) => setEmail(e.target.value)} />
                      <CustomPasswordInput label="Password" value={password} placeHolder={"Enter password"} onChange={(e) => setPassword(e.target.value)} />
-                     <p className="text-decoration-underline text-end mt-3 text-primary" style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigate('/forgot')}>
-                        Forgot Password?
-                     </p>
+                     <div className='d-flex justify-content-between align-items-center'>
+                        <div class="form-check">
+                           <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"  />
+                              <label class="form-check-label" for="flexCheckChecked">
+                                 Remember account
+                              </label>
+                        </div>
+                        <p className="text-decoration-underline text-end mt-3 text-primary" style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigate('/forgot')}>
+                           Forgot Password?
+                        </p>
+                     </div>
                      <Button
-                        variant="primary"
                         className="mt-3 w-100"
                         type="submit"
-                        style={{ height: "45px" }} // Đặt chiều cao cố định
+                        style={{ backgroundColor: '#003b95', borderColor: '#003b95', height: '50px'}} // Đặt chiều cao cố định
                      >
                         {loading ? (
                            <Spinner animation="border" style={{ width: 30, height: 30 }} role="status" />
