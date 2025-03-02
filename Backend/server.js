@@ -9,6 +9,7 @@ const authenticateRoute = require('./src/routes/authenticate.route');
 const FeedbackRouter = require('./src/routes/feedback.route');
 const RoomRouter = require('./src/routes/room.route');
 const BedRouter = require('./src/routes/bed.route');
+const ServiceRouter = require('./src/routes/service.route');
 require("dotenv").config();
 const fileupload = require("express-fileupload");
 const app = express(); //Create server
@@ -19,11 +20,11 @@ app.use(express.urlencoded({ extended: true })); // Hỗ trợ dữ liệu form-
 app.use(fileupload({ useTempFiles: true }));
 //Cors setting
 app.use(
-   cors({
-     origin: "*",
-   })
- );
- 
+  cors({
+    origin: "*",
+  })
+);
+
 
 app.use("/customer", UserRouter)
 
@@ -39,9 +40,6 @@ app.use("/reservation", ReservationRouter);
 //Payment
 app.use("/payment", PaymentRouter);
 
-//Feedback
-
-app.use("/feedback", FeedbackRouter);
 
 //Feedback
 app.use("/feedback", FeedbackRouter)
@@ -51,6 +49,9 @@ app.use('/room', RoomRouter)
 
 //Bed
 app.use('/bed', BedRouter)
+
+//Service
+app.use('/service', ServiceRouter)
 
 //Connect Mongo Config
 connectDB();

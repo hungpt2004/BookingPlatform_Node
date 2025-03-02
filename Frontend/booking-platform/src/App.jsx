@@ -12,6 +12,7 @@ import ResetPasswordPage from "./views/reset_password/ResetPasswordPage"
 import { SuccessPaymentPage } from "./views/status/SuccessPaymentPage"
 import CustomerProfileSetting from "./views/customer/CustomerProfileSetting"
 import FeedbackPage from './views/feedback/feedback'
+import { Createhotel } from './views/hotel/Createhotel'
 
 function App() {
   return (
@@ -30,6 +31,8 @@ function App() {
         <Route path="/cancel/:id" element={<SuccessPaymentPage />} />
         <Route path="/update-customer" element={<CustomerProfileSetting />} />
         <Route path="/feedback" element={<FeedbackPage />} />
+        <Route path="/create-hotel" element={<Createhotel />} />
+       
       </Routes>
     </Router>
   )

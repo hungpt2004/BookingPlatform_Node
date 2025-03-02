@@ -101,3 +101,4 @@ exports.getTotalReservationByHotelId = asyncHandler(async (req, res) => {
   });
 
 });
+

@@ -1,7 +1,7 @@
 const express = require('express')
 const FeedbackRouter = express.Router();
 const FeedbackController = require('../controllers/feedback.controller')
-const {protect,} = require("../controllers/authenticate.controller");
+const { protect, } = require("../controllers/authenticate.controller");
 const authController = require("./../controllers/authenticate.controller");
 const router = express.Router();
 
@@ -12,6 +12,6 @@ FeedbackRouter.post('/create-feedback/:reservationId', protect, FeedbackControll
 FeedbackRouter.patch('/update-feedback/:feedbackId', protect, FeedbackController.updateFeedback)
 FeedbackRouter.get('/get-feeback/:reservationId', protect, FeedbackController.getFeedbackByUserAndReservation)
 FeedbackRouter.delete('/delete-feedback/:feedbackId', FeedbackController.deleteFeedback)
-
+FeedbackRouter.get('/get', protect, FeedbackController.getFeedbackByUser)
 
 module.exports = FeedbackRouter;
