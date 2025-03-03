@@ -237,7 +237,7 @@ const BookingStepTwo = () => {
 
                                 <div>
                                     <Card.Text className="fw-bold mb-0 pb-0">Add your estimated time of arrival <small className="fw-normal text-muted">(optional) </small></Card.Text>
-                                    <select className="form-control">
+                                    <select className="form-control w-50">
                                         <option value="" disabled>
                                             Please select
                                         </option>
