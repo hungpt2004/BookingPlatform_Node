@@ -56,6 +56,11 @@ const defaultCenter = {
     lat: 10.8231, // Default to Vietnam coordinates
     lng: 106.6297
 };
+const stepContainer = {
+    width: "100%",          // Dấu % phải để trong chuỗi
+    maxWidth: "3500px",    // Không có khoảng trắng giữa maxWidth
+    margin: "auto"         // Phải đặt trong chuỗi
+};
 
 // Component to handle map events
 function MapEvents({ onMapClick, updateMapPin }) {
@@ -248,7 +253,7 @@ const Step5 = ({ nextStep, prevStep }) => {
     };
 
     return (
-        <div className='p-5'>
+        <div className='pt-1'style={stepContainer}>
             {/* Fullscreen map with floating card */}
             <div style={contentWrapperStyle}>
                 {/* OpenStreetMap Component - Full screen */}
