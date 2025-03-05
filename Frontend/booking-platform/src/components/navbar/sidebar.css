@@ -1,0 +1,19 @@
+.auto-typing {
+   display: inline-block; /* Giữ kích thước theo nội dung */
+   max-width: fit-content; /* Giới hạn chiều rộng */
+   letter-spacing: 5px;
+   border-right: 5px solid;
+   white-space: nowrap;
+   overflow: hidden;
+   animation: typing 5s steps(18) infinite alternate, cursor 0.7s step-end infinite;
+}
+
+@keyframes cursor {
+   50% { border-color: transparent; }
+}
+
+@keyframes typing {
+   0% { width: 0; }
+   50%{width: 100%;}
+   100% { width: 0; } /* Chữ chỉ chạy trong phạm vi nội dung */
+}

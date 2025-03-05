@@ -31,5 +31,10 @@ ReservationRouter.get(
   protect,
   ReservationController.getHotelByReservationId
 );
+ReservationRouter.post(
+  "/cancel/:reservationId",
+  protect,
+  ReservationController.cancelReservation
+);
 
 module.exports = ReservationRouter;
