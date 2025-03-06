@@ -13,6 +13,7 @@ import { SuccessPaymentPage } from "./views/status/SuccessPaymentPage"
 import FavoriteHotelsList from "./views/favorite/FavoriteHotelsList"
 import CustomerProfileSetting from "./views/customer/CustomerProfileSetting"
 import FeedbackPage from './views/feedback/feedback'
+import { Createhotel } from './views/hotel/Createhotel'
 
 function App() {
   return (
@@ -33,6 +34,8 @@ function App() {
 
         <Route path="/update-customer" element={<CustomerProfileSetting />} />
         <Route path="/feedback" element={<FeedbackPage />} />
+        <Route path="/create-hotel" element={<Createhotel />} />
+       
       </Routes>
     </Router>
   )
