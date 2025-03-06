@@ -15,7 +15,8 @@ const Booking = ({
     checkOutDate,
     numberOfPeople,
     userId,
-    currentHotel
+    currentHotel,
+    listFeedback
 }) => {
     const [selectedRooms, setSelectedRooms] = useState({});
     const [loading, setLoading] = useState(false);
@@ -23,7 +24,7 @@ const Booking = ({
     const [rooms, setRooms] = useState([]);
     const [beds, setBeds] = useState([])
     const [bed, setBed] = useState([])
-    const [quantity, setQuantity] = useState([])
+    const [quantity, setQuantity] = useState({});
     const [loadingBeds, setLoadingBeds] = useState(false);
     const [capacityError, setCapacityError] = useState(null);
     const [distanceDay, setDistanceDay] = useState(0)
@@ -31,7 +32,6 @@ const Booking = ({
     const navigate = useNavigate();
 
 
-    // console.log("Data rooms 1:", JSON.stringify(rooms, null, 2));
     // console.log("Data bed 2:", JSON.stringify(beds, null, 2));
     // console.log("Data bed detail 3:", JSON.stringify(bed, null, 2));
 
@@ -61,15 +61,21 @@ const Booking = ({
     };
 
     const fetchBed = async (id) => {
-        setLoading(true); // Bắt đầu loading
+        setLoading(true);
         console.log(`Fetching bed with ID: ${id}`);
         try {
             const response = await axios.get(`${BASE_URL}/bed/bed-detail/${id}`);
-            if (response.data && response.data.bed[0].bed) {
+            if (response.data && response.data.bed.length > 0) {
                 console.log("Data bed:", JSON.stringify(response.data.bed, null, 2));
-                console.log("Bed quantity:", response.data.bed[0].quantity);
-                setQuantity(response.data.bed[0].quantity);
-                return response.data.bed[0].bed;
+                const bedData = response.data.bed[0];
+
+                // Cập nhật số lượng giường theo từng roomId
+                setQuantity(prev => ({
+                    ...prev,
+                    [id]: bedData.quantity
+                }));
+
+                return bedData.bed;
             }
         } catch (err) {
             console.error("Error fetching bed:", err.response?.data?.message || err.message);
@@ -77,10 +83,9 @@ const Booking = ({
         } finally {
             setTimeout(() => {
                 setLoading(false);
-            }, 500)
+            }, 500);
         }
     };
-
 
 
     //Get Bed Detail
@@ -142,7 +147,7 @@ const Booking = ({
 
     //Calculate total price
     const calculateTotalPrice = () => {
-        
+
         //Calculate total night stay
         const dateOut = dayjs(checkOutDate);
         const dateIn = dayjs(checkInDate);
@@ -153,10 +158,12 @@ const Booking = ({
             return total + (room.price * quantity);
         }, 0);
 
-        const hotelTotalPrice =  currentHotel.pricePerNight * nightTotal;
+        const hotelTotalPrice = currentHotel.pricePerNight * nightTotal;
 
-        return roomTotalPrice + hotelTotalPrice
-
+        if(roomTotalPrice > 0) {
+            return roomTotalPrice + hotelTotalPrice
+        } 
+        return roomTotalPrice;
     };
 
     //Confirm Booking And Go to Payment
@@ -164,23 +171,26 @@ const Booking = ({
         if (Object.keys(selectedRooms).length === 0) return;
 
         const totalCapacity = calculateTotalCapacity();
-        // const totalRooms = Object.values(selectedRooms).reduce((acc, curr) => acc + curr, 0);
 
         if (totalCapacity < numberOfPeople) {
             setCapacityError(`You still need  to  fit ${numberOfPeople - totalCapacity} more people`);
             return;
         }
-        
+
         // Prepare room details with quantities and prices
         const roomDetails = rooms
             .filter(room => selectedRooms[room._id] > 0) // Only include selected rooms
             .map(room => ({
+                roomName: room.name,
                 roomId: room._id,
                 roomType: room.type,
                 quantity: selectedRooms[room._id],
                 pricePerRoom: room.price,
                 totalPrice: room.price * selectedRooms[room._id],
             }));
+
+
+        console.log("Data rooms:", JSON.stringify(roomDetails, null, 2));
 
         const roomIds = rooms
             .filter(room => selectedRooms[room._id] > 0)
@@ -197,7 +207,10 @@ const Booking = ({
             checkOutDate,
             totalPrice: calculateTotalPrice(),
             roomDetails,
-            roomIds
+            roomIds,
+            currentHotel,
+            distanceNight: distanceDay,
+            listFeedback
         };
 
         console.log("Booking Data", bookingData);
@@ -205,10 +218,11 @@ const Booking = ({
         navigate('/booking-step2', { state: bookingData });
     };
 
+
     const validDate = checkInDate === checkOutDate
 
     useEffect(() => {
-        if(checkInDate && checkOutDate){
+        if (checkInDate && checkOutDate) {
             const dateOut = dayjs(checkOutDate);
             const dateInt = dayjs(checkInDate);
             const distanceDay = dateOut.diff(dateInt, "day");
@@ -264,8 +278,10 @@ const Booking = ({
                                     <td>
                                         <div>
                                             <p className="text-decoration-underline text-primary fw-bold fs-5 cursor-pointer">{room.type}</p>
-                                            <p className="text-danger fw-bold">Only {quantity} rooms left on our site </p>
-                                            <p>1 {loadingBeds ? <Spinner animation="border" size="sm" /> : bed[index]?.name || "N/A"}</p>
+                                            <p className="text-danger fw-bold">
+                                                Each room have {quantity && room._id in quantity ? quantity[room._id] : "N/A"} beds on our site
+                                            </p>
+                                            <p>{quantity && room._id in quantity ? quantity[room._id] : "N/A"} {loadingBeds ? <Spinner animation="border" size="sm" /> : bed[index]?.name || "N/A"}</p>
                                         </div>
                                     </td>
                                     <td className="text-center">{renderPersonIcon(room.capacity)}</td>
@@ -277,17 +293,20 @@ const Booking = ({
                                                 variant="outline-dark"
                                                 id={`dropdown-room-${index}`}
                                                 aria-placeholder="Select quantity"
-                                                title={selectedRooms[room._id] || 0}
-                                                onSelect={(eventKey) => setSelectedRooms(prev => ({
-                                                    ...prev,
-                                                    [room._id]: parseInt(eventKey)
-                                                }))}
+                                                title={selectedRooms[room._id] ?? 0}
+                                                onSelect={(eventKey) =>
+                                                    setSelectedRooms((prev) => ({
+                                                        ...prev,
+                                                        [room._id]: parseInt(eventKey),
+                                                    }))
+                                                }
                                             >
-                                                {[...Array(room.quantity).keys()].slice(0).map(num => (
-                                                    <Dropdown.Item key={num} eventKey={num}>{num}</Dropdown.Item>
+                                                {Array.from({ length: room.quantity + 1 }, (_, i) => i).map((num) => (
+                                                    <Dropdown.Item key={num} eventKey={num}>
+                                                        {num}
+                                                    </Dropdown.Item>
                                                 ))}
                                             </DropdownButton>
-
                                         </div>
                                     </td>
                                 </tr>
@@ -298,7 +317,7 @@ const Booking = ({
             )}
 
             {/* Total Price Display */}
-            {Object.keys(selectedRooms).length > 0 && (
+            {(Object.keys(selectedRooms).length > 0 && calculateTotalPrice() > 0) && (
                 <div className="d-flex justify-content-end mt-3">
                     <Badge bg="dark" className="p-3 fs-6 shadow text-light">
                         Total: {formatCurrencyVND(calculateTotalPrice())}
@@ -310,7 +329,7 @@ const Booking = ({
                 <Button
                     variant="primary"
                     onClick={handleContinueBooking}
-                    disabled={Object.keys(selectedRooms).length === 0 || validDate}
+                    disabled={(Object.keys(selectedRooms).length === 0 || calculateTotalPrice() <= 0)|| validDate}
                     size="lg"
                 >
                     Continue

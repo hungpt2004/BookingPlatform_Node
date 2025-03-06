@@ -41,16 +41,13 @@ export const HotelDetailPage = () => {
    const [listFeedback, setListFeedback] = useState([]);
    const [showModal, setShowModal] = useState(false);
    const [selectedImage, setSelectedImage] = useState('')
-
    const { id } = useParams();
-
    const [open, setOpen] = useState(false);
    const [searchParams] = useSearchParams();
    const [checkInDate, setCheckInDate] = useState('');
    const [checkOutDate, setCheckOutDate] = useState('');
    const [numberOfPeople, setNumberOfPeople] = useState(1);
    const [dateErrors, setDateErrors] = useState({ checkIn: '', checkOut: '' });
-   // Add these new states at the top of HotelDetailPage
    const [capacityError, setCapacityError] = useState('');
    const [availabilityError, setAvailabilityError] = useState('');
    const [userId, setUserId] = useState(null); // State to store userId
@@ -187,7 +184,7 @@ export const HotelDetailPage = () => {
       if (new Date(initialCheckOut) <= new Date(initialCheckIn)) {
          initialCheckOut = new Date(initialCheckIn);
          initialCheckOut.setDate(initialCheckOut.getDate() + 1);
-         initialCheckOut = initialCheckOut.toISOString().split('T')[0];
+         initialCheckOut = initialCheckOut.toString().split('T')[0];
       }
 
       setCheckInDate(initialCheckIn);
@@ -413,7 +410,6 @@ export const HotelDetailPage = () => {
                      <div className="col-md-3">
                         <CustomDateValidator
                            type="date"
-                           label="CHECK IN DATE"
                            value={checkInDate}
                            min={new Date().toISOString().split('T')[0]}
                            onChange={(e) => handleDateChange('checkin', e.target.value)}
@@ -423,7 +419,6 @@ export const HotelDetailPage = () => {
                      <div className="col-md-3">
                         <CustomDateValidator
                            type="date"
-                           label="CHECK OUT DATE"
                            value={checkOutDate}
                            min={checkInDate || new Date().toISOString().split('T')[0]}
                            onChange={(e) => handleDateChange('checkout', e.target.value)}
@@ -464,6 +459,7 @@ export const HotelDetailPage = () => {
                   userId={userId}
                   key={`${checkInDate}-${checkOutDate}-${numberOfPeople}`} // Add key to force re-render
                   currentHotel={currentHotel}
+                  listFeedback={listFeedback}
                />
 
 

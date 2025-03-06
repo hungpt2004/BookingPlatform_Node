@@ -20,6 +20,7 @@ import HotelCard from '../../components/card/HotelCard';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { newData, trendingRowFirst, trendingRowSecond } from './DataNews';
+import { TopCommentSlide } from '../../components/slide/TopCommentSlide';
 
 
 export const HomePage = () => {
@@ -42,7 +43,7 @@ export const HomePage = () => {
   const [vietCities, setVietCities] = useState([]);
   const navigate = useNavigate();
 
-  // CHECK VALIDATE
+
   useEffect(() => {
     const fetchCities = async () => {
       try {
@@ -114,8 +115,6 @@ export const HomePage = () => {
     return isValid;
   };
 
-
-
   const CustomDateValidator = ({ label, error, ...props }) => (
     <div className="mb-0">
       {label && <label className="form-label">{label}</label>}
@@ -144,14 +143,14 @@ export const HomePage = () => {
 
     return (
       <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-        <Badge className='fw-4 fs-5' style={{ backgroundColor: '#6499E9' }}>Filter By Star</Badge>
+        <div className='fw-4 fs-5 p-2' style={{ backgroundColor: '#003b95', color: 'white', borderRadius: '5px' }}>Filter By Star</div>
         {[...Array(5)].map((_, index) => (
           <>
             <span
               key={index}
               style={{
                 fontSize: '30px',
-                color: (hoverValue || value) > index ? '#FFD700' : '#ccc',
+                color: (hoverValue || value) > index ? '#003b95' : '#ccc',
                 transition: 'color 0.3s ease, transform 0.2s ease',
                 margin: '0 5px',
                 transform: (hoverValue || value) > index ? 'scale(1.2)' : 'scale(1)',
@@ -213,15 +212,12 @@ export const HomePage = () => {
     fetchHotels(1);
   };
 
-
   const handlePageChange = (newPage) => {
     if (newPage < 1 || newPage > totalPages) return;
     fetchHotels(newPage);
   };
 
-  // useEffect(() => {
-  //   fetchHotels();
-  // }, [hotelName, address, checkinDate, checkoutDate, minRating, numberOfPeople]);
+
 
   return (
     <>
@@ -235,9 +231,9 @@ export const HomePage = () => {
         transition={{ duration: 1 }}
         viewport={{ once: true, amount: 0.3 }}
       >
-        <h1 className='text-center fw-bold m-5'>Your next adventure is just a search away</h1>
+        <h1 className='text-center fw-bold m-5 mt-5'>Your next adventure is just a search away</h1>
       </motion.div>
-      <div className="row d-flex justify-content-center align-items-center">
+      <div className="row mx-5 d-flex justify-content-center align-items-center p-0 py-2 rounded-2" style={{ backgroundColor: '#ffb700' }}>
         <div className="col-md-2">
           <CustomInput
             type="text"
@@ -251,7 +247,7 @@ export const HomePage = () => {
             <select
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              className="form-select rounded-0 p-3" 
+              className="form-select rounded-0 p-3"
             >
               <option value="">Select a city</option>
               {vietCities.map((city) => (
@@ -267,7 +263,7 @@ export const HomePage = () => {
             )}
           </div>
         </div>
-        <div className='col-md-2'>
+        <div className='col-md-3'>
           <CustomDateValidator
             type="date"
             placeholder="Check-in Date"
@@ -282,7 +278,7 @@ export const HomePage = () => {
             error={checkInError}
           />
         </div>
-        <div className='col-md-2'>
+        <div className='col-md-3'>
           <CustomDateValidator
             type="date"
             placeholder="Check-out Date"
@@ -303,9 +299,10 @@ export const HomePage = () => {
       </div>
       <div className="d-flex justify-content-center mt-4">
         <Button
-          va="primary"
+          style={{ backgroundColor: '#003b95' }}
           onClick={handleSearch}
           disabled={loading}
+          className='py-2'
         >
           {loading ? <Spinner animation="border" style={{ width: 20, height: 20 }} role="status" /> : 'Search'}
         </Button>
@@ -328,7 +325,7 @@ export const HomePage = () => {
           <div className="col-md-9">
             {loading ? (
               <div className="d-flex justify-content-center p-5 align-items-center">
-                <Spinner size={40} color="#003b95" style={{color: '#003b95'}}/>
+                <Spinner size={40} color="#003b95" style={{ color: '#003b95' }} />
               </div>
             ) : (
               showHotels && (
@@ -392,13 +389,16 @@ export const HomePage = () => {
         transition={{ duration: 1.5 }}
         viewport={{ once: true, amount: 0.3 }}
       >
-        <h1 className='fw-bold m-5'>Trending destinations</h1>
+        <div className='d-flex justify-content-between align-items-center'>
+          <h1 className='fw-bold m-5 mt-5'>Trending destinations</h1>
+          <h3 className='text-decoration-underline mx-5' style={{ color: '#003b95' }}>See more</h3>
+        </div>
       </motion.div>
 
       {/* HN / HCM */}
       <div className="row mx-5">
         {trendingRowFirst.map((item, index) => (
-          <div key={index} className="col-md-6 mb-1 position-relative card-container">
+          <div key={index} className="col-md-6 mb-2 position-relative card-container">
             {/* Ảnh */}
             <Image src={item.url} fluid className="w-100 card-des" style={{ borderRadius: "10px", height: '50vh', objectFit: 'cover' }} />
 
@@ -414,7 +414,7 @@ export const HomePage = () => {
       {/* DN , VT , DL */}
       <div className='row mx-5 mt-3'>
         {trendingRowSecond.map((item, index) => (
-          <div key={index} className="col-md-4 mb-1 position-relative card-container">
+          <div key={index} className="col-md-4 mb-2 position-relative card-container">
             {/* Ảnh */}
             <Image src={item.url} fluid className="w-100 card-des" style={{ borderRadius: "10px", height: '50vh', objectFit: 'cover' }} />
 
@@ -434,7 +434,7 @@ export const HomePage = () => {
         transition={{ duration: 1.5 }}
         viewport={{ once: true, amount: 0.3 }}
       >
-        <h1 className='fw-bold m-5'>Get inspiration for your next trip</h1>
+        <h1 className='fw-bold m-5 mt-5'>Get inspiration for your next trip</h1>
       </motion.div>
       <motion.div
         className='row w-100 h-100 mx-4'
@@ -459,10 +459,15 @@ export const HomePage = () => {
                           fluid
                           style={{ width: '100%', height: '24vh', borderRadius: '10px' }}
                         />
-                        <Card.Title className='mt-1 fw-bold'>
+                        <Card.Title className='mt-1 fw-bold fs-3' style={{
+                          display: '-webkit-box',
+                          WebkitBoxOrient: 'vertical',
+                          WebkitLineClamp: 2,
+                          overflow: 'hidden',
+                        }}>
                           {item.title}
                         </Card.Title>
-                        <Card.Text>
+                        <Card.Text className='fs-5 text-secondary'>
                           {item.content}
                         </Card.Text>
                         <Button style={{ backgroundColor: '#003b95', borderColor: '#003b95' }}>
@@ -506,7 +511,7 @@ export const HomePage = () => {
         transition={{ duration: 2 }}
         viewport={{ once: true, amount: 0.3 }}
       >
-        <h1 className='text-center fw-bold m-5'>About Us</h1>
+        <h1 className='text-center fw-bold m-5 mt-5'>About Us</h1>
       </motion.div>
       <motion.div
         className='row w-100 mx-4'
@@ -515,94 +520,20 @@ export const HomePage = () => {
         transition={{ duration: 2 }}
         viewport={{ once: true, amount: 0.3 }}
       >
-        <div className='col-md-5 align-content-center mx-3'>
-          <p>Welcome to <span className='fw-bold' style={{color: '#003b95'}}>TRAVELOFY</span>, your go-to booking platform for hassle-free travel planning. Whether you're looking for a cozy stay, luxurious resorts, or budget-friendly accommodations, we bring you the best options at unbeatable prices.</p>
-          <p>At Travelofuy, we believe that booking your next adventure should be simple, secure, and transparent. Our platform is designed to provide:</p>
-          <p>✔️ Transparent pricing with no hidden fees</p>
-          <p>✔️ Secure and safe booking process</p>
-          <p>✔️ Honest reviews and real images</p>
+        <div className='col-md-6 align-content-center mx-3'>
+          <p className='fs-4'>Welcome to <span className='fw-bolder fs-2' style={{ color: '#003b95' }}>TRAVELOFY</span>, your go-to booking platform for hassle-free travel planning. Whether you're looking for a cozy stay, luxurious resorts, or budget-friendly accommodations, we bring you the best options at unbeatable prices.</p>
+          <p className='fs-4'>At Travelofuy, we believe that booking your next adventure should be simple, secure, and transparent. Our platform is designed to provide:</p>
+          <p className='fs-4'>✔️ Transparent pricing with no hidden fees</p>
+          <p className='fs-4'>✔️ Secure and safe booking process</p>
+          <p className='fs-4'>✔️ Honest reviews and real images</p>
         </div>
-        <div className='col-md-6'>
-          <Image src='/hotel/about-remove.png' fluid className='w-100 object-fit-cover'/>
+        <div className='col-md-5'>
+          <Image src='/hotel/about-remove.png' fluid className='w-100 object-fit-cover' />
         </div>
       </motion.div>
 
       {/* Comment */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 2.5 }}
-        viewport={{ once: true, amount: 0.3 }}
-      >
-        <h1 className='text-center fw-bold m-5'>Comments</h1>
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 2.5 }}
-        viewport={{ once: true, amount: 0.3 }}
-      >
-        <Swiper
-          // pagination={{}}
-          // modules={[Pagination]}
-          slidesPerView={1}
-          onSlideChange={() => console.log('slide change')}
-          onSwiper={(swiper) => console.log(swiper)}
-          autoplay={true}
-        >
-          <SwiperSlide>
-            <Card className='border-0 cursor-pointer mb-5'>
-              <div className='d-flex justify-content-center align-items-center mb-4'>
-                <div style={{ width: '100px', height: '100px', borderRadius: '50%' }}>
-                  <Image
-                    src='https://c8.alamy.com/comp/2PWERD5/student-avatar-illustration-simple-cartoon-user-portrait-user-profile-icon-youth-avatar-vector-illustration-2PWERD5.jpg'
-                    fluid
-                    style={{ objectFit: 'cover', borderRadius: '50%' }}
-                  />
-                </div>
-              </div>
-              <Card.Title className='text-center'>Sara Wilsson</Card.Title>
-              <Card.Subtitle className='text-center text-muted'>Designer</Card.Subtitle>
-              <Card.Text className='text-center'>⭐⭐⭐⭐⭐</Card.Text>
-              <Card.Text className='text-center text-secondary'>LoreLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremm</Card.Text>
-            </Card>
-          </SwiperSlide>
-          <SwiperSlide>
-            <Card className='border-0 cursor-pointer'>
-              <div className='d-flex justify-content-center align-items-center mb-4'>
-                <div style={{ width: '100px', height: '100px', borderRadius: '50%' }}>
-                  <Image
-                    src='https://c8.alamy.com/comp/2PWERD5/student-avatar-illustration-simple-cartoon-user-portrait-user-profile-icon-youth-avatar-vector-illustration-2PWERD5.jpg'
-                    fluid
-                    style={{ objectFit: 'cover', borderRadius: '50%' }}
-                  />
-                </div>
-              </div>
-              <Card.Title className='text-center'>Sara Wilsson</Card.Title>
-              <Card.Subtitle className='text-center text-muted'>Designer</Card.Subtitle>
-              <Card.Text className='text-center'>⭐⭐⭐⭐⭐</Card.Text>
-              <Card.Text className='text-center text-secondary'>LoreLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremm</Card.Text>
-            </Card>
-          </SwiperSlide>
-          <SwiperSlide>
-            <Card className='border-0 cursor-pointer'>
-              <div className='d-flex justify-content-center align-items-center mb-4'>
-                <div style={{ width: '100px', height: '100px', borderRadius: '50%' }}>
-                  <Image
-                    src='https://c8.alamy.com/comp/2PWERD5/student-avatar-illustration-simple-cartoon-user-portrait-user-profile-icon-youth-avatar-vector-illustration-2PWERD5.jpg'
-                    fluid
-                    style={{ objectFit: 'cover', borderRadius: '50%' }}
-                  />
-                </div>
-              </div>
-              <Card.Title className='text-center'>Sara Wilsson</Card.Title>
-              <Card.Subtitle className='text-center text-muted'>Designer</Card.Subtitle>
-              <Card.Text className='text-center'>⭐⭐⭐⭐⭐</Card.Text>
-              <Card.Text className='text-center text-secondary'>LoreLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremm</Card.Text>
-            </Card>
-          </SwiperSlide>
-        </Swiper>
-      </motion.div>
+      <TopCommentSlide />
 
       {/* Email subscribe */}
       <div className='align-content-center' style={{ backgroundColor: '#f5f6f8' }}>
@@ -659,46 +590,5 @@ export const HomePage = () => {
         {/* Row - 6 - 3/3 */}
       </div>
     </>
-  );
-};
-
-const StarRating = ({ value, onChange }) => {
-  const [hoverValue, setHoverValue] = useState(null);
-
-  const handleClick = (index) => {
-    onChange(index + 1);
-  };
-
-  const handleMouseEnter = (index) => {
-    setHoverValue(index + 1);
-  };
-
-  const handleMouseLeave = () => {
-    setHoverValue(null);
-  };
-
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-      <Badge className='fw-4 fs-5' style={{ backgroundColor: '#6499E9', borderColor: '#6499E9' }}>Filter By Star</Badge>
-      {[...Array(5)].map((_, index) => (
-        <>
-          <span
-            key={index}
-            style={{
-              fontSize: '30px',
-              color: (hoverValue || value) > index ? '#FFD700' : '#ccc',
-              transition: 'color 0.3s ease, transform 0.2s ease',
-              margin: '0 5px',
-              transform: (hoverValue || value) > index ? 'scale(1.2)' : 'scale(1)',
-            }}
-            onClick={() => handleClick(index)}
-            onMouseEnter={() => handleMouseEnter(index)}
-            onMouseLeave={handleMouseLeave}
-          >
-            ★
-          </span>
-        </>
-      ))}
-    </div>
   );
 };

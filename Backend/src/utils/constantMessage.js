@@ -29,6 +29,7 @@ module.exports = {
    FEEDBACK: {
      NOT_FOUND: "No feedback found.",
      INVALID_STATUS: "Invalid feedback status.",
+     SUCCESS: "Get feedback success",
    },
    ROOM: {
     NOT_FOUND: "No room found.",
@@ -37,7 +38,9 @@ module.exports = {
    },
    PAYMENT: {
     SUCCESS: "Payment Success",
-    FAIL: "Payment Failed ! Check Error In Server"
+    FAIL: "Payment Failed ! Check Error In Server",
+    CANCEL_SUCCESS: 'Cancel Payment Success',
+    CANCEL_FAIL: 'Cancel Payment Failed !'
    }
  };
  

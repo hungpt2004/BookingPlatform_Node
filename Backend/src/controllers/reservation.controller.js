@@ -112,6 +112,7 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   const perPage = 6;
   const page = parseInt(req.query.page) || 1;
   const currentUser = req.user;
+  const paymentLink = req.cookies["payment_link"];
 
   if (!status) {
     return res.status(400).json({
@@ -161,6 +162,7 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
     totalReservations: totalPageReservations,
     perPage: perPage,
     reservations,
+    paymentLink: paymentLink || null,
     message: `Get reservations by '${status}' successfully`,
   });
 });
@@ -302,9 +304,7 @@ const autoDeleteNotPaidReservation = asyncHandler(async () => {
   for (const r of reservations) {
     //1. Update from Booked to CheckIn
     if (r.status === "NOT PAID") {
-      await Reservation.deleteOne(
-        { _id: r._id },
-      );
+      await Reservation.deleteOne({ _id: r._id });
     }
 
     console.log(`Delete status for reservation ID ${r._id} to ${r.status}`);

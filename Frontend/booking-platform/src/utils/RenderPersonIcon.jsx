@@ -5,3 +5,11 @@ export const renderPersonIcon = (capacity) => {
    }
    return personString;
 }
+
+export const renderStarIcon = (star) => {
+   var personString = '';
+   for(var i = 0; i < star; i++) {
+      personString += '⭐'
+   }
+   return personString;
+}
