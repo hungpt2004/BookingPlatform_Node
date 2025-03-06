@@ -4,7 +4,7 @@ import CustomNavbar from "../../components/navbar/CustomNavbar";
 import {
     CreatehotelStep1, CreatehotelStep2, CreatehotelStep3,
     CreatehotelStep4, CreatehotelStep5, CreatehotelStep6,
-    CreatehotelStep7
+    CreatehotelStep7, CreatehotelStep15
 } from '../../components/hotel_slide';
 
 export const Createhotel = () => {
@@ -31,7 +31,8 @@ export const Createhotel = () => {
         <CreatehotelStep4 key={4} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} hotelType={selectedHotel} />,
         <CreatehotelStep5 key={5} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
         <CreatehotelStep6 key={6} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
-        <CreatehotelStep7 key={7} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />
+        <CreatehotelStep7 key={7} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
+        <CreatehotelStep15 key={8} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />
     ];
 
     return (
