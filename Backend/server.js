@@ -26,7 +26,6 @@ app.use(cookieParser())
 
 
 //Cors setting
-
 const allowedOrigins = ["http://localhost:5173", "https://mywebsite.com"];
 
 app.use(
@@ -70,7 +69,6 @@ app.use("/reservation", ReservationRouter);
 app.use("/payment", PaymentRouter);
 
 //Feedback
-
 app.use("/feedback", FeedbackRouter);
 
 //Feedback

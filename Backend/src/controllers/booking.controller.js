@@ -30,7 +30,6 @@ exports.createBooking = asyncHandler(async (req, res) => {
            return res.status(404).json({ error: true, message: "Some rooms were not found or do not belong to the specified hotel" });
        }
 
-
        const checkIn = new Date(checkInDate);
        const checkOut = new Date(checkOutDate);
 

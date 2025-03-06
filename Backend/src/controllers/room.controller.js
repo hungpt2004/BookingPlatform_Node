@@ -141,10 +141,8 @@ exports.getRoomByHotelId = asyncHandler(async (req, res, next) => {
         message: "Internal Server Error",
       });
     }
-  });
+});
   
-
-// Create a room facility
 exports.createRoomFacility = asyncHandler(async (req, res) => {
   const { roomId } = req.params; // Get the room ID from the request
   const { name, description, url, unavailableDates } = req.body;
@@ -171,7 +169,7 @@ exports.createRoomFacility = asyncHandler(async (req, res) => {
     room: roomId,
     name,
     description,
-    url, // Assuming `url` is a Buffer; handle image uploads separately if needed
+    url, 
   });
 
   await roomFacility.save();

@@ -13,6 +13,7 @@ import { SuccessPaymentPage } from "./views/status/SuccessPaymentPage"
 import CustomerProfileSetting from "./views/customer/CustomerProfileSetting"
 import FeedbackPage from './views/feedback/feedback'
 import CancelPaymentPage from './views/status/CancelPaymentPage'
+import DashboardPage from './views/dashBoard/DashboardPage'
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
         <Route path="/cancel/:id" element={<CancelPaymentPage />} />
         <Route path="/update-customer" element={<CustomerProfileSetting />} />
         <Route path="/feedback" element={<FeedbackPage />} />
+        <Route path='/dashboard' element={<DashboardPage/>}/>
       </Routes>
     </Router>
   )

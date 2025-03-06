@@ -167,6 +167,115 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   });
 });
 
+
+exports.cancelReservation = asyncHandler(async (req, res) => {
+  const { reservationId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const reservation = await Reservation.findById(reservationId)
+      .populate('hotel')
+      .populate('rooms.room');
+
+    if (!reservation) {
+      return res.status(404).json({
+        error: true,
+        message: "Reservation not found",
+      });
+    }
+
+    if (reservation.user.toString() !== userId) {
+      return res.status(403).json({
+        error: true,
+        message: "You are not authorized to cancel this reservation",
+      });
+    }
+
+    if (!["BOOKED", "PENDING"].includes(reservation.status)) {
+      return res.status(400).json({
+        error: true,
+        message: `Cannot cancel a reservation with status: ${reservation.status}`,
+      });
+    }
+
+    const checkInDate = new Date(reservation.checkInDate);
+    const currentDate = new Date();
+    const daysUntilCheckIn = Math.floor((checkInDate - currentDate) / (1000 * 60 * 60 * 24));
+
+    let refundPercentage = 0;
+    let cancellationFee = 0;
+    let canCancel = true;
+
+    if (daysUntilCheckIn >= 5) {
+      refundPercentage = 100;
+      cancellationFee = 0;
+    } else if (daysUntilCheckIn >= 3) {
+      refundPercentage = 50;
+      cancellationFee = reservation.totalPrice * 0.5;
+    } else if (daysUntilCheckIn >= 1) {
+      refundPercentage = 0;
+      cancellationFee = reservation.totalPrice;
+    } else {
+      canCancel = false;
+    }
+
+    if (!canCancel) {
+      return res.status(400).json({
+        error: true,
+        message: "Cancellation not allowed less than 24 hours before check-in",
+      });
+    }
+
+    reservation.status = "CANCELLED";
+    await reservation.save();
+
+    const refundAmount = (reservation.totalPrice * refundPercentage) / 100;
+    if (refundAmount > 0) {
+      const refund = new RefundingReservation({
+        reservation: reservation._id,
+        refundAmount: refundAmount,
+        status: 'PENDING',
+        requestDate: new Date()
+      });
+      await refund.save();
+    }
+    
+    for (const roomItem of reservation.rooms) {
+      const room = await Room.findById(roomItem.room._id);
+      if (room) {
+        room.quantity += roomItem.quantity;
+        await room.save();
+      }
+    }
+
+    return res.status(200).json({
+      error: false,
+      message: "Reservation cancelled successfully",
+      data: {
+        reservation: {
+          _id: reservation._id,
+          hotelName: reservation.hotel.hotelName,
+          checkInDate: reservation.checkInDate,
+          checkOutDate: reservation.checkOutDate,
+          status: reservation.status,
+        },
+        cancellationPolicy: {
+          refundPercentage: refundPercentage,
+          refundAmount: refundAmount,
+          cancellationFee: cancellationFee,
+          daysUntilCheckIn: daysUntilCheckIn
+        }
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: true,
+      message: "Failed to cancel reservation"
+    });
+  }
+});
+
 //automatic update status of reservations
 const autoUpdateReservationStatus = asyncHandler(async () => {
   const currentDate = new Date();
