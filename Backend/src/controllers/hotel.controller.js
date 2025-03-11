@@ -4,7 +4,7 @@ const Room = require("../models/room");
 const Reservation = require("../models/reservation");
 const Bed = require("../models/bed");
 const { AUTH, GENERAL, HOTEL } = require("../utils/constantMessage");
-
+const { uploadMultipleImages, deleteImages, getPublicIdFromUrl } = require("../utils/uploadToCloudinary");
 exports.getAllHotels = asyncHandler(async (req, res) => {
   const hotels = await Hotel.find();
 
@@ -100,5 +100,85 @@ exports.getTotalReservationByHotelId = asyncHandler(async (req, res) => {
     message: HOTEL.SUCCESS,
   });
 
+});
+
+
+exports.createHotel = asyncHandler(async (req, res) => {
+console.log(req.user.id)
+  try {
+    const ownerID = req.user?.id || req.body.id;
+    const {
+      hotelName,
+      description,
+      address,
+      phoneNumber,
+      rating = 0,
+      star = 1,
+      pricePerNight = 0,
+      facilities = [],
+
+    } = req.body;
+
+    // Kiểm tra các trường bắt buộc
+    if (!hotelName || !description || !address || !phoneNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "Vui lòng cung cấp đầy đủ thông tin khách sạn và tên công ty"
+      });
+    }
+
+    // Kiểm tra ảnh
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Vui lòng tải lên ít nhất một ảnh khách sạn"
+      });
+    }
+
+    // Lấy các files ảnh từ request
+    const hotelImages = req.files.images
+      ? Array.isArray(req.files.images)
+        ? req.files.images
+        : [req.files.images]
+      : Object.values(req.files).flat();
+
+    // Tạo đường dẫn thư mục với tên công ty
+    const folderPath = `hotels/${hotelName}`;
+
+    // Upload ảnh lên Cloudinary
+    const imageUrls = await uploadMultipleImages(hotelImages, folderPath, {
+      width: 800,
+      crop: "fill",
+      quality: "auto:good"
+    });
+
+    // Tạo khách sạn mới
+    const newHotel = await Hotel.create({
+      hotelName,
+      description,
+      address,
+      phoneNumber,
+      rating,
+      star,
+      pricePerNight,
+      facilities,
+      images: imageUrls,
+      owner: ownerID
+    });
+
+    // Trả về phản hồi thành công
+    res.status(201).json({
+      success: true,
+      message: "Tạo khách sạn mới thành công",
+      hotel: newHotel
+    });
+  } catch (error) {
+    console.error("Lỗi khi tạo khách sạn:", error);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi máy chủ khi tạo khách sạn",
+      error: error.message
+    });
+  }
 });
 
