@@ -7,7 +7,9 @@ import {
     CreatehotelStep7,
     CreatehotelStep8,
     CreatehotelStep9,
-    CreatehotelStep15
+    CreatehotelStep15,
+    CreatehotelStep10,
+    CreatehotelStep11
 } from '../../components/hotel_slide';
 
 
@@ -37,7 +39,9 @@ export const Createhotel = () => {
         <CreatehotelStep7 key={7} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
         <CreatehotelStep8 key={8} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
         <CreatehotelStep9 key={9} nextStep={() => setStep(step + 1)} prevStep={() => setStep(5)} />,
-        <CreatehotelStep15 key={8} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />
+        <CreatehotelStep10 key={10} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
+        <CreatehotelStep11 key={11} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
+        <CreatehotelStep15 key={12} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />
     ];
 
     return (

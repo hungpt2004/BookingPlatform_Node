@@ -207,7 +207,7 @@ export const Step9 = ({ nextStep, prevStep }) => {
                             </p>
                         </div>
                     </div>
-                    <Button variant="outline-primary" className="fw-medium" >
+                    <Button variant="outline-primary" className="fw-medium" onClick={nextStep}>
                         Thêm các thông tin cuối cùng
                     </Button>
                 </div>
