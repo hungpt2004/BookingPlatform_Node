@@ -9,11 +9,9 @@ import { useNavigate } from "react-router-dom";
 export const Step9 = ({ nextStep, prevStep }) => {
     const navigate = useNavigate();
     // Retrieve data from sessionStorage
-    const [basicInfo, setBasicInfo] = useState(JSON.parse(sessionStorage.getItem("basicInfo")) || {});
     const [rooms, setRooms] = useState(JSON.parse(sessionStorage.getItem("rooms")) || []);
     console.log(rooms.bedTypes);
     const [photos, setPhotos] = useState(JSON.parse(sessionStorage.getItem("hotelPhotos")) || []);
-    const [paymentInfo, setPaymentInfo] = useState(JSON.parse(sessionStorage.getItem("paymentInfo")) || {});
 
     const toCreateRoom = () => {
         if (sessionStorage.getItem("id")) {
@@ -47,6 +45,11 @@ export const Step9 = ({ nextStep, prevStep }) => {
         navigate("/create-photo");
     }
 
+    const validPhoto = photos.length >= 1; // 1 photos due to insufficent space 
+
+    const isValidInfo = () => {
+        return rooms.length > 0 && validPhoto;
+    }
     return (
         <Container style={{ maxWidth: "65%" }} >
             {/* Basic Information Section */}
@@ -163,7 +166,7 @@ export const Step9 = ({ nextStep, prevStep }) => {
             <Card className="p-4 mt-3">
                 <div className="d-flex justify-content-between align-items-center">
                     <div className="d-flex align-items-center">
-                        {photos.length > 5 ? (
+                        {validPhoto ? (
                             <span><FaCheckCircle className="text-success me-2" size={50} /></span>
                         ) : (
                             <span><FaImage className="me-2" size={50} style={{ color: "#1A1A1A" }} /></span>
@@ -207,7 +210,7 @@ export const Step9 = ({ nextStep, prevStep }) => {
                             </p>
                         </div>
                     </div>
-                    <Button variant="outline-primary" className="fw-medium" onClick={nextStep}>
+                    <Button variant="outline-primary" className="fw-medium" onClick={nextStep} disabled={!isValidInfo()}>
                         Thêm các thông tin cuối cùng
                     </Button>
                 </div>
