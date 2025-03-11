@@ -14,6 +14,12 @@ import FavoriteHotelsList from "./views/favorite/FavoriteHotelsList"
 import CustomerProfileSetting from "./views/customer/CustomerProfileSetting"
 import FeedbackPage from './views/feedback/feedback'
 import { Createhotel } from './views/hotel/Createhotel'
+import { CreateRoom } from './views/room/createRoom'
+import CancelPolicy from './views/room/roomPriceType/CancelPolicy'
+import PricePerPerson from './views/room/roomPriceType/PricePerCapacity'
+import PriceNoRefund from './views/room/roomPriceType/PriceNoRefund'
+import PricePerWeek from './views/room/roomPriceType/PricePerWeek'
+import HotelPhotos from './views/hotel/CreateHotelPhotos'
 
 function App() {
   return (
@@ -35,7 +41,13 @@ function App() {
         <Route path="/update-customer" element={<CustomerProfileSetting />} />
         <Route path="/feedback" element={<FeedbackPage />} />
         <Route path="/create-hotel" element={<Createhotel />} />
-       
+        <Route path='/create-room' element={<CreateRoom />} />
+        <Route path='/cancel-policy' element={<CancelPolicy />} />
+        <Route path='/edit-capacity-price' element={<PricePerPerson />} />
+        <Route path='/edit-non-refundable' element={<PriceNoRefund />} />
+        <Route path='/edit-weekly-price' element={<PricePerWeek />} />
+        <Route path='/create-photo' element={<HotelPhotos />} />
+
       </Routes>
     </Router>
   )

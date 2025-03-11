@@ -122,10 +122,10 @@ export const Step6 = ({ nextStep, prevStep }) => {
     );
 };
 export const Step7 = ({ nextStep, prevStep }) => {
-    const [selectedServices, setSelectedServices] = useState([]);
+    const [selectedOptions, setSelectedOptions] = useState([]);
 
     const handleCheckboxChange = (service) => {
-        setSelectedServices((prev) => {
+        setSelectedOptions((prev) => {
             const exists = prev.some((s) => s.id === service.id);
             return exists ? prev.filter((s) => s.id !== service.id) : [...prev, service];
         });
@@ -133,8 +133,8 @@ export const Step7 = ({ nextStep, prevStep }) => {
 
     // Lưu cả ID và Name vào sessionStorage
     useEffect(() => {
-        sessionStorage.setItem("service", JSON.stringify(selectedServices));
-    }, [selectedServices]);
+        sessionStorage.setItem("options", JSON.stringify(selectedOptions));
+    }, [selectedOptions]);
 
     return (
         <Container>
@@ -149,7 +149,7 @@ export const Step7 = ({ nextStep, prevStep }) => {
                                     type="checkbox"
                                     id={`service-${service.id}`}
                                     label={service.name}
-                                    checked={selectedServices.some((s) => s.id === service.id)}
+                                    checked={selectedOptions.some((s) => s.id === service.id)}
                                     onChange={() => handleCheckboxChange(service)}
                                 />
                             </Col>
@@ -162,7 +162,7 @@ export const Step7 = ({ nextStep, prevStep }) => {
                 {/* Nút Back & Next */}
                 <div className="d-flex justify-content-between">
                     <Button variant="secondary" onClick={prevStep}>Quay lại</Button>
-                    <Button variant="primary" onClick={nextStep} disabled={selectedServices.length === 0}>
+                    <Button variant="primary" onClick={nextStep} disabled={selectedOptions.length === 0}>
                         Tiếp tục
                     </Button>
                 </div>
