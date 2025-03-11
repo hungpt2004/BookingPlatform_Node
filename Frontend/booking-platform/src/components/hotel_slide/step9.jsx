@@ -12,7 +12,7 @@ export const Step9 = ({ nextStep, prevStep }) => {
     const [basicInfo, setBasicInfo] = useState(JSON.parse(sessionStorage.getItem("basicInfo")) || {});
     const [rooms, setRooms] = useState(JSON.parse(sessionStorage.getItem("rooms")) || []);
     console.log(rooms.bedTypes);
-    const [photos, setPhotos] = useState(JSON.parse(sessionStorage.getItem("photos")) || []);
+    const [photos, setPhotos] = useState(JSON.parse(sessionStorage.getItem("hotelPhotos")) || []);
     const [paymentInfo, setPaymentInfo] = useState(JSON.parse(sessionStorage.getItem("paymentInfo")) || {});
 
     const toCreateRoom = () => {
@@ -163,7 +163,7 @@ export const Step9 = ({ nextStep, prevStep }) => {
             <Card className="p-4 mt-3">
                 <div className="d-flex justify-content-between align-items-center">
                     <div className="d-flex align-items-center">
-                        {photos.length > 0 ? (
+                        {photos.length > 5 ? (
                             <span><FaCheckCircle className="text-success me-2" size={50} /></span>
                         ) : (
                             <span><FaImage className="me-2" size={50} style={{ color: "#1A1A1A" }} /></span>
@@ -179,9 +179,16 @@ export const Step9 = ({ nextStep, prevStep }) => {
 
                         </div>
                     </div>
-                    <Button variant="primary" onClick={toCreatePhoto}>
-                        Thêm ảnh
-                    </Button>
+                    {photos.length > 0 ? (
+                        <Button variant="link" className="text-decoration-none" onClick={toCreatePhoto}>
+                            Chỉnh sửa
+                        </Button>
+
+                    ) : (
+                        <Button variant="primary" onClick={toCreatePhoto}>
+                            Thêm ảnh
+                        </Button>
+                    )}
                 </div>
             </Card>
 
