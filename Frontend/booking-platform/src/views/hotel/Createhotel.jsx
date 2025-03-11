@@ -6,12 +6,13 @@ import {
     CreatehotelStep4, CreatehotelStep5, CreatehotelStep6,
     CreatehotelStep7,
     CreatehotelStep8,
-    CreatehotelStep9
+    CreatehotelStep9,
+    CreatehotelStep15
 } from '../../components/hotel_slide';
+
 
 export const Createhotel = () => {
     const [step, setStep] = useState(() => Number(sessionStorage.getItem("hotelStep")) || 1);
-
     const [selectedHotel, setSelectedHotel] = useState(() => {
         const savedHotel = sessionStorage.getItem("selectedHotel");
         return savedHotel ? JSON.parse(savedHotel) : { id: 1, title: '1 khách sạn với nhiều phòng' };
@@ -35,7 +36,8 @@ export const Createhotel = () => {
         <CreatehotelStep6 key={6} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
         <CreatehotelStep7 key={7} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
         <CreatehotelStep8 key={8} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
-        <CreatehotelStep9 key={9} nextStep={() => setStep(step + 1)} prevStep={() => setStep(5)} />
+        <CreatehotelStep9 key={9} nextStep={() => setStep(step + 1)} prevStep={() => setStep(5)} />,
+        <CreatehotelStep15 key={8} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />
     ];
 
     return (

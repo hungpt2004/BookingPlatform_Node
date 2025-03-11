@@ -29,7 +29,7 @@ const hotelStar = [
     { id: 5, star: 5 },
 ];
 
-const yesNo=[
+const yesNo = [
     { id: 1, title: "Có" },
     { id: 2, title: "Không" },
 ]
@@ -50,4 +50,16 @@ const services = [
     { id: 13, name: "Hồ bơi" },
     { id: 14, name: "Bãi biển" },
 ];
-export { hotelType, mainOptions, extraOptions, hotelStar, yesNo, services };
+
+const typeOption = [
+    { id: 1, type: "Ca Nhan", desc: "Mot ca nhanh hoac chu so huu duy nhat va dieu hanh mot nghiep khong co tu cach phap nhan" },
+    { id: 2, type: "Doanh Nghiep", desc: "Mot chuc the kinh doanh co the duoc so huu boi nhieu ca nhan, chang han nhu cong ty hop danh, cong ty dai chung hoac tu, to chuc phi loi nhan,v.v." }
+];
+
+const nation = [
+    { id: 1, name: "Viet Nam" },
+    { id: 2, name: "United States" },
+    { id: 3, name: "United Kingdom" },
+    { id: 4, name: "Japan" },
+]
+export { hotelType, mainOptions, extraOptions, hotelStar, yesNo, services, typeOption, nation };

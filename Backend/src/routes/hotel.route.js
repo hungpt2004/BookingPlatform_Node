@@ -24,6 +24,6 @@ HotelRouter.get(
 );
 
 HotelRouter.get("/top-hotel", HotelController.getTopHotel);
-
+HotelRouter.post("/create", protect, HotelController.createHotel);
 
 module.exports = HotelRouter;
