@@ -466,7 +466,7 @@ export const HotelDetailPage = () => {
                <h2 className="px-5 fw-bolder">Đánh giá của khách hàng</h2>
                <h4 className="px-5 fw-bold mt-3">Hạng mục</h4>
 
-               <p className="fw-bold px-5 mb-1">Đánh giá 5 {"(⭐)"} 1.400<span className="text-muted"> total feedback</span></p>
+               <p className="fw-bold px-5 mb-1">Đánh giá 5 {"(⭐)"} {listFeedback.length}<span className="text-muted"> total feedback</span></p>
                <ProgressBar className="mx-5" variant="primary" now={60} />
 
                <p className="fw-bold px-5 mb-1">Đánh giá 4 {"(⭐)"} </p>

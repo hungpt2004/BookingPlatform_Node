@@ -196,11 +196,6 @@ const BookingStepTwo = () => {
                                     <div className="input-group mb-3">
                                         <select className="form-control" >
                                             <option value="VN">Viet Nam</option>
-                                            <option value="US">United States</option>
-                                            <option value="UK">United Kingdom</option>
-                                            <option value="FR">France</option>
-                                            <option value="DE">Germany</option>
-                                            {/* Thêm các quốc gia khác nếu cần */}
                                         </select>
                                     </div>
                                 </div>

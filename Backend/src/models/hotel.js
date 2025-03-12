@@ -56,7 +56,31 @@ const hotelSchema = new Schema(
     ],
     
     //Thêm mảng lưu trữ hình ảnh
-    
+    businessDocuments: [{ 
+      type: String, 
+      required: true 
+    }],
+
+    adminStatus: {
+      type:String,
+      enum: ["PENDING", "APPROVED"], //Nếu admin reject thì xóa khỏi collection
+      default: "PENDING"
+    },
+
+    ownerStatus: {
+      type:String,
+      enum: ["ACTIVE", "NONACTIVE"], //Nếu admin reject thì xóa khỏi collection
+      default: "ACTIVE"
+    },
+
+    requestDate: { 
+      type: Date, 
+      default: Date.now 
+    }, // Ngày gửi yêu cầu
+
+    decisionDate: { 
+      type: Date 
+    } // Ngày quyết định (nếu có)
 
   },
   { versionKey: false }

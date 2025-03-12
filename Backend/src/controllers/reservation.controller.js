@@ -1,5 +1,7 @@
 const asyncHandler = require("../middlewares/asyncHandler");
 const Reservation = require("../models/reservation");
+const RefundingReservation = require('../models/refundingReservation')
+const Room = require('../models/room')
 const cron = require("node-cron");
 
 exports.getALlReservation = asyncHandler(async (req, res) => {
@@ -189,7 +191,7 @@ exports.cancelReservation = asyncHandler(async (req, res) => {
       });
     }
 
-    if (!["BOOKED", "PENDING"].includes(reservation.status)) {
+    if (!["BOOKED"].includes(reservation.status)) {
       return res.status(400).json({
         error: true,
         message: `Cannot cancel a reservation with status: ${reservation.status}`,
@@ -224,7 +226,11 @@ exports.cancelReservation = asyncHandler(async (req, res) => {
       });
     }
 
-    reservation.status = "CANCELLED";
+    //Setting reservation become pending status
+    await reservation.updateOne({
+      $set: {status: "PENDING"}
+    })
+
     await reservation.save();
 
     const refundAmount = (reservation.totalPrice * refundPercentage) / 100;
@@ -315,4 +321,7 @@ const autoDeleteNotPaidReservation = asyncHandler(async () => {
 cron.schedule("*/5 * * * *", () => {
   // autoUpdateReservationStatus();
   // autoDeleteNotPaidReservation();
-});
+},{
+  timezone: "Asia/Ho_Chi_Minh"
+}
+);

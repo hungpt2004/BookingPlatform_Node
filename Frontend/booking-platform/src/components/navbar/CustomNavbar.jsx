@@ -43,7 +43,7 @@ function CustomNavbar() {
   return (
     <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary sticky-top">
       <Container className='d-flex align-items-center justify-content-center'>
-        <Navbar.Brand className='fs-2 fw-bold' style={{ color: '#003b95' }} href="/">Travelofy</Navbar.Brand>
+        <Navbar.Brand className='fs-2 fw-bold' style={{ color: '#003b95' }} href="/home">Travelofy</Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
