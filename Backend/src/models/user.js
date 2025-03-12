@@ -10,29 +10,31 @@ const UserSchema = new Schema(
     name: { type: String, required: true },
     email: {
       type: String,
-      required: [true, 'Email is required!'],
+      required: [true, "Email is required!"],
       unique: true,
       lowercase: true,
-      validate: [validator.isEmail, 'Please provide a valid email!'],
+      validate: [validator.isEmail, "Please provide a valid email!"],
     },
     password: {
       type: String,
-      required: [true, 'Password is required!'],
+      required: [true, "Password is required!"],
       select: false,
     },
     phoneNumber: {
-      type: String
+      type: String,
     },
     createOn: { type: Date, default: new Date().getTime() },
     cmnd: { type: String, default: "N/A" },
     updatedAt: { type: Date, default: new Date().getTime() },
     phone: { type: String, default: "N/A" },
     address: { type: String, default: "N/A" },
-    role: { type: String, enum: ["CUSTOMER", "ADMIN", "OWNER"], default: "CUSTOMER" },
+    role: {
+      type: String,
+      enum: ["CUSTOMER", "ADMIN", "OWNER"],
+      default: "CUSTOMER",
+    },
 
-    reservations: [
-      { type: Schema.Types.ObjectId, ref: "Reservation" },
-    ],
+    reservations: [{ type: Schema.Types.ObjectId, ref: "Reservation" }],
     ownedHotels: [
       {
         type: Schema.Types.ObjectId,
@@ -49,13 +51,11 @@ const UserSchema = new Schema(
     image: {
       public_ID: {
         type: String,
-        required: true,
       },
       url: {
         type: String,
-        required: true,
       },
-    },//avatar
+    }, //avatar
     //MẢNG BUSSINESS DOCUMENT
     isVerified: { type: Boolean, default: false },
     resetPasswordToken: String,
@@ -64,7 +64,7 @@ const UserSchema = new Schema(
     verificationTokenExpiresAt: Date,
   },
   { timestamps: true },
-  { versionKey: false },
+  { versionKey: false }
 );
 
 // Hashing mật khẩu trước khi lưu
@@ -76,7 +76,7 @@ UserSchema.pre("save", async function (next) {
 
 UserSchema.methods.correctPassword = async function (
   candidatePassword,
-  userPassword,
+  userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
@@ -84,4 +84,4 @@ UserSchema.methods.correctPassword = async function (
 // Index hóa email để tìm kiếm nhanh hơn
 UserSchema.index({ email: 1 });
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", UserSchema);

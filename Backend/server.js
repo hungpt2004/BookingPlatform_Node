@@ -9,21 +9,19 @@ const authenticateRoute = require("./src/routes/authenticate.route");
 const FeedbackRouter = require("./src/routes/feedback.route");
 const RoomRouter = require("./src/routes/room.route");
 const BedRouter = require("./src/routes/bed.route");
+const HotelServiceRouter = require("./src/routes/hotel.service.route");
 require("dotenv").config();
 const fileupload = require("express-fileupload");
 const app = express(); //Create server
-const path = require("path"); 
+const path = require("path");
 const fs = require("fs");
-const session = require('express-session')
+const session = require("express-session");
 const cookieParser = require("cookie-parser");
-
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Hỗ trợ dữ liệu form-urlencoded
 app.use(fileupload({ useTempFiles: true }));
-app.use(cookieParser())
-
+app.use(cookieParser());
 
 //Cors setting
 const allowedOrigins = ["http://localhost:5173", "https://mywebsite.com"];
@@ -37,7 +35,7 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     credentials: true,
   })
 );
@@ -79,6 +77,9 @@ app.use("/room", RoomRouter);
 
 //Bed
 app.use("/bed", BedRouter);
+
+//Hotel Service
+app.use("/hotel-service", HotelServiceRouter);
 
 //Connect Mongo Config
 connectDB();
