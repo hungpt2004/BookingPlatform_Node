@@ -74,7 +74,7 @@ export const Step1 = ({ nextStep, prevStep }) => {
     // Render bed type rows
     const renderBedTypes = () =>
         formData.bedTypes.map((bed, index) => (
-            <Row key={bed.label} className="align-items-center mb-2">
+            <Row key={bed.label} className="align-items-center mb-2 p-0" >
                 <Col xs={8} className="d-flex align-items-center">
                     <span className="material-symbols-outlined me-2" style={{ fontSize: "2rem", }}>
                         {bed.label === "Giường đơn" ? "single_bed" : "king_bed"}
@@ -82,7 +82,6 @@ export const Step1 = ({ nextStep, prevStep }) => {
                     <div className="d-flex flex-column">
                         <Form.Label className="mb-0">{bed.label}</Form.Label>
                         <p className="text-secondary mb-0" style={{ fontSize: "0.8rem" }}>{bed.lengthDetail}</p>
-
                     </div>
                 </Col>
 

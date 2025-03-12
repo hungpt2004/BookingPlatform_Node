@@ -9,9 +9,6 @@
     border-color: #2196F3;
 }
 
-.object-fit-cover {
-    object-fit: cover;
-}
 .dragging {
     opacity: 0.5;
     transform: scale(0.95);
@@ -21,20 +18,5 @@
 .img-thumbnail {
     will-change: transform;
     backface-visibility: hidden;
-}
-
-.row {
-    min-height: 300px; /* Ensure container has minimum height */
-    position: relative;
-}
-
-.col {
-    transition: transform 0.2s;
-}
-
-.badge {
-    font-size: 0.8rem;
-    padding: 0.25rem 0.5rem;
-    z-index: 1;
 }
 
