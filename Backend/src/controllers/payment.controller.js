@@ -30,6 +30,10 @@ exports.createBooking = asyncHandler(async (req, res) => {
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
 
+    //Check not paid reservation
+    
+
+
     const session = await mongoose.startSession();
     session.startTransaction();
 

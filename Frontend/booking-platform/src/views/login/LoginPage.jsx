@@ -1,54 +1,227 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // Components
 import CustomInput from '../../components/input/CustomInput';
 import { CustomPasswordInput } from '../../components/input/CustomPasswordInput';
 // CSS
-import { Button, Col, Container, Image, Row, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import Spinner from 'react-bootstrap/Spinner';
+import { Modal, Spinner, Container } from 'react-bootstrap';
 import './LoginPage.css'
 // Router
-import { useNavigate, useNavigation } from 'react-router-dom';
-// Spinner
-import { MoonLoader, PulseLoader } from 'react-spinners';
-// GG Login
+import { useNavigate } from 'react-router-dom';
+// Store
 import { useAuthStore } from '../../store/authStore';
 import { GoogleLogin } from '@react-oauth/google'
-// Icon
-import { HiCheckCircle, HiExclamationCircle } from 'react-icons/hi'
-import { FaRegEyeSlash } from "react-icons/fa";
 // Toast
 import { toast, ToastContainer } from 'react-toastify'
 import "react-toastify/dist/ReactToastify.css";
-import { CustomToast } from '../../components/toast/CustomToast';
 // Animation
-import UseTime from './UseTime.jsx';
-import DragBox from '../../components/animation/DragBox.jsx';
-import { motion } from 'framer-motion';  // Import motion
+import { motion } from 'framer-motion';
+import CustomInputLogin from '../../components/input/CustomInputLogin';
+
+// Tạo CSS cho hiệu ứng nút 3D
+const buttonStyles = `
+  .button-3d {
+    position: relative;
+    width: 240px;
+    height: 54px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    z-index: 1;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    transform-style: preserve-3d;
+    transform: perspective(1000px) translateZ(0);
+  }
+
+  .button-3d:active {
+    transform: perspective(1000px) translateZ(-10px);
+    box-shadow: 0 3px 8px rgb(255, 255, 255);
+  }
+
+  /* Primary Button (Login) */
+  .button-3d.primary {
+    background-color: #003b95;
+    color: white;
+  }
+
+  .button-3d.primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background-color: #0055d4;
+    transition: width 0.3s ease;
+    z-index: -1;
+  }
+
+  .button-3d.primary:hover::before {
+    width: 100%;
+  }
+
+  .button-3d.primary::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2), transparent);
+    z-index: -1;
+  }
+
+  /* Secondary Button (Register) */
+  .button-3d.secondary {
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+  }
+
+  .button-3d.secondary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: width 0.3s ease;
+    z-index: -1;
+  }
+
+  .button-3d.secondary:hover::before {
+    width: 100%;
+  }
+
+  .button-3d.secondary::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), transparent);
+    z-index: -1;
+  }
+
+  /* Disabled state */
+  .button-3d:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: perspective(1000px) translateZ(0) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  /* Spin animation for loading state */
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
 
 export const LoginPage = () => {
+   // Navigation
+   const navigate = useNavigate();
+
+   // States
+   const [showLoginModal, setShowLoginModal] = useState(false);
+   const [showRegisterModal, setShowRegisterModal] = useState(false);
+   const [isImageLoaded, setIsImageLoaded] = useState(false);
+
+   // Login form states
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
    const [loading, setLoading] = useState(false);
-   const [showError, setShowError] = useState(false);
-   const navigate = useNavigate(); //Navigation # Navigate nhu the nao ? 
-   const [showToast, setShowToast] = useState(false);
-   const [toastType, setToastType] = useState("success"); // success hoặc error
-   const [showPassword, setShowPassword] = useState(false);
 
-   const { login, isLoading, error, googleLogin } = useAuthStore();
+   // Register form states
+   const [fullName, setFullName] = useState("");
+   const [registerEmail, setRegisterEmail] = useState("");
+   const [registerPassword, setRegisterPassword] = useState("");
+   const [confirmPassword, setConfirmPassword] = useState("");
+   const [registerLoading, setRegisterLoading] = useState(false);
 
+   // Auth store
+   const { login, googleLogin, signup } = useAuthStore();
+
+
+   // Preload background image
+   useEffect(() => {
+      const img = new Image();
+      img.src = '/hotel/travel.jpg';
+      img.onload = () => setIsImageLoaded(true);
+   }, []);
+
+   // Handle login form submission
    const handleLogin = async (e) => {
       e.preventDefault();
-      setShowError(false);
-      setLoading(true); // Bắt đầu loading
+
+      if (!email || !password) {
+         toast.error("Vui lòng nhập đầy đủ thông tin!", {
+            position: "top-center",
+            autoClose: 2000,
+         });
+         return;
+      }
+
+      setLoading(true);
 
       try {
+
          await login(email, password);
+
+         toast.success("Đăng nhập thành công", {
+            position: "top-center",
+            autoClose: 2000,
+         });
+
+         // Close modal after successful login
+         setTimeout(() => {
+            setLoading(false);
+            setShowLoginModal(false);
+            navigate("/home");
+         }, 2000);
+
+      } catch (err) {
+         setLoading(false);
+         toast.error(err.message || "Đăng nhập thất bại", {
+            position: "top-center",
+            autoClose: 2000,
+         });
+      }
+   };
+
+   const handleSignUp = async (e) => {
+      e.preventDefault();
+
+      if (!fullName || !registerEmail || !registerPassword || !confirmPassword) {
+         toast.error("Vui lòng nhập đầy đủ thông tin!", {
+            position: "top-center",
+            autoClose: 2000,
+         });
+         return;
+      }
+
+      if (registerPassword !== confirmPassword) {
+         toast.error("Mật khẩu xác nhận không khớp!", {
+            position: "top-center",
+            autoClose: 2000,
+         });
+         return;
+      }
+
+      setLoading(true)
+      try {
+         const response = await signup(fullName, registerEmail, registerPassword);
+         // Assuming response contains userId for verification
 
          setTimeout(() => {
             setLoading(false); // Tắt loading sau 1.5s
 
-            toast.success("Đăng nhập thành công", {
+            toast.success("Đăng kí thành công! Đợi xíu nha", {
                position: "top-center",
                autoClose: 2000,
                hideProgressBar: false,
@@ -58,15 +231,21 @@ export const LoginPage = () => {
             });
 
             setTimeout(() => {
-               navigate("/home");
+               navigate("/verify-email", {
+                  state: {
+                     userId: response.userId,
+                     email: registerEmail,
+                  },
+               });
             }, 2000); // Chuyển trang sau khi toast hiển thị
          }, 1500);
+
 
       } catch (err) {
          setTimeout(() => {
             setLoading(false); // Tắt loading sau 1.5s
 
-            toast.error(err.message, {
+            toast.error("Register Failed! Try again", {
                position: "top-center",
                autoClose: 2000,
             });
@@ -74,8 +253,7 @@ export const LoginPage = () => {
       }
    };
 
-
-
+   // Handle Google login
    const handleGoogleLogin = async (credentialResponse) => {
       try {
          await googleLogin(credentialResponse.credential);
@@ -83,15 +261,13 @@ export const LoginPage = () => {
          toast.success("Đăng nhập thành công", {
             position: "top-center",
             autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
          });
 
+         // Close modal after successful login
          setTimeout(() => {
+            setShowLoginModal(false);
             navigate("/home");
-         }, 2000); // Chuyển trang sau khi toast hiển thị
+         }, 2000);
 
       } catch (error) {
          toast.error("Đăng nhập thất bại", {
@@ -103,83 +279,273 @@ export const LoginPage = () => {
 
    return (
       <>
-         <CustomToast />
-         <Container fluid className='p-0 m-0'>
-            <Row>
-               <Col xs={8} className='position-relative'>
-                  <Image src='/hotel/travel.jpg' fluid style={{ objectFit: 'cover', height: '100vh', width: '100%' }} />
-                  <div
-                     className='position-absolute top-0 start-0 w-100 h-100'
-                     style={{
-                        backdropFilter: 'blur(3px)', // Làm mờ nền
-                        backgroundColor: 'rgba(0, 0, 0, 0.3)' // Kết hợp với màu tối
-                     }}
-                  ></div>
-                  <motion.div
-                     className="position-absolute translate-middle text-light text-center top-50 start-50"
-                     style={{
-                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        padding: '20px',
-                        borderRadius: '10px'
-                     }}
-                     animate={{ y: [0, -10, 0] }}
-                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+         {/* Inject custom CSS for 3D buttons */}
+         <style>{buttonStyles}</style>
+
+         <ToastContainer />
+
+         {/* Main Landing Page */}
+         <div
+            className="vh-100 w-100 position-relative overflow-hidden"
+            style={{
+               backgroundImage: isImageLoaded ? "url('/hotel/travel.jpg')" : "none",
+               backgroundColor: isImageLoaded ? "transparent" : "#003b95",
+               backgroundSize: "cover",
+               backgroundPosition: "center",
+               transition: "background-color 0.5s ease"
+            }}
+         >
+            {/* Dark Overlay */}
+            <div
+               className="position-absolute top-0 start-0 w-100 h-100"
+               style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)'
+               }}
+            />
+
+            {/* Main Content Container */}
+            <Container className="position-relative h-100 d-flex flex-column justify-content-center align-items-center text-white">
+               {/* Logo and Branding */}
+               <motion.div
+                  className="text-center mb-5"
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8 }}
+               >
+                  <div className="bg-white rounded-circle mx-auto mb-3" style={{ width: "80px", height: "80px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                     <div className="bg-primary rounded-circle" style={{ width: "60px", height: "60px" }}></div>
+                  </div>
+                  <h1 className="display-4 fw-bold mb-2">Travelofy</h1>
+                  <p className="lead">Discover the world's most amazing places</p>
+               </motion.div>
+
+               {/* Welcome Text with Animation */}
+               <motion.div
+                  className="text-center mb-5"
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+               >
+                  <h2 className="display-5 fw-light">Your journey begins here</h2>
+               </motion.div>
+
+               {/* Action Buttons */}
+               <motion.div
+                  className="d-flex flex-column gap-4 align-items-center"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
+               >
+                  {/* 3D Login Button */}
+                  <button
+                     className="button-3d primary"
+                     onMouseEnter={() => setLoginHovered(true)}
+                     onMouseLeave={() => setLoginHovered(false)}
+                     onClick={() => setShowLoginModal(true)}
                   >
-                     <p className="fs-1 fw-bolder">Welcome to Travelofy</p>
-                     <p className="fs-5 fw-medium">Enjoy Your Blast Time</p>
-                  </motion.div>
-               </Col>
-               <Col className='justify-content-center align-content-center border-dark p-5' style={{ borderWidth: '1px', borderColor: 'black' }}>
-                  <div className='bg-secondary rounded-5 mb-1' style={{ width: '40px', height: '40px' }}></div>
-                  <h1 className='text-start'>Travel with <span style={{ color: '#003b95' }} className='fw-bolder'>Travelofy</span></h1>
-                  <h3 className='text-start mb-3'>Join with us</h3>
-                  <form onSubmit={handleLogin}>
-                     <div className='d-flex align-items-center justify-content-center mb-4'>
-                        <GoogleLogin
-                           onSuccess={handleGoogleLogin}
-                           onError={() => console.log("Google login failed")}
-                           shape="rectangular"
-                           theme="outline"
-                           size="large"
-                           width="320"
-                           text="continue_with"
-                           logo_alignment="center"
-                           useOneTap={false}
-                        />
+                     Sign In
+                  </button>
+
+                  {/* 3D Register Button */}
+                  <button
+                     className="button-3d secondary"
+                     onMouseEnter={() => setRegisterHovered(true)}
+                     onMouseLeave={() => setRegisterHovered(false)}
+                     onClick={() => setShowRegisterModal(true)}
+                  >
+                     Register
+                  </button>
+               </motion.div>
+            </Container>
+         </div>
+
+         {/* Login Modal */}
+         <Modal
+            show={showLoginModal}
+            onHide={() => setShowLoginModal(false)}
+            centered
+            backdrop="static"
+            size="md"
+         >
+            <Modal.Header closeButton className="border-0 pb-0">
+               <Modal.Title className="w-100 text-center">
+                  <h4 className="fw-bold">Sign in to Travelofy</h4>
+               </Modal.Title>
+            </Modal.Header>
+
+            <Modal.Body className="px-4 pt-0">
+               <form onSubmit={handleLogin}>
+                  <div className="d-flex align-items-center justify-content-center my-4">
+                     <GoogleLogin
+                        onSuccess={handleGoogleLogin}
+                        onError={() => console.log("Google login failed")}
+                        shape="rectangular"
+                        theme="outline"
+                        size="large"
+                        text="continue_with"
+                        logo_alignment="center"
+                     />
+                  </div>
+
+                  <div className="d-flex align-items-center my-4">
+                     <hr className="flex-grow-1 me-2" />
+                     <span className="text-muted">or</span>
+                     <hr className="flex-grow-1 ms-2" />
+                  </div>
+
+                  <CustomInputLogin
+                     label="Email or Username"
+                     type="text"
+                     value={email}
+                     placeHolder="Enter your email or username"
+                     onChange={(e) => setEmail(e.target.value)}
+                  />
+
+                  <CustomPasswordInput
+                     label="Password"
+                     value={password}
+                     placeHolder="Enter your password"
+                     onChange={(e) => setPassword(e.target.value)}
+                  />
+
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                     <div className="form-check">
+                        <input className="form-check-input" type="checkbox" id="rememberMe" />
+                        <label className="form-check-label" htmlFor="rememberMe">
+                           Remember me
+                        </label>
                      </div>
-                     <CustomInput label="Username" type="text" value={email} placeHolder={"Enter username"} onChange={(e) => setEmail(e.target.value)} />
-                     <CustomPasswordInput label="Password" value={password} placeHolder={"Enter password"} onChange={(e) => setPassword(e.target.value)} />
-                     <div className='d-flex justify-content-between align-items-center'>
-                        <div class="form-check">
-                           <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"  />
-                              <label class="form-check-label" for="flexCheckChecked">
-                                 Remember account
-                              </label>
-                        </div>
-                        <p className="text-decoration-underline text-end mt-3 text-primary" style={{ fontSize: '16px', cursor: 'pointer' }} onClick={() => navigate('/forgot')}>
-                           Forgot Password?
-                        </p>
-                     </div>
-                     <Button
-                        className="mt-3 w-100"
-                        type="submit"
-                        style={{ backgroundColor: '#003b95', borderColor: '#003b95', height: '50px'}} // Đặt chiều cao cố định
+
+                     <p
+                        className="m-0 text-primary"
+                        style={{ fontSize: '14px', cursor: 'pointer', textDecoration: 'underline' }}
+                        onClick={() => navigate('/forgot')}
                      >
-                        {loading ? (
-                           <Spinner animation="border" style={{ width: 30, height: 30 }} role="status" />
-                        ) : (
-                           "Sign In"
-                        )}
-                     </Button>
-                  </form>
-                  <p className="text-center mt-3 text-primary" style={{ fontSize: '14px', cursor: 'pointer' }}>
-                     <span className='text-dark'>No have an account ?</span> <span onClick={() => navigate('/register')} style={{ textDecorationLine: 'underline' }}>Sign In</span>
+                        Forgot Password?
+                     </p>
+                  </div>
+
+                  <button
+                     className="button-3d primary w-100 mb-3"
+                     type="submit"
+                     disabled={loading}
+                  >
+                     {loading ? (
+                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                     ) : (
+                        "Sign In"
+                     )}
+                  </button>
+
+                  <p className="text-center mb-0" style={{ fontSize: '14px' }}>
+                     <span>Don't have an account?</span>{' '}
+                     <span
+                        className="text-primary"
+                        style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                        onClick={() => {
+                           setShowLoginModal(false);
+                           setTimeout(() => setShowRegisterModal(true), 300);
+                        }}
+                     >
+                        Sign Up
+                     </span>
                   </p>
-                  {showError ? (error ? <p className='alert alert-danger'>{error}</p> : null) : null}
-               </Col>
-            </Row>
-         </Container>
+               </form>
+            </Modal.Body>
+         </Modal>
+
+         {/* Register Modal */}
+         <Modal
+            show={showRegisterModal}
+            onHide={() => setShowRegisterModal(false)}
+            centered
+            backdrop="static"
+            size="md"
+         >
+            <Modal.Header closeButton className="border-0 pb-0">
+               <Modal.Title className="w-100 text-center">
+                  <h4 className="fw-bold">Create your account</h4>
+               </Modal.Title>
+            </Modal.Header>
+
+            <Modal.Body className="px-4 pt-0">
+               <form onSubmit={handleSignUp}>
+
+               <div className="d-flex align-items-center justify-content-center my-4">
+                     <GoogleLogin
+                        onSuccess={handleGoogleLogin}
+                        onError={() => console.log("Google login failed")}
+                        shape="rectangular"
+                        theme="outline"
+                        size="large"
+                        text="continue_with"
+                        logo_alignment="center"
+                     />
+                  </div>
+
+                  <div className="d-flex align-items-center my-4">
+                     <hr className="flex-grow-1 me-2" />
+                     <span className="text-muted">or</span>
+                     <hr className="flex-grow-1 ms-2" />
+                  </div>
+
+                  <CustomInputLogin
+                     label="Full Name"
+                     type="text"
+                     value={fullName}
+                     placeHolder="Enter your full name"
+                     onChange={(e) => setFullName(e.target.value)}
+                  />
+
+                  <CustomInputLogin
+                     label="Email"
+                     type="email"
+                     value={registerEmail}
+                     placeHolder="Enter your email"
+                     onChange={(e) => setRegisterEmail(e.target.value)}
+                  />
+
+                  <CustomPasswordInput
+                     label="Password"
+                     value={registerPassword}
+                     placeHolder="Create a password"
+                     onChange={(e) => setRegisterPassword(e.target.value)}
+                  />
+
+                  <CustomPasswordInput
+                     label="Confirm Password"
+                     value={confirmPassword}
+                     placeHolder="Confirm your password"
+                     onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+
+                  <button
+                     className="button-3d primary w-100 my-4"
+                     type="submit"
+                     disabled={registerLoading}
+                  >
+                     {registerLoading ? (
+                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                     ) : (
+                        "Create Account"
+                     )}
+                  </button>
+
+                  <p className="text-center mb-0" style={{ fontSize: '14px' }}>
+                     <span>Already have an account?</span>{' '}
+                     <span
+                        className="text-primary"
+                        style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                        onClick={() => {
+                           setShowRegisterModal(false);
+                           setTimeout(() => setShowLoginModal(true), 300);
+                        }}
+                     >
+                        Sign In
+                     </span>
+                  </p>
+               </form>
+            </Modal.Body>
+         </Modal>
       </>
    );
 };
-

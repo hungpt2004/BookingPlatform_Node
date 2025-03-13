@@ -231,9 +231,10 @@ export const HotelDetailPage = () => {
                   </p>
 
                   <Row>
-                     <Col xs={10} className="">
+                     <Col xs={10}>
                         {currentHotel?.images?.length > 0 ? (
                            <>
+                              {/* Ảnh chính lớn */}
                               <motion.div
                                  className="d-flex justify-content-center"
                                  style={{ marginBottom: '20px' }}
@@ -241,7 +242,7 @@ export const HotelDetailPage = () => {
                                  animate={{ scale: 1 }}
                                  transition={{ duration: 0.8 }}
                               >
-                                 <Card className="w-100 p-2">
+                                 <Card className="w-100 p-2 shadow-lg">
                                     {loading ? (
                                        <Placeholder as="div" animation="glow">
                                           <Placeholder xs={12} style={{ height: '400px', backgroundColor: '#ddd' }} />
@@ -253,7 +254,7 @@ export const HotelDetailPage = () => {
                                           style={{
                                              objectFit: 'cover',
                                              width: '100%',
-                                             maxHeight: '400px',
+                                             height: '400px',
                                              borderRadius: '10px',
                                              transition: 'transform 0.3s',
                                           }}
@@ -264,52 +265,71 @@ export const HotelDetailPage = () => {
                                  </Card>
                               </motion.div>
 
-                              <Row>
-                                 <Card className="p-2 border-none">
-                                    <Swiper
-                                       slidesPerView={4}
-                                       spaceBetween={5}
-                                    >
-                                       {currentHotel.images.map((item, index) => (
+                              {/* Grid ảnh phụ */}
+                              <Row className="g-2">
+                                 {currentHotel.images.slice(1, 5).map((item, index) => (
+                                    <Col key={index} xs={6} md={3}>
+                                       <motion.div whileHover={{ scale: 1.05 }}>
+                                          {loading ? (
+                                             <Placeholder as="div" animation="glow">
+                                                <Placeholder xs={12} style={{ height: '120px', backgroundColor: '#ddd' }} />
+                                             </Placeholder>
+                                          ) : (
+                                             <Image
+                                                src={item}
+                                                className="img-fluid rounded shadow-sm"
+                                                style={{
+                                                   objectFit: 'cover',
+                                                   width: '100%',
+                                                   height: '120px',
+                                                   borderRadius: '8px',
+                                                }}
+                                                onError={(e) => (e.target.src = '/fallback-image.jpg')}
+                                                onClick={() => handleShowModalImage(item)}
+                                             />
+                                          )}
+                                       </motion.div>
+                                    </Col>
+                                 ))}
+                              </Row>
+
+                              {/* Carousel ảnh mở rộng */}
+                              {currentHotel.images.length > 5 && (
+                                 <Card className="p-2 border-0 mt-4">
+                                    <Swiper slidesPerView={4} spaceBetween={10} loop={true}>
+                                       {currentHotel.images.slice(5).map((item, index) => (
                                           <SwiperSlide key={index}>
-                                             <div className="d-flex justify-content-center">
-                                                <motion.div
-                                                   whileHover={{ scale: 1.02 }}
-                                                   className="img-container"
-                                                >
-                                                   {loading
-                                                      ? (
-                                                         <Placeholder as="div" animation="glow">
-                                                            <Placeholder xs={12} style={{ height: '400px', backgroundColor: '#ddd' }} />
-                                                         </Placeholder>
-                                                      )
-                                                      : (
-                                                         <Image
-                                                            src={item}
-                                                            className="img-fluid"
-                                                            style={{
-                                                               objectFit: 'cover',
-                                                               width: '100%',
-                                                               marginBottom: '10px',
-                                                               borderRadius: '5px',
-                                                            }}
-                                                            onError={(e) => (e.target.src = '/fallback-image.jpg')}
-                                                            onClick={() => handleShowModalImage(item)}
-                                                         />
-                                                      )
-                                                   }
-                                                </motion.div>
-                                             </div>
+                                             <motion.div whileHover={{ scale: 1.02 }}>
+                                                {loading ? (
+                                                   <Placeholder as="div" animation="glow">
+                                                      <Placeholder xs={12} style={{ height: '100px', backgroundColor: '#ddd' }} />
+                                                   </Placeholder>
+                                                ) : (
+                                                   <Image
+                                                      src={item}
+                                                      className="img-fluid rounded"
+                                                      style={{
+                                                         objectFit: 'cover',
+                                                         width: '100%',
+                                                         height: '100px',
+                                                         borderRadius: '5px',
+                                                      }}
+                                                      onError={(e) => (e.target.src = '/fallback-image.jpg')}
+                                                      onClick={() => handleShowModalImage(item)}
+                                                   />
+                                                )}
+                                             </motion.div>
                                           </SwiperSlide>
                                        ))}
                                     </Swiper>
                                  </Card>
-                              </Row>
+                              )}
                            </>
                         ) : (
                            <p>No images available</p>
                         )}
                      </Col>
+
 
                      <Col>
                         <Card>

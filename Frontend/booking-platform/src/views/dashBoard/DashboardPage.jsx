@@ -7,7 +7,8 @@ import "chart.js/auto";
 import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar";
 import { Sidebar } from "../../components/navbar/CustomeSidebar";
 import { FaBars, FaSearch } from "react-icons/fa";
-import axiosInstance from "../../utils/axiosInstance";
+import axiosInstance from "../../utils/AxiosInstance";
+import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 
 // Dashboard Overview Component
 const DashboardOverview = () => {
@@ -24,15 +25,19 @@ const DashboardOverview = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // In a real app, you would fetch this data from an API
-        // For now, we'll simulate a successful API response with sample data
-        setDashboardData({
-          totalReservations: 1450,
-          revenue: 45670,
-          activeHotels: 3,
-          pendingBookings: 24,
-          revenueData: [1200, 1900, 3000, 5000, 2300, 3400],
-        });
+
+        const response = await axiosInstance('/monthly-payment');
+
+        if(response.data){
+          setDashboardData({
+            totalReservations: response.data.totalReservationAmount,
+            revenue: formatCurrencyVND(response.data.totalRevenue),
+            activeHotels: response.data.activeHotel,
+            successBooking: response.data.normalReservations,
+            pendingBookings: response.data.cancelReservation,
+            revenueData: response.data.averageMonthlyRevenue,
+          });
+        }
         setLoading(false);
       } catch (err) {
         setError("Failed to load dashboard data");
@@ -44,7 +49,7 @@ const DashboardOverview = () => {
   }, []);
 
   const chartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "July", "Aug", "Sep", "Oct", "Nov", "Dec"],
     datasets: [
       {
         label: "Revenue",
@@ -76,9 +81,9 @@ const DashboardOverview = () => {
           },
           {
             title: "Revenue",
-            value: `$${dashboardData.revenue.toLocaleString()}`,
+            value: `${dashboardData.revenue.toLocaleString()}`,
           },
-          { title: "Active Hotels", value: dashboardData.activeHotels },
+          { title: "Success Bookings", value: dashboardData.successBooking },
           { title: "Pending Bookings", value: dashboardData.pendingBookings },
         ].map((item, index) => (
           <div key={index} className="col-md-3">
@@ -329,11 +334,11 @@ const ServiceManagement = () => {
         const updatedServices = services.map((service) =>
           service._id === currentId
             ? {
-                ...service,
-                name: newService.name,
-                description: newService.description,
-                price: newService.price,
-              }
+              ...service,
+              name: newService.name,
+              description: newService.description,
+              price: newService.price,
+            }
             : service
         );
 
@@ -345,16 +350,16 @@ const ServiceManagement = () => {
           searchTerm.trim() === ""
             ? servicesWithUpdatedIds
             : updateDisplayIds(
-                servicesWithUpdatedIds.filter(
-                  (service) =>
-                    service.name
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                    service.description
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase())
-                )
+              servicesWithUpdatedIds.filter(
+                (service) =>
+                  service.name
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase()) ||
+                  service.description
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
               )
+            )
         );
 
         setSuccess("Service updated successfully");
@@ -388,16 +393,16 @@ const ServiceManagement = () => {
           searchTerm.trim() === ""
             ? servicesWithDisplayIds
             : updateDisplayIds(
-                servicesWithDisplayIds.filter(
-                  (service) =>
-                    service.name
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                    service.description
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase())
-                )
+              servicesWithDisplayIds.filter(
+                (service) =>
+                  service.name
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase()) ||
+                  service.description
+                    .toLowerCase()
+                    .includes(searchTerm.toLowerCase())
               )
+            )
         );
 
         setSuccess("Service added successfully");
@@ -445,16 +450,16 @@ const ServiceManagement = () => {
         searchTerm.trim() === ""
           ? servicesWithUpdatedIds
           : updateDisplayIds(
-              servicesWithUpdatedIds.filter(
-                (service) =>
-                  service.name
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase()) ||
-                  service.description
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase())
-              )
+            servicesWithUpdatedIds.filter(
+              (service) =>
+                service.name
+                  .toLowerCase()
+                  .includes(searchTerm.toLowerCase()) ||
+                service.description
+                  .toLowerCase()
+                  .includes(searchTerm.toLowerCase())
             )
+          )
       );
 
       setSuccess("Service deleted successfully");

@@ -1,6 +1,7 @@
 const asyncWrapper = require('../middlewares/asyncHandler')
 const hotel = require('../models/hotel')
 const reservation = require('../models/reservation')
+const monthlyPayment = require('../models/monthlyPayment')
 const dayjs = require('dayjs')
 const cron = require('node-cron')
 
@@ -42,6 +43,73 @@ exports.getMonthlyPaymentOfAllHotels = asyncWrapper(async (req, res) => {
 });
 
 
+exports.getDashBoardData = asyncWrapper(async (req, res) => {
+  const currentUser = req.user;
+
+  try {
+    // Get all hotels of owner
+    const ownerHotels = await hotel.find({ owner: currentUser._id });
+    const hotelIds = ownerHotels.map((item) => item._id);
+
+    // Get all reservations of owner hotels
+    const reservations = await reservation.find({ hotel: { $in: hotelIds } });
+
+    // Count active hotels
+    const activeHotelCount = await hotel.countDocuments({
+      owner: currentUser._id,
+      ownerStatus: "ACTIVE",
+      adminStatus: "APPROVED",
+    });
+
+    // Total reservations
+    const totalReservationAmount = reservations.length;
+
+    // Total revenue (only successful bookings)
+    const totalRevenue = reservations
+      .filter((res) =>
+        ["COMPLETED", "CHECKED OUT", "PROCESSING", "BOOKED"].includes(res.status)
+      )
+      .reduce((sum, res) => sum + res.totalPrice, 0);
+
+    // Count canceled reservations
+    const cancelReservation = reservations.filter((res) =>
+      ["CANCELLED", "PENDING"].includes(res.status)
+    ).length;
+
+    // Normal reservations (successful bookings)
+    const normalReservations = totalReservationAmount - cancelReservation;
+
+    // Initialize revenue per month
+    const monthlyRevenue = Array(12).fill(0); // Mảng chứa doanh thu từng tháng
+
+    // Lọc dữ liệu doanh thu theo từng tháng
+    reservations.forEach((res) => {
+      if (["COMPLETED", "CHECKED OUT", "PROCESSING", "BOOKED"].includes(res.status)) {
+        const monthIndex = new Date(res.checkInDate).getMonth(); // Lấy tháng (0-11)
+        monthlyRevenue[monthIndex] += res.totalPrice; // Cộng tổng doanh thu vào tháng tương ứng
+      }
+    });
+
+    // Tính doanh thu trung bình của từng tháng
+    const averageMonthlyRevenue = monthlyRevenue.map((revenue) =>
+      hotelIds.length > 0 ? Math.round(revenue / hotelIds.length) : 0
+    );
+
+    return res.status(200).json({
+      totalHotel: ownerHotels.length,
+      activeHotel: activeHotelCount,
+      totalRevenue,
+      totalReservationAmount,
+      cancelReservation,
+      normalReservations,
+      averageMonthlyRevenue, // Thêm dữ liệu trung bình theo tháng
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+
 
 const calculateMonthlyPayments = async () => {
   try {
@@ -61,7 +129,7 @@ const calculateMonthlyPayments = async () => {
     for (const hotel of hotels) {
       const reservations = await reservation.find({
         hotel: hotel._id,
-        status: { $in: ["CHECKED OUT", "COMPLETED"] },
+        status: { $in: ["CHECKED OUT", "COMPLETED", "PROCESSING", "BOOKED"] },
         checkOutDate: {
           $gte: dayjs().startOf("month").toDate(),
           $lte: dayjs().endOf("month").toDate(),
