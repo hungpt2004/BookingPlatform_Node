@@ -50,7 +50,6 @@ const hotelSchema = new Schema(
     images: [
       { type: String }
     ],
-   
   },
   { versionKey: false }
 );

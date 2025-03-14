@@ -33,7 +33,11 @@ export default function BookingManagePage() {
                     <div className="d-flex align-items-end gap-3">
                         <Form.Group className="">
                             <Form.Label>Lọc theo ngày</Form.Label>
-                            <Form.Control type="date" className="border" />
+                            <div className="d-flex">
+                                <Form.Control type="date" placeholder="Từ ngày" />
+                                <Form.Control type="date" placeholder="Đến ngày" />
+
+                            </div >
                         </Form.Group>
                         <div className="">
                             <Button variant="outline-primary" >
