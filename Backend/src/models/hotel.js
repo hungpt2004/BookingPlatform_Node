@@ -61,6 +61,7 @@ const hotelSchema = new Schema(
       required: true 
     }],
 
+    //Thêm comment từ admin
     adminStatus: {
       type:String,
       enum: ["PENDING", "APPROVED"], //Nếu admin reject thì xóa khỏi collection

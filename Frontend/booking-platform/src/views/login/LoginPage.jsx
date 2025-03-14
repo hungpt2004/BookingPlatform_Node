@@ -325,7 +325,7 @@ export const LoginPage = () => {
                   animate={{ y: [0, -10, 0] }}
                   transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                >
-                  <h2 className="display-5 fw-light">Your journey begins here</h2>
+                  <h2 className="display-5 fw-light">Bắt đầu những trải nghiệm của bạn tại đây</h2>
                </motion.div>
 
                {/* Action Buttons */}
@@ -342,7 +342,7 @@ export const LoginPage = () => {
                      onMouseLeave={() => setLoginHovered(false)}
                      onClick={() => setShowLoginModal(true)}
                   >
-                     Sign In
+                     Đăng nhập
                   </button>
 
                   {/* 3D Register Button */}
@@ -352,7 +352,7 @@ export const LoginPage = () => {
                      onMouseLeave={() => setRegisterHovered(false)}
                      onClick={() => setShowRegisterModal(true)}
                   >
-                     Register
+                     Đăng ký
                   </button>
                </motion.div>
             </Container>
@@ -368,7 +368,7 @@ export const LoginPage = () => {
          >
             <Modal.Header closeButton className="border-0 pb-0">
                <Modal.Title className="w-100 text-center">
-                  <h4 className="fw-bold">Sign in to Travelofy</h4>
+                  <h4 className="fw-bold">Đăng nhập vào Travelofy</h4>
                </Modal.Title>
             </Modal.Header>
 
@@ -437,7 +437,7 @@ export const LoginPage = () => {
                   </button>
 
                   <p className="text-center mb-0" style={{ fontSize: '14px' }}>
-                     <span>Don't have an account?</span>{' '}
+                     <span>Bạn chưa có tài khoản?</span>{' '}
                      <span
                         className="text-primary"
                         style={{ cursor: 'pointer', textDecoration: 'underline' }}
@@ -446,7 +446,7 @@ export const LoginPage = () => {
                            setTimeout(() => setShowRegisterModal(true), 300);
                         }}
                      >
-                        Sign Up
+                        Đăng ký
                      </span>
                   </p>
                </form>
@@ -531,7 +531,7 @@ export const LoginPage = () => {
                   </button>
 
                   <p className="text-center mb-0" style={{ fontSize: '14px' }}>
-                     <span>Already have an account?</span>{' '}
+                     <span>Bạn đã có tài khoản rồi?</span>{' '}
                      <span
                         className="text-primary"
                         style={{ cursor: 'pointer', textDecoration: 'underline' }}
@@ -540,7 +540,7 @@ export const LoginPage = () => {
                            setTimeout(() => setShowLoginModal(true), 300);
                         }}
                      >
-                        Sign In
+                        Đăng nhập
                      </span>
                   </p>
                </form>
