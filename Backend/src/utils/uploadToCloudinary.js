@@ -1,5 +1,5 @@
 const cloudinary = require("../utils/cloudinary"); // Cấu hình Cloudinary
-
+const asyncHandler = require("../middlewares/asyncHandler"); 
 /**
  * Upload nhiều ảnh lên Cloudinary
  * @param {Array|Object} files - File hoặc mảng các file cần upload
@@ -102,3 +102,33 @@ exports.getPublicIdFromUrl = (url) => {
         return null;
     }
 };
+
+
+// API để tải file ZIP lên Cloudinary và lưu URL vào MongoDB
+
+exports.uploadZipFile = asyncHandler(async (req, res) => {
+    try {
+        const ownerID = req.user?.id || req.body.id;
+        if (!req.files || !req.files.file) {
+            return res.status(400).json({ success: false, message: "Vui lòng tải lên một file ZIP" });
+        }
+
+        const zipFile = req.files.file; // Lấy file ZIP từ request
+        //console.log(`Nhận file ZIP: ${zipFile.name} - Dung lượng: ${zipFile.size} bytes`);
+
+        const tempFilePath = zipFile.tempFilePath; 
+
+        const hotelDocument = `hotels/${ownerID}/document`; // Tên thư mục trên Cloudinary
+        // Upload file ZIP lên Cloudinary
+        const uploadResponse = await cloudinary.uploader.upload(tempFilePath, {
+            folder: hotelDocument,
+            resource_type: "raw" // Quan trọng: Chỉ định đây là file không phải ảnh
+        });
+      
+
+        res.status(200).json({ success: true, documentUrl: uploadResponse.secure_url });
+    } catch (error) {
+        console.error("Lỗi khi tải file ZIP:", error);
+        res.status(500).json({ success: false, message: "Lỗi máy chủ", error: error.message });
+    }
+});

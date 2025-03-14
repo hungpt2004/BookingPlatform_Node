@@ -11,9 +11,18 @@ export const Step6 = ({ nextStep, prevStep }) => {
     const [selectedGroup, setSelectedGroup] = useState(2);
     const [hotelGroup, setHotelGroup] = useState("");
     // Save location data to sessionStorage when it changes
+    const saveNameStarHotel = () => {
+        const star = hotelStar.find(item => item.id === selectedStar);
+        const hotelNameStar = {
+            ...star,
+            hotelName
+        };
+        sessionStorage.setItem("hotelName&Star", JSON.stringify(hotelNameStar));
+    }
+
     useEffect(() => {
-        sessionStorage.setItem("hotelName", JSON.stringify(hotelName));
-    }, [hotelName]);
+        saveNameStarHotel()
+    }, [hotelName, selectedStar]);
     return (
         <Container>
             <h4 className="fw-bold mt-4">Cho chúng tôi biết thêm về hotel của Quý vị</h4>
@@ -133,7 +142,7 @@ export const Step7 = ({ nextStep, prevStep }) => {
 
     // Lưu cả ID và Name vào sessionStorage
     useEffect(() => {
-        sessionStorage.setItem("options", JSON.stringify(selectedOptions));
+        sessionStorage.setItem("ServiceOptions", JSON.stringify(selectedOptions));
     }, [selectedOptions]);
 
     return (

@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 import { mainOptions, extraOptions, hotelType } from "../data/HotelOption.js";
 
 export const Step1 = ({ nextStep }) => {
+
+
     return (
         <>
             <div className="text-center mt-5">
@@ -60,6 +62,16 @@ export const Step2 = ({ nextStep, prevStep }) => {
     const [selected, setSelected] = useState(null);
     const [showExtra, setShowExtra] = useState(false);
 
+    const saveHotelDescription = () => {
+        const hotelDes = mainOptions.find((item) => item.id === selected);
+        const formData = {
+            ...hotelDes
+        }
+        sessionStorage.setItem("hotelDes", JSON.stringify(formData));
+    };
+    useEffect(() => {
+        saveHotelDescription();
+    }, [selected]);
     return (
         <Container className="mt-4 pb-5">
             <h2 className="text-center mb-4" style={{ userSelect: "none" }}>Chỗ nghỉ nào trong danh sách dưới đây giống với chỗ nghỉ của Quý vị nhất?</h2>
@@ -110,7 +122,7 @@ export const Step2 = ({ nextStep, prevStep }) => {
 };
 export const Step3 = ({ nextStep, prevStep, selectedHotel }) => {
     // Initialize with value from sessionStorage if available
-    const savedHotel = JSON.parse(sessionStorage.getItem("selectedHotel") || '{"id":1}');
+    const savedHotel = JSON.parse(sessionStorage.getItem("hotelType") || '{"id":1}');
     const [selected, setSelected] = useState(savedHotel.id);
 
     // Initialize hotelCount from sessionStorage if available and if option 2 is selected

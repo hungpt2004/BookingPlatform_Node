@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Container, Card, Button, Row, Col, Form } from 'react-bootstrap';
+import { Container, Card, Button, Row, Col,} from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { FaChevronLeft, FaTimes, FaTimesCircle, FaUpload } from 'react-icons/fa';
 import "./CreateHotelPhoto.css";

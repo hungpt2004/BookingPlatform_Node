@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import { Container, Card, Form, Row, Col, Button } from 'react-bootstrap';
 import { typeOption, nation } from '../data/HotelOption';
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Thêm useEffect
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import axiosInstance from '../../utils/AxiosInstance';
 
 const Step15 = ({ prevStep, nextStep }) => {
     const [selectedGroup, setSelectedGroup] = useState(2);
@@ -11,6 +12,41 @@ const Step15 = ({ prevStep, nextStep }) => {
     const [phone, setPhone] = useState("");
     const [isValid, setIsValid] = useState(true);
     const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+    const [user, setUser] = useState(null);
+    const [city, setCity] = useState("");
+    const [postalCode, setPostalCode] = useState("");
+    const [zipFile, setZipFile] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [documentUrl, setDocumentUrl] = useState("");
+
+    // Hàm lưu dữ liệu vào sessionStorage
+    const saveToSessionStorage = () => {
+        const selectedGroupData = typeOption.find(item => item.id === selectedGroup);
+        const formData = {
+            ...selectedGroupData,
+            hotelParent,
+            isValid,
+            isButtonEnabled,
+        };
+        sessionStorage.setItem('step15FormData', JSON.stringify(formData));
+    };
+
+    // Lưu dữ liệu vào sessionStorage mỗi khi có sự thay đổi
+    useEffect(() => {
+        saveToSessionStorage();
+    }, [selectedGroup, hotelParent, isValid, isButtonEnabled]);
+
+    // Khôi phục dữ liệu từ sessionStorage khi component được tải
+    useEffect(() => {
+        const savedData = sessionStorage.getItem('step15FormData');
+        if (savedData) {
+            const parsedData = JSON.parse(savedData);
+            setSelectedGroup(parsedData.selectedGroup);
+            setHotelParent(parsedData.hotelParent);
+            setIsValid(parsedData.isValid);
+            setIsButtonEnabled(parsedData.isButtonEnabled);
+        }
+    }, []);
 
     const handleChange = (value) => {
         setPhone(value);
@@ -21,6 +57,162 @@ const Step15 = ({ prevStep, nextStep }) => {
         const checkboxes = document.querySelectorAll('input[type="checkbox"]');
         setIsButtonEnabled([...checkboxes].every(checkbox => checkbox.checked));
     };
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await axiosInstance.get('/customer/current-user'); // Gọi API từ backend
+                setUser(response.data.user);
+            } catch (error) {
+                console.error('Error fetching user:', error);
+            }
+        };
+
+        fetchUser();
+    }, []);
+    //get data from session storage
+    useEffect(() => {
+        const storedLocation = sessionStorage.getItem("hotelLocation");
+        if (storedLocation) {
+            const { city, postalCode } = JSON.parse(storedLocation);
+            setCity(city);
+            setPostalCode(postalCode);
+        }
+    }, []);
+
+    // Xử lý chọn file ZIP
+    const handleFileSelect = (event) => {
+        const file = event.target.files[0];
+        if (file && file.type === "application/zip") {
+            setZipFile(file);
+        } else {
+            alert("Vui lòng chọn một file ZIP hợp lệ.");
+        }
+    };
+
+    // Gửi file ZIP lên backend
+    const handleUploadZip = async () => {
+        if (!zipFile) {
+            alert("Vui lòng chọn file ZIP trước.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", zipFile);
+
+        setIsUploading(true);
+        try {
+            const response = await axiosInstance.post("/hotel/upload-zip", formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+
+            setDocumentUrl(response.data.documentUrl);
+            alert("Tải file ZIP thành công!");
+        } catch (error) {
+            console.error("Lỗi khi tải file ZIP:", error);
+            alert("Tải file ZIP thất bại.");
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const createHotelFromSessionStorage = async () => {
+        try {
+            // Get all data from sessionStorage
+            const hotelNameAndStar = JSON.parse(sessionStorage.getItem('hotelName&Star'));
+            const hotelLocation = JSON.parse(sessionStorage.getItem('hotelLocation'));
+            const hotelDescription = JSON.parse(sessionStorage.getItem('hotelDes'));
+            const hotelBillInfo = JSON.parse(sessionStorage.getItem('hotelBillInfo'));
+            //const hotelServices = JSON.parse(sessionStorage.getItem('ServiceOptions'));
+            //const hotelPhotos = JSON.parse(sessionStorage.getItem('hotelPhotos'));
+
+            // First create a PendingHost entry with the business documents
+            if (!documentUrl) {
+                alert('Vui lòng tải lên tài liệu đăng ký khách sạn trước khi hoàn thành!');
+                return;
+            }
+
+            // Create PendingHost entry first
+            const pendingHostData = {
+                businessName: hotelBillInfo.companyLegalName || hotelNameAndStar.hotelName, // Use company name if available, or hotel name as fallback
+                businessDocuments: [documentUrl], // Use the document URL from the ZIP upload
+            };
+
+            // Send pendingHost data to backend
+            const pendingHostResponse = await axiosInstance.post('/hotel/create-pending', pendingHostData);
+
+            if (!pendingHostResponse.data.success) {
+                alert(`Lỗi: ${pendingHostResponse.data.message}`);
+                return;
+            }
+
+            // Now create the hotel data
+            const formData = new FormData();
+
+            // Add hotel information
+            formData.append('hotelName', hotelNameAndStar.hotelName);
+            formData.append('star', hotelNameAndStar.star);
+            formData.append('description', hotelDescription.desc);
+            formData.append('address', `${hotelLocation.address}, ${hotelLocation.city}, ${hotelLocation.postalCode}`);
+            formData.append('phoneNumber', user ? user.phone : phone);
+
+            // Add facilities from service options
+            // if (hotelServices && Array.isArray(hotelServices)) {
+            //     hotelServices.forEach(service => {
+            //         formData.append('facilities', service.name);
+            //     });
+            // }
+            console.log(formData);
+            // Handle images
+            // if (hotelPhotos && hotelPhotos.length > 0) {
+            //     // Convert base64 images to files
+            //     hotelPhotos.forEach((photo, index) => {
+            //         if (photo.url && photo.url.startsWith('data:')) {
+            //             const blob = dataURLtoBlob(photo.url);
+            //             const file = new File([blob], photo.name || `hotel-image-${index}.jpg`, {
+            //                 type: blob.type
+            //             });
+            //             formData.append('images', file);
+            //         }
+            //     });
+            // }
+
+            // Send data to backend
+            const response = await axiosInstance.post('/hotel/create', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            if (response.data.success) {
+                alert('Khách sạn đã được tạo thành công! Vui lòng chờ đợi xét duyệt đăng ký của bạn.');
+                nextStep(); // Move to the next step
+            } else {
+                alert(`Lỗi: ${response.data.message}`);
+            }
+        } catch (error) {
+            console.error('Lỗi khi tạo khách sạn:', error);
+            alert('Đã xảy ra lỗi khi tạo khách sạn. Vui lòng thử lại.');
+        }
+    };
+
+    // Helper function to convert base64/dataURL to Blob
+    // const dataURLtoBlob = (dataURL) => {
+    //     const arr = dataURL.split(',');
+    //     const mime = arr[0].match(/:(.*?);/)[1];
+    //     const bstr = atob(arr[1]);
+    //     let n = bstr.length;
+    //     const u8arr = new Uint8Array(n);
+
+    //     while (n--) {
+    //         u8arr[n] = bstr.charCodeAt(n);
+    //     }
+
+    //     return new Blob([u8arr], { type: mime });
+    // };
+
+
+
 
     return (
         <Container>
@@ -84,11 +276,11 @@ const Step15 = ({ prevStep, nextStep }) => {
                         <Row className='mt-3'>
                             <Col md={6}>
                                 <Form.Label className='fw-bold'>Thành phố</Form.Label>
-                                <Form.Control type="text" placeholder="Nhập thành phố" />
+                                <Form.Control type="text" placeholder="Nhập thành phố" value={city} />
                             </Col>
                             <Col md={6}>
                                 <Form.Label className='fw-bold'>Mã bưu chính</Form.Label>
-                                <Form.Control type="text" placeholder="Nhập mã bưu chính" />
+                                <Form.Control type="text" placeholder="Nhập mã bưu chính" value={postalCode} />
                             </Col>
                         </Row>
                     </Form.Group>
@@ -99,11 +291,11 @@ const Step15 = ({ prevStep, nextStep }) => {
                         <hr />
                         <Form.Group>
                             <Form.Label className='fw-bold'>Họ và tên</Form.Label>
-                            <Form.Control type="text" placeholder="Nhập họ và tên" />
+                            <Form.Control type="text" placeholder="Nhập họ và tên" value={user ? user.name : ""} />
                         </Form.Group>
                         <Form.Group>
                             <Form.Label className='fw-bold'>Email</Form.Label>
-                            <Form.Control type="email" placeholder="Nhập email" />
+                            <Form.Control type="email" placeholder="Nhập email" value={user ? user.email : ""} />
                         </Form.Group>
                         <Form.Group>
                             <Form.Label className='fw-bold'>
@@ -112,7 +304,7 @@ const Step15 = ({ prevStep, nextStep }) => {
                             <div className={`border rounded d-flex align-items-center ${isValid ? "" : "border-danger"}`}>
                                 <PhoneInput
                                     country={"vn"}
-                                    value={phone}
+                                    value={user ? user.phone : phone}
                                     onChange={handleChange}
                                     inputStyle={{ border: "none", width: "100%" }}
                                     buttonStyle={{ border: "none", background: "transparent" }}
@@ -124,7 +316,20 @@ const Step15 = ({ prevStep, nextStep }) => {
                     </Form.Group>
                 </Form>
             </Card>
+            <Card className="p-4 mt-3">
+                <h4 className="fw-bold">Tải tài liệu đăng ký khách sạn</h4>
+                <Form.Group>
+                    <Form.Label>Chọn file ZIP chứa các tài liệu</Form.Label>
+                    <Form.Control type="file" accept=".zip" onChange={handleFileSelect} />
+                </Form.Group>
+                <Button className="mt-3" onClick={handleUploadZip} disabled={isUploading}>
+                    {isUploading ? "Đang tải..." : "Tải lên ZIP"}
+                </Button>
 
+                {documentUrl && (
+                    <p className="mt-3 text-success">Tài liệu đã tải lên: <a href={documentUrl} target="_blank" rel="noopener noreferrer">Xem tài liệu</a></p>
+                )}
+            </Card>
             {/* Xác nhận đăng ký */}
             <Card className='p-4 mt-3'>
                 <Form>
@@ -159,7 +364,13 @@ const Step15 = ({ prevStep, nextStep }) => {
                 </Form>
                 <div className="d-flex justify-content-between mt-3">
                     <Button variant="secondary" onClick={prevStep}>Quay lại</Button>
-                    <Button variant="primary" onClick={nextStep} disabled={!isButtonEnabled}>Tiếp tục</Button>
+                    <Button
+                        variant="primary"
+                        onClick={createHotelFromSessionStorage}
+                        disabled={!isButtonEnabled}
+                    >
+                        Hoàn Thành
+                    </Button>
                 </div>
             </Card>
         </Container>

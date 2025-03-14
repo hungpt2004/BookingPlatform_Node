@@ -48,12 +48,9 @@ const hotelSchema = new Schema(
       required: true,
     },
     images: [
-      { type: String, required: true }
+      { type: String }
     ],
-
-    //Thêm mảng lưu trữ hình ảnh
-
-
+   
   },
   { versionKey: false }
 );
