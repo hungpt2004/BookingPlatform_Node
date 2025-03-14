@@ -17,16 +17,13 @@ export default function ReviewPage() {
                     <div className="me-3">
                         <Form.Group>
                             <Form.Label>Ngày</Form.Label>
-                            <Dropdown>
-                                <Dropdown.Toggle variant="light" className=" text-start border">
-                                    Nhận phòng
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                    <Dropdown.Item>Đặt phòng</Dropdown.Item>
-                                    <Dropdown.Item>Nhận phòng</Dropdown.Item>
-                                    <Dropdown.Item>Ngày đi</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
+                            <Form.Group>
+                                <Form.Select variant="light" className=" text-start border">
+                                    <option>Đặt phòng</option>
+                                    <option>Nhận phòng</option>
+                                    <option>Ngày đi</option>
+                                </Form.Select>
+                            </Form.Group>
                         </Form.Group>
                     </div>
 
