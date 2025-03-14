@@ -19,6 +19,7 @@ export const SuccessPaymentPage = () => {
         const response = await axiosInstance.post(`payment/success/${id}`);
         if(response.data?.message) {
           CustomSuccessToast(response.data.message);
+          sessionStorage.removeItem('payment_link')
         }
       } catch (err) {
         CustomFailedToast(err.response?.data?.message || "Payment failed.");
@@ -40,7 +41,7 @@ export const SuccessPaymentPage = () => {
             {/* Biểu tượng checkmark */}
             <HiCheckCircle className="text-success mb-3" size={60} />
 
-            <Card.Title className="fw-bold">Payment Successful! {id}</Card.Title>
+            <Card.Title className="fw-bold">Payment Successful!</Card.Title>
             <Card.Text className="text-muted">
               Thank you for your purchase. Your transaction has been completed successfully.
             </Card.Text>

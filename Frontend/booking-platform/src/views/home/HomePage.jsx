@@ -22,6 +22,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { newData, trendingRowFirst, trendingRowSecond } from './DataNews';
 import { TopCommentSlide } from '../../components/slide/TopCommentSlide';
+import Footer from '../../components/footer/FooterComponent';
 
 
 export const HomePage = () => {
@@ -468,6 +469,31 @@ export const HomePage = () => {
         ))}
       </div>
 
+      <motion.div
+        className="row justify-content-center my-5 py-5 bg-light"
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 2 }}
+        viewport={{ once: true, amount: 0.3 }}
+      >
+        <h2 className="text-center fw-bold mb-4">Why Choose <span style={{ color: '#003b95' }}>Travelofy?</span></h2>
+        <div className="col-md-3 text-center">
+          <img src="/icons/best-price.png" alt="Best Price" width="80" />
+          <h4 className="mt-3">Best Prices</h4>
+          <p>We offer the most competitive rates with no hidden fees.</p>
+        </div>
+        <div className="col-md-3 text-center">
+          <img src="/icons/security.png" alt="Secure Booking" width="80" />
+          <h4 className="mt-3">Secure Booking</h4>
+          <p>Your information is encrypted and secure with us.</p>
+        </div>
+        <div className="col-md-3 text-center">
+          <img src="/icons/customer-support.png" alt="24/7 Support" width="80" />
+          <h4 className="mt-3">24/7 Support</h4>
+          <p>Our team is available round-the-clock to assist you.</p>
+        </div>
+      </motion.div>
+
 
       {/* News */}
       <motion.div
@@ -577,6 +603,7 @@ export const HomePage = () => {
       {/* Comment */}
       <TopCommentSlide />
 
+
       {/* Email subscribe */}
       <div className='align-content-center' style={{ backgroundColor: '#f5f6f8' }}>
         <h3 className='text-center fw-bold p-3'>Join our Travelofy</h3>
@@ -596,41 +623,7 @@ export const HomePage = () => {
       </div>
 
       {/* Footer */}
-      <div className='mt-5 mb-5'>
-        {/* Column 8- 4 */}
-        <div className='d-flex flex-column '>
-          <div className='row'>
-            <div className='col-md-6'>
-              <h2 className='mx-4 mt-2' style={{ color: '#6499E9' }}>Travelofy</h2>
-              <p className='mx-4'>123 Abc Street, CDF City</p>
-              <p className='mx-4'>Viet Nam, VN</p>
-              <p className='mx-4'><span className='fw-bold'>Phone:</span>+1 5589 55488 55</p>
-              <p className='mx-4'><span className='fw-bold'>Email:</span>info@gmail.com</p>
-            </div>
-            <div className='col-md-6 row'>
-              <div className='mx-4 col-md-5'>
-                <h6 className='fw-bold mt-4' style={{ color: '#6499E9' }}>Useful Links</h6>
-                <ul className='text-start p-0 m-0' style={{ listStyle: 'none', color: 'black' }}>
-                  <li><IoIosArrowForward />Home</li>
-                  <li><IoIosArrowForward />About Us</li>
-                  <li><IoIosArrowForward />Services</li>
-                  <li><IoIosArrowForward />Terms of service</li>
-                </ul>
-              </div>
-              <div className=' mx-4 col-md-5'>
-                <h6 className='fw-bold mt-4' style={{ color: '#6499E9' }}>Our Services</h6>
-                <ul className='text-start p-0 m-0' style={{ listStyle: 'none', color: 'black' }}>
-                  <li><IoIosArrowForward />Booking</li>
-                  <li><IoIosArrowForward />Become Owner</li>
-                  <li><IoIosArrowForward />Marketing</li>
-                  <li><IoIosArrowForward />Destination</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* Row - 6 - 3/3 */}
-      </div>
+      <Footer/>
     </>
   );
 };

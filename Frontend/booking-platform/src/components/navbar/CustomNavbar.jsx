@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../../utils/AxiosInstance'; // Import axiosInstance
+import axiosInstance from '../../utils/AxiosInstance';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
@@ -8,23 +8,24 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Card } from 'react-bootstrap';
 import { useAuthStore } from '../../store/authStore';
 import { generateShortCutName } from '../../utils/GenerateShortName';
+import '../navbar/CustomNavbar.css'; // Import file CSS mới
 
 function CustomNavbar() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-
   const { logout } = useAuthStore();
 
   const handleLogout = () => {
     logout();
     setUser(null);
-    navigate('/'); // Điều hướng về trang đăng nhập
+    
+    navigate('/');
   };
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axiosInstance.get('/customer/current-user'); // Gọi API từ backend
+        const response = await axiosInstance.get('/customer/current-user');
         setUser(response.data.user);
       } catch (error) {
         console.error('Error fetching user:', error);
@@ -34,27 +35,21 @@ function CustomNavbar() {
     fetchUser();
   }, []);
 
-  // const handleLogout = () => {
-  //   sessionStorage.removeItem('token'); // Xóa token khi logout
-  //   setUser(null);
-  //   navigate('/'); // Điều hướng về trang đăng nhập
-  // };
-
   return (
     <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary sticky-top">
       <Container className='d-flex align-items-center justify-content-center'>
-        <Navbar.Brand className='fs-2' style={{ color: 'dodgerblue' }} href="/">Travelofy</Navbar.Brand>
+        <Navbar.Brand className='fs-1 fw-bold' style={{ color: '#003b95' }} href="/home">Travelofy</Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="#deets">Website Scope</Nav.Link>
-            <Nav.Link eventKey={2} href="#memes">Achievements</Nav.Link>
+            <Nav.Link className="custom-nav-link fs-4" href="#deets">Website Scope</Nav.Link>
+            <Nav.Link className="custom-nav-link fs-4" eventKey={2} href="#memes">Achievements</Nav.Link>
           </Nav>
           <Nav>
-            <Nav.Link href="/home">Home</Nav.Link>
-            <Nav.Link href="#">About</Nav.Link>
-            <NavDropdown title="Service" id="collapsible-nav-dropdown">
-              <NavDropdown.Item href="/favorite-list">Favorite List</NavDropdown.Item>
+            <Nav.Link className="custom-nav-link fs-4" href="/home">Home</Nav.Link>
+            <Nav.Link className="custom-nav-link fs-4" href="#">About</Nav.Link>
+            <NavDropdown className="fs-4" title="Service" id="collapsible-nav-dropdown">
+              <NavDropdown.Item href="#action/3.1">Favorite List</NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item href="/transaction">Transaction History</NavDropdown.Item>
               <NavDropdown.Divider />
@@ -63,35 +58,14 @@ function CustomNavbar() {
             <Container className="d-flex align-items-center">
               {user ? (
                 <>
-                  <Card
-                    style={{
-                      width: '50px',
-                      height: '50px',
-                      borderColor: 'grey',
-                      borderWidth: '1px',
-                      borderRadius: '50%',
-                      display: 'inline-block',
-                      textAlign: 'center',
-                      overflow: 'hidden',
-                    }}
-                  >
+                  <Card className="profile-card rounded-5">
                     {user.image?.url ? (
-                      <img
-                        src={user.image.url}
-                        alt={user.name}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                        }}
-                      />
+                      <img src={user.image.url} alt={user.name} className="profile-img" />
                     ) : (
-                      <span style={{ fontSize: '20px', lineHeight: '50px', color: 'white' }}>
-                        {generateShortCutName(user.name.charAt(0).toUpperCase())}
-                      </span>
+                      <span className="profile-text fs-4">{generateShortCutName(user.name.charAt(0).toUpperCase())}</span>
                     )}
                   </Card>
-                  <NavDropdown title={user.name} id="collapsible-nav-dropdown">
+                  <NavDropdown className="" title={user.name} id="collapsible-nav-dropdown">
                     <NavDropdown.Item href="/update-customer">Setting</NavDropdown.Item>
                     <NavDropdown.Divider />
                     <NavDropdown.Item href="#action/3.1">Owner Account</NavDropdown.Item>
@@ -100,7 +74,7 @@ function CustomNavbar() {
                   </NavDropdown>
                 </>
               ) : (
-                <Nav.Link href="/">Login</Nav.Link>
+                <Nav.Link className="custom-nav-link" href="/">Login</Nav.Link>
               )}
             </Container>
           </Nav>

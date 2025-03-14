@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Spinner, Alert, Table, Badge, DropdownButton, Dropdown } from "react-bootstrap";
+import { Button, Spinner, Alert, Badge, DropdownButton, Dropdown } from "react-bootstrap";
 import axiosInstance from "../../utils/AxiosInstance";
 import axios from "axios";
 import { BASE_URL } from "../../utils/Constant";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 import { renderPersonIcon } from "../../utils/RenderPersonIcon";
 import dayjs from "dayjs";
+import { Table, Select, Spin } from 'antd';
+const { Option } = Select;
 
 const Booking = ({
     setOpen,
@@ -24,7 +26,7 @@ const Booking = ({
     const [rooms, setRooms] = useState([]);
     const [beds, setBeds] = useState([])
     const [bed, setBed] = useState([])
-    const [quantity, setQuantity] = useState([])
+    const [quantity, setQuantity] = useState({});
     const [loadingBeds, setLoadingBeds] = useState(false);
     const [capacityError, setCapacityError] = useState(null);
     const [distanceDay, setDistanceDay] = useState(0)
@@ -32,7 +34,6 @@ const Booking = ({
     const navigate = useNavigate();
 
 
-    // console.log("Data rooms 1:", JSON.stringify(rooms, null, 2));
     // console.log("Data bed 2:", JSON.stringify(beds, null, 2));
     // console.log("Data bed detail 3:", JSON.stringify(bed, null, 2));
 
@@ -63,15 +64,21 @@ const Booking = ({
     };
 
     const fetchBed = async (id) => {
-        setLoading(true); // Bắt đầu loading
+        setLoading(true);
         console.log(`Fetching bed with ID: ${id}`);
         try {
             const response = await axios.get(`${BASE_URL}/bed/bed-detail/${id}`);
-            if (response.data && response.data.bed[0].bed) {
+            if (response.data && response.data.bed.length > 0) {
                 console.log("Data bed:", JSON.stringify(response.data.bed, null, 2));
-                console.log("Bed quantity:", response.data.bed[0].quantity);
-                setQuantity(response.data.bed[0].quantity);
-                return response.data.bed[0].bed;
+                const bedData = response.data.bed[0];
+
+                // Cập nhật số lượng giường theo từng roomId
+                setQuantity(prev => ({
+                    ...prev,
+                    [id]: bedData.quantity
+                }));
+
+                return bedData.bed;
             }
         } catch (err) {
             console.error("Error fetching bed:", err.response?.data?.message || err.message);
@@ -79,10 +86,9 @@ const Booking = ({
         } finally {
             setTimeout(() => {
                 setLoading(false);
-            }, 500)
+            }, 500);
         }
     };
-
 
 
     //Get Bed Detail
@@ -157,8 +163,10 @@ const Booking = ({
 
         const hotelTotalPrice = currentHotel.pricePerNight * nightTotal;
 
-        return roomTotalPrice + hotelTotalPrice
-
+        if (roomTotalPrice > 0) {
+            return roomTotalPrice + hotelTotalPrice
+        }
+        return roomTotalPrice;
     };
 
     //Confirm Booking And Go to Payment
@@ -166,7 +174,6 @@ const Booking = ({
         if (Object.keys(selectedRooms).length === 0) return;
 
         const totalCapacity = calculateTotalCapacity();
-        // const totalRooms = Object.values(selectedRooms).reduce((acc, curr) => acc + curr, 0);
 
         if (totalCapacity < numberOfPeople) {
             setCapacityError(`You still need  to  fit ${numberOfPeople - totalCapacity} more people`);
@@ -177,6 +184,7 @@ const Booking = ({
         const roomDetails = rooms
             .filter(room => selectedRooms[room._id] > 0) // Only include selected rooms
             .map(room => ({
+                roomName: room.name,
                 roomId: room._id,
                 roomType: room.type,
                 quantity: selectedRooms[room._id],
@@ -184,6 +192,8 @@ const Booking = ({
                 totalPrice: room.price * selectedRooms[room._id],
             }));
 
+
+        console.log("Data rooms:", JSON.stringify(roomDetails, null, 2));
 
         const roomIds = rooms
             .filter(room => selectedRooms[room._id] > 0)
@@ -218,7 +228,6 @@ const Booking = ({
         }
     };
 
-    console.log(currentHotel)
 
     const validDate = checkInDate === checkOutDate
 
@@ -263,57 +272,72 @@ const Booking = ({
 
             {!loading && !error && (
                 <div className="table-responsive">
-
-                    <Table striped bordered className="align-middle">
-                        <thead>
-                            <tr className="text-center fs-4 bg-primary">
-                                <th>Accomodation Type</th>
-                                <th>Capacity</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {rooms.map((room, index) => (
-                                <tr key={index}>
-                                    <td>
-                                        <div>
-                                            <p className="text-decoration-underline text-primary fw-bold fs-5 cursor-pointer">{room.type}</p>
-                                            <p className="text-danger fw-bold">Only {quantity} rooms left on our site </p>
-                                            <p>1 {loadingBeds ? <Spinner animation="border" size="sm" /> : bed[index]?.name || "N/A"}</p>
-                                        </div>
-                                    </td>
-                                    <td className="text-center">{renderPersonIcon(room.capacity)}</td>
-                                    <td className="text-center">{(formatCurrencyVND(room.price))}</td>
-                                    <td>
-                                        <div className="d-flex align-items-center justify-content-center">
-                                            <DropdownButton
-                                                className="rounded-0"
-                                                variant="outline-dark"
-                                                id={`dropdown-room-${index}`}
-                                                aria-placeholder="Select quantity"
-                                                title={selectedRooms[room._id] || 0}
-                                                onSelect={(eventKey) => setSelectedRooms(prev => ({
-                                                    ...prev,
-                                                    [room._id]: parseInt(eventKey)
-                                                }))}
-                                            >
-                                                {[...Array(room.quantity).keys()].slice(0).map(num => (
-                                                    <Dropdown.Item key={num} eventKey={num}>{num}</Dropdown.Item>
-                                                ))}
-                                            </DropdownButton>
-
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
+                    <Table
+                        bordered
+                        dataSource={rooms}
+                        rowKey="_id"
+                        pagination={false}
+                        columns={[
+                            {
+                                title: 'Accommodation Type',
+                                dataIndex: 'type',
+                                key: 'type',
+                                render: (text, record, index) => (
+                                    <div>
+                                        <p className="text-decoration-underline text-primary fw-bold fs-6 cursor-pointer">{text}</p>
+                                        <p className="text-danger fw-bold">
+                                            Each room has {quantity?.[record._id] ?? "N/A"} beds on our site
+                                        </p>
+                                        <p>
+                                            {quantity?.[record._id] ?? "N/A"} {loadingBeds ? <Spin size="small" /> : bed[index]?.name || "N/A"}
+                                        </p>
+                                    </div>
+                                ),
+                            },
+                            {
+                                title: 'Capacity',
+                                dataIndex: 'capacity',
+                                key: 'capacity',
+                                align: 'center',
+                                render: (capacity) => renderPersonIcon(capacity),
+                            },
+                            {
+                                title: 'Price',
+                                dataIndex: 'price',
+                                key: 'price',
+                                align: 'center',
+                                render: (price) => formatCurrencyVND(price),
+                            },
+                            {
+                                title: 'Quantity',
+                                key: 'quantity',
+                                align: 'center',
+                                render: (_, record) => (
+                                    <Select
+                                        value={selectedRooms[record._id] ?? 0}
+                                        onChange={(value) =>
+                                            setSelectedRooms((prev) => ({
+                                                ...prev,
+                                                [record._id]: parseInt(value),
+                                            }))
+                                        }
+                                        style={{ width: 80 }}
+                                    >
+                                        {Array.from({ length: record.quantity + 1 }, (_, i) => (
+                                            <Option key={i} value={i}>
+                                                {i}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                ),
+                            },
+                        ]}
+                    />
                 </div>
             )}
 
             {/* Total Price Display */}
-            {Object.keys(selectedRooms).length > 0 && (
+            {(Object.keys(selectedRooms).length > 0 && calculateTotalPrice() > 0) && (
                 <div className="d-flex justify-content-end mt-3">
                     <Badge bg="dark" className="p-3 fs-6 shadow text-light">
                         Total: {formatCurrencyVND(calculateTotalPrice())}
@@ -325,7 +349,7 @@ const Booking = ({
                 <Button
                     variant="primary"
                     onClick={handleContinueBooking}
-                    disabled={Object.keys(selectedRooms).length === 0 || validDate}
+                    disabled={(Object.keys(selectedRooms).length === 0 || calculateTotalPrice() <= 0) || validDate}
                     size="lg"
                 >
                     Continue

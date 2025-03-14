@@ -7,7 +7,6 @@ const crypto = require("crypto");
 const { promisify } = require("util");
 const User = require("../models/user");
 const AppError = require("../utils/appError");
-const asyncHandler = require("../middlewares/asyncHandler");
 const catchAsync = require("../utils/catchAsync.js");
 const cloudinary = require("../utils/cloudinary");
 const {
@@ -141,6 +140,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     },
   });
 });
+
 // Email Verification (corrected)
 exports.verifyEmail = catchAsync(async (req, res, next) => {
   const { email, otp } = req.body;
@@ -230,6 +230,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   const user = await User.findOne({ email }).select("+password");
+
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError("Incorrect email or password", 401));
   }
@@ -257,22 +258,20 @@ exports.googleLogin = catchAsync(async (req, res, next) => {
   // Check if user exists
   let user = await User.findOne({ email });
 
-  if (!user) {
-    // Create new user if doesn't exist
-    const randomPassword = crypto.randomBytes(20).toString("hex");
-    user = await User.create({
-      email,
-      name,
-      password: randomPassword,
-      isVerified: true, // Google users are automatically verified
-      picture, // Save profile picture URL if needed
-    });
-  } else {
-    return res.status(403).json({
-      error: true,
-      message: "User already exist",
-    });
+  if (user) {
+    // User already exists, log them in
+    return createSendToken(user, 200, res);
   }
+
+  // Create new user if doesn't exist
+  const randomPassword = crypto.randomBytes(20).toString("hex");
+  user = await User.create({
+    email,
+    name,
+    password: randomPassword,
+    isVerified: true, // Google users are automatically verified
+    picture, // Save profile picture URL if needed
+  });
 
   // Create and send JWT token
   createSendToken(user, 200, res);

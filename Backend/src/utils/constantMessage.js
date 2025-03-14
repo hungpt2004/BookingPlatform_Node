@@ -38,7 +38,9 @@ module.exports = {
   },
   PAYMENT: {
     SUCCESS: "Payment Success",
-    FAIL: "Payment Failed ! Check Error In Server"
-  }
-};
-
+    FAIL: "Payment Failed ! Check Error In Server",
+    CANCEL_SUCCESS: 'Cancel Payment Success',
+    CANCEL_FAIL: 'Cancel Payment Failed !'
+   }
+ };
+ 

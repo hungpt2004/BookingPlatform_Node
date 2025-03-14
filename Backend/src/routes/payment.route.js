@@ -11,6 +11,7 @@ const PaymentController = require("../controllers/payment.controller");
 
 PaymentRouter.post("/create-booking", protect, PaymentController.createBooking)
 PaymentRouter.post("/create-payment-link", protect, PaymentController.createPaymentLink);
-PaymentRouter.post("/success", protect, PaymentController.successPayment)
+PaymentRouter.post("/cancel/:id", protect, PaymentController.cancelPayment)
+PaymentRouter.post("/success/:id", protect, PaymentController.successPayment)
 
 module.exports = PaymentRouter;

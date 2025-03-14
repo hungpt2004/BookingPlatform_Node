@@ -9,8 +9,9 @@ import CustomSlide from "../../components/slide/CustomSlide";
 import CustomInput from "../../components/input/CustomInput";
 import { renderStarIcon } from "../../utils/RenderPersonIcon";
 import { RatingConsider } from "../../utils/RatingConsider";
-import { FaChevronDown, FaChevronRight, FaConciergeBell, FaCheckCircle } from 'react-icons/fa';
 import RoomCards from "../../components/card/RoomCard";
+import { FaConciergeBell, FaCheckCircle, FaChevronRight, FaChevronDown } from "react-icons/fa";
+
 const BookingStepTwo = () => {
     const { state: bookingData } = useLocation();
     const navigate = useNavigate();
@@ -18,10 +19,12 @@ const BookingStepTwo = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [expandedRooms, setExpandedRooms] = useState([]);
 
+
     const {
+        userId,
         hotelId,
-        roomQuantities,
         totalRooms,
+        roomQuantities,
         checkInDate,
         checkOutDate,
         totalPrice,
@@ -30,7 +33,7 @@ const BookingStepTwo = () => {
         currentHotel,
         distanceNight,
         listFeedback,
-        numberOfPeople,
+        numberOfPeople
 
     } = bookingData;
 
@@ -69,7 +72,7 @@ const BookingStepTwo = () => {
         fetchAndExpandRooms();
     }, [roomIds]);
 
-    // Toggle the dropdown
+
     const handleToggle = () => {
         setIsOpen(!isOpen);
     };
@@ -94,7 +97,8 @@ const BookingStepTwo = () => {
     // Only show rooms that have quantity > 0
     const selectedRooms = roomDetails.filter((room) => room.quantity > 0);
 
-
+    
+    // console.log(`Detail Room Selected: ${JSON.stringify(roomDetails, null, 2)}`)
 
     const generateTimeOptions = () => {
         const options = [];
@@ -118,37 +122,33 @@ const BookingStepTwo = () => {
         return options;
     };
 
+
     const payment = async () => {
         try {
+            const responseBooking = await axiosInstance.post('/payment/create-booking', {
+                hotelId,
+                roomIds,
+                checkInDate,
+                checkOutDate,
+                roomDetails,
+                totalPrice
+            });
 
-            try {
-                const responseBooking = await axiosInstance.post('/payment/create-booking', {
-                    hotelId,
-                    roomIds,
-                    checkInDate,
-                    checkOutDate,
-                    roomDetails,
-                    totalPrice
+            if (responseBooking.data && responseBooking.data.message && responseBooking.data.reservation) {
+                const reservationId = responseBooking.data.reservation._id;
+
+                const responsePayment = await axiosInstance.post('/payment/create-payment-link', {
+                    amount: totalPrice,
+                    rooms: roomDetails,
+                    hotelId: hotelId,
+                    roomIds: roomIds,
+                    reservationId: reservationId
                 });
-                if (responseBooking.data && responseBooking.data.message) {
-                    // console.log(JSON.stringify(responseBooking.data.reservation))
-                }
-            } catch (err) {
-                console.log(err)
+
+                sessionStorage.setItem('payment_link', responsePayment.data.checkoutUrl)
+
+                window.location.href = responsePayment.data.checkoutUrl;
             }
-
-            console.log(roomIds)
-
-
-            // const responsePayment = await axiosInstance.post('/payment/create-payment-link', {
-            //     amount: totalPrice,
-            //     rooms: roomDetails,
-            //     hotelId: hotelId,
-            //     roomIds: roomIds
-            // });
-
-            // // Redirect in frontend
-            // window.location.href = responsePayment.data.checkoutUrl;
         } catch (error) {
             console.error("Payment error:", error);
         }
@@ -196,11 +196,6 @@ const BookingStepTwo = () => {
                                     <div className="input-group mb-3">
                                         <select className="form-control" >
                                             <option value="VN">Viet Nam</option>
-                                            <option value="US">United States</option>
-                                            <option value="UK">United Kingdom</option>
-                                            <option value="FR">France</option>
-                                            <option value="DE">Germany</option>
-                                            {/* Thêm các quốc gia khác nếu cần */}
                                         </select>
                                     </div>
                                 </div>
@@ -237,7 +232,7 @@ const BookingStepTwo = () => {
 
                                 <div>
                                     <Card.Text className="fw-bold mb-0 pb-0">Add your estimated time of arrival <small className="fw-normal text-muted">(optional) </small></Card.Text>
-                                    <select className="form-control w-50">
+                                    <select className="form-control">
                                         <option value="" disabled>
                                             Please select
                                         </option>

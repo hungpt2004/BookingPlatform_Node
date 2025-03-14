@@ -1,18 +1,20 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { LoginPage } from "./views/login/LoginPage"
-import { HomePage } from "./views/home/HomePage"
-import { HistoryTransaction } from "./views/transaction/HistoryTransaction"
-import './App.css'
-import { RegisterPage } from "./views/register/RegisterPage"
-import { EmailVerificationPage } from "./views/verify_email/EmailVerificationPage"
-import BookingStepTwo from "./views/booking/BookingStepTwo"
-import { HotelDetailPage } from "./views/details/HotelDetailPage"
-import ForgotPasswordPage from "./views/forgot_password/ForgotPasswordPage"
-import ResetPasswordPage from "./views/reset_password/ResetPasswordPage"
-import { SuccessPaymentPage } from "./views/status/SuccessPaymentPage"
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { LoginPage } from "./views/login/LoginPage";
+import { HomePage } from "./views/home/HomePage";
+import { HistoryTransaction } from "./views/transaction/HistoryTransaction";
+import "./App.css";
+import { RegisterPage } from "./views/register/RegisterPage";
+import { EmailVerificationPage } from "./views/verify_email/EmailVerificationPage";
+import BookingStepTwo from "./views/booking/BookingStepTwo";
+import { HotelDetailPage } from "./views/details/HotelDetailPage";
+import ForgotPasswordPage from "./views/forgot_password/ForgotPasswordPage";
+import ResetPasswordPage from "./views/reset_password/ResetPasswordPage";
+import { SuccessPaymentPage } from "./views/status/SuccessPaymentPage";
 import FavoriteHotelsList from "./views/favorite/FavoriteHotelsList"
-import CustomerProfileSetting from "./views/customer/CustomerProfileSetting"
-import FeedbackPage from './views/feedback/feedback'
+import CustomerProfileSetting from "./views/customer/CustomerProfileSetting";
+import FeedbackPage from "./views/feedback/feedback";
+import CancelPaymentPage from "./views/status/CancelPaymentPage";
+import DashboardPage from "./views/dashBoard/DashboardPage";
 import { Createhotel } from './views/hotel/Createhotel'
 import { CreateRoom } from './views/room/createRoom'
 import CancelPolicy from './views/room/roomPriceType/CancelPolicy'
@@ -35,7 +37,7 @@ function App() {
         <Route path="/forgot" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/success/:id" element={<SuccessPaymentPage />} />
-        <Route path="/cancel/:id" element={<SuccessPaymentPage />} />
+        <Route path="/cancel/:id" element={<CancelPaymentPage />} />
         <Route path="/favorite-list" element={<FavoriteHotelsList />} />
 
         <Route path="/update-customer" element={<CustomerProfileSetting />} />
@@ -48,9 +50,10 @@ function App() {
         <Route path='/edit-weekly-price' element={<PricePerWeek />} />
         <Route path='/create-photo' element={<HotelPhotos />} />
 
+        <Route path="/dashboard/*" element={<DashboardPage />} />
       </Routes>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
