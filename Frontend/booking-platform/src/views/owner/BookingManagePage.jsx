@@ -4,7 +4,7 @@ import { Printer, Download, Filter, FileIcon as FileEarmark } from "lucide-react
 import { OwnerNavbar } from "../../components/navbar/OwnerNavbar"
 
 export default function BookingManagePage() {
-    const [dateRange, setDateRange] = useState("14 tháng 3, 2025 - 15 tháng 3, 2025")
+    const [dateRange, setDateRange] = useState("")
 
     return (
         <div className="booking-app">
@@ -33,7 +33,7 @@ export default function BookingManagePage() {
                     <div className="d-flex align-items-end gap-3">
                         <Form.Group className="">
                             <Form.Label>Lọc theo ngày</Form.Label>
-                            <Form.Control type="date" value={dateRange} readOnly className="border" />
+                            <Form.Control type="date" className="border" />
                         </Form.Group>
                         <div className="">
                             <Button variant="outline-primary" >
