@@ -49,7 +49,6 @@ const UserSchema = new Schema(
     image: {
       public_ID: {
         type: String,
-        required: true,
       },
       url: {
         type: String,

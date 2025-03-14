@@ -54,7 +54,18 @@ const hotelSchema = new Schema(
       // },
       { type: String, required: true}
     ],
-    
+    adminStatus:{
+      type: String,
+      enum:["PENDING","APPROVED"],
+      default:"APPROVED"
+    },
+    requestDate:{
+      type: Date,
+      default: Date.now
+    },
+    decisionDate:{
+      type:Date
+    }
     //Thêm mảng lưu trữ hình ảnh
     
 
