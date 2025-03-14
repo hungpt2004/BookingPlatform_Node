@@ -22,8 +22,9 @@ export default function BookingManagePage() {
                                     Nhận phòng
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
+                                    <Dropdown.Item>Đặt phòng</Dropdown.Item>
                                     <Dropdown.Item>Nhận phòng</Dropdown.Item>
-                                    <Dropdown.Item>Trả phòng</Dropdown.Item>
+                                    <Dropdown.Item>Ngày đi</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                         </Form.Group>
