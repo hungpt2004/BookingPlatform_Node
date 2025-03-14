@@ -7,15 +7,19 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "npm run dev"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@mantine/core": "^7.17.1",
+    "@mantine/hooks": "^7.17.1",
     "@react-oauth/google": "^0.12.1",
     "@tailwindcss/vite": "^4.0.3",
+    "antd": "^5.24.3",
     "axios": "^1.7.9",
     "booking-platform": "file:",
     "bootstrap": "^5.3.3",

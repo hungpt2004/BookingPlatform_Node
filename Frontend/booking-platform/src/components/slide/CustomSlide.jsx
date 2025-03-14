@@ -85,10 +85,10 @@ const CustomSlide = () => {
             >
                {hotels.map((item, index) => (
                   <SwiperSlide key={index}>
-                     <Card className='shadow-lg mb-2 bg-body-tertiary rounded-0'>
+                     <Card className='shadow-lg mb-2 bg-body-tertiary rounded-4'>
                         <Card.Img
                            variant='top'
-                           className="object-fit-cover rounded-0"
+                           className="object-fit-cover rounded-top-4"
                            src={item.images?.[0] || '/hotel/default.jpg'} // ✅ Fix lỗi ảnh
                            alt="Hotel"
                         />

@@ -17,14 +17,14 @@ export const CustomPasswordInput = ({ label, value, onChange, placeHolder }) => 
          <Form.Label className='mt-2 mb-0' htmlFor='input'>{label}</Form.Label>
          <InputGroup>
             <Form.Control
-               className='rounded-0 p-3'
+               className='rounded-1 p-2 mb-3'
                type={!showPassword ? 'password' : 'text'}
                placeholder={placeHolder}
                value={value}
                onChange={onChange}
-               required
+               // required
             />
-           <InputGroup.Text onClick={() => seePassword()} style={{ cursor: 'pointer' }}>
+           <InputGroup.Text className='mb-3' onClick={() => seePassword()} style={{ cursor: 'pointer' }}>
                {showPassword ? <IoEyeSharp size={20} /> : <FaEyeSlash size={20} />}
             </InputGroup.Text>
          </InputGroup>

@@ -1,10 +1,102 @@
-.container-login:hover{
-   transform: translateY(-5px);
-   transition: ease-in 0.2s;
-   box-shadow: 0 8px 20px #0ac472;
-}
+.button-3d {
+   position: relative;
+   width: 240px;
+   height: 54px;
+   font-size: 18px;
+   font-weight: bold;
+   border: none;
+   border-radius: 8px;
+   cursor: pointer;
+   transition: all 0.3s ease;
+   overflow: hidden;
+   z-index: 1;
+   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+   transform-style: preserve-3d;
+   transform: perspective(1000px) translateZ(0);
+ }
 
-.container-login{
-   transform: translateY(10px);
-   transition: ease-in 0.2s;
-}
+ .button-3d:active {
+   transform: perspective(1000px) translateZ(-10px);
+   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+ }
+
+ /* Primary Button (Login) */
+ .button-3d.primary {
+   background-color: #003b95;
+   color: white;
+ }
+
+ .button-3d.primary::before {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 0;
+   height: 100%;
+   background-color: #0055d4;
+   transition: width 0.3s ease;
+   z-index: -1;
+ }
+
+ .button-3d.primary:hover::before {
+   width: 100%;
+ }
+
+ .button-3d.primary::after {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.2), transparent);
+   z-index: -1;
+ }
+
+ /* Secondary Button (Register) */
+ .button-3d.secondary {
+   background-color: transparent;
+   color: white;
+   border: 2px solid white;
+ }
+
+ .button-3d.secondary::before {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 0;
+   height: 100%;
+   background-color: rgba(255, 255, 255, 0.2);
+   transition: width 0.3s ease;
+   z-index: -1;
+ }
+
+ .button-3d.secondary:hover::before {
+   width: 100%;
+ }
+
+ .button-3d.secondary::after {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), transparent);
+   z-index: -1;
+ }
+
+ /* Disabled state */
+ .button-3d:disabled {
+   opacity: 0.7;
+   cursor: not-allowed;
+   transform: perspective(1000px) translateZ(0) !important;
+   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+ }
+
+ /* Spin animation for loading state */
+ @keyframes spin {
+   0% { transform: rotate(0deg); }
+   100% { transform: rotate(360deg); }
+ }

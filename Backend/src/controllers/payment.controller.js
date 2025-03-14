@@ -30,6 +30,10 @@ exports.createBooking = asyncHandler(async (req, res) => {
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
 
+    //Check not paid reservation
+    
+
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -319,4 +323,6 @@ async function restoreRooms() {
 cron.schedule("0 0 * * *", async () => {
   console.log("🔄 Đang chạy cron job khôi phục số phòng...");
   await restoreRooms();
+},{
+  timezone: "Asia/Ho_Chi_Minh"
 });

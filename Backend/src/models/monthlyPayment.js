@@ -13,17 +13,24 @@ const monthlyPaymentSchema = new Schema({
   }, 
   year: { 
     type: Number, 
-    required: true 
+    required: true,
+    default: 2025
   }, 
   amount: { 
     type: Number, 
-    required: true 
+    required: true ,
+    default: 0
   }, 
   status: { 
     type: String, 
     enum: ['PENDING', 'PAID'], 
     default: 'PENDING' 
   }, // Trạng thái thanh toán
+  paymentDate: {
+    type: Date,
+    required: true,
+    default: null
+  }
 }, { timestamps: true }, {versionKey: false});
 
 module.exports = mongoose.model('MonthlyPayment', monthlyPaymentSchema);

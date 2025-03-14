@@ -210,6 +210,7 @@ exports.getFeedbackByUserAndReservation = asyncHandler(async (req, res) => {
   }
 });
 
+
 const calculateAvgRatingHotel = async (hotelId) => {
   // Sử dụng aggregate để tính trung bình rating
   const result = await Feedback.aggregate([

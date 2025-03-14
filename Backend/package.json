@@ -20,6 +20,7 @@
     "cookie-parser": "^1.4.7",
     "cookies-parser": "^1.2.0",
     "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
     "eslint-plugin-react-hooks": "^5.1.0",
     "express": "^4.21.2",
@@ -31,6 +32,7 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.10.0",
     "nodemon": "^3.1.9",
+    "pdfkit-table": "^0.1.99",
     "prettier": "^3.4.2",
     "validator": "^13.12.0"
   },
