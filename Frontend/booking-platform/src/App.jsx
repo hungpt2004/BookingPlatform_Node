@@ -20,6 +20,7 @@ import PricePerPerson from './views/room/roomPriceType/PricePerCapacity'
 import PriceNoRefund from './views/room/roomPriceType/PriceNoRefund'
 import PricePerWeek from './views/room/roomPriceType/PricePerWeek'
 import HotelPhotos from './views/hotel/CreateHotelPhotos'
+import BookingManagePage from './views/owner/BookingManagePage'
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
         <Route path='/edit-non-refundable' element={<PriceNoRefund />} />
         <Route path='/edit-weekly-price' element={<PricePerWeek />} />
         <Route path='/create-photo' element={<HotelPhotos />} />
+        <Route path='booking-management' element={<BookingManagePage />} />
 
       </Routes>
     </Router>
