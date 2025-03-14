@@ -14,6 +14,9 @@ import CustomerProfileSetting from "./views/customer/CustomerProfileSetting";
 import FeedbackPage from "./views/feedback/feedback";
 import CancelPaymentPage from "./views/status/CancelPaymentPage";
 import DashboardPage from "./views/dashBoard/DashboardPage";
+import DashboardOverview from "./views/dashBoard/DashboardPage";
+import Receipt from "./views/receipt/ReceiptPaymentPage";
+import MonthlyPayment from "./views/monthly_payment/MonthlyPaymentPage";
 
 function App() {
   return (
@@ -32,7 +35,9 @@ function App() {
         <Route path="/cancel/:id" element={<CancelPaymentPage />} />
         <Route path="/update-customer" element={<CustomerProfileSetting />} />
         <Route path="/feedback" element={<FeedbackPage />} />
-        <Route path="/dashboard/*" element={<DashboardPage />} />
+        <Route path="/dashboard" element={<DashboardOverview />} />
+        <Route path="/receipt" element={<Receipt />}/> 
+        <Route path="/monthly-owner" element={<MonthlyPayment/>}/>
       </Routes>
     </Router>
   );

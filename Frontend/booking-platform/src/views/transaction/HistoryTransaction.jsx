@@ -30,6 +30,8 @@ export const HistoryTransaction = () => {
    const [cancellationStep, setCancellationStep] = useState(1);
    const [cancellationStatus, setCancellationStatus] = useState('idle');
 
+   const navigate = useNavigate();
+
    const handleChangeStatus = (newStatus) => {
       setStatus(newStatus);
       setActiveStatus(newStatus);
@@ -362,9 +364,9 @@ export const HistoryTransaction = () => {
                                           : "col-md-4"
                                     }`
                                  }>
-                                    <Card className="card-search-hotel p-3 m-3">
-                                       <Card.Title className="text-center">{item.hotel.hotelName || "Unknown Hotel"}</Card.Title>
-                                       <Card.Body>
+                                    <Card className="card-search-hotel m-3 rounded-4">
+                                       <Card.Header style={{backgroundColor: '#003b95'}} className="text-center text-light fs-4 rounded-top-4">{item.hotel.hotelName || "Unknown Hotel"}</Card.Header>
+                                       <Card.Body className="p-4">
                                           <p style={{
                                              display: '-webkit-box',
                                              WebkitBoxOrient: 'vertical',
@@ -378,7 +380,7 @@ export const HistoryTransaction = () => {
                                              {statusText[item.status] || "Unknown Status"}
                                           </Badge>
                                        </Card.Body>
-                                       <Row className="m-2">
+                                       <Row className="m-2 p-3">
                                           {item.status === "CHECKED OUT" && (
                                              <Button
                                                 className="mb-1"
@@ -423,7 +425,9 @@ export const HistoryTransaction = () => {
                                                 </Badge>
                                              )
                                           )}
-                                          <Button className="mt-1" variant="outline-dark">
+                                          <Button
+                                          onClick={() => navigate('/receipt')}
+                                          className="mt-1" variant="outline-dark">
                                              View Details
                                           </Button>
                                        </Row>

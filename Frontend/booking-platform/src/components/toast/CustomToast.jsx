@@ -34,7 +34,7 @@ export const CustomSuccessToast = (msg) => {
 }
 
 export const CustomFailedToast = (msg) => {
-  return toast.fail(
+  return toast.error(
     msg,
     {
       position: "top-center",
