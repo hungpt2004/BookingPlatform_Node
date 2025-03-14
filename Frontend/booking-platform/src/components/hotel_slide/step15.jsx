@@ -183,8 +183,13 @@ const Step15 = ({ prevStep }) => {
             if (response.data.success) {
 
                 CustomSuccessToast('Khách sạn đã được tạo thành công! Vui lòng chờ đợi xét duyệt đăng ký của bạn.');
-                //sessionStorage.removeItem('hotelStep');
-                //navigate('/home');
+                sessionStorage.removeItem('hotelStep');
+                sessionStorage.removeItem('hotelFacility');
+                sessionStorage.removeItem('hotelDes');
+                sessionStorage.removeItem('hotelLocation');
+                sessionStorage.removeItem('hotelName&Star');
+                sessionStorage.removeItem('step15FormData');
+                navigate('/home');
             } else {
                 CustomFailedToast(`Lỗi: ${response.data.message}`);
             }
