@@ -15,19 +15,19 @@ export default function BookingManagePage() {
 
                 <div className="mb-4 d-flex align-items-center">
                     <div className="me-3">
-                        <Form.Group>
-                            <Form.Label>Ngày</Form.Label>
-                            <Dropdown>
-                                <Dropdown.Toggle variant="light" className=" text-start border">
-                                    Nhận phòng
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                    <Dropdown.Item>Đặt phòng</Dropdown.Item>
-                                    <Dropdown.Item>Nhận phòng</Dropdown.Item>
-                                    <Dropdown.Item>Ngày đi</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </Form.Group>
+
+                        <div className="me-3">
+                            <Form.Group>
+                                <Form.Label>Ngày</Form.Label>
+                                <Form.Group>
+                                    <Form.Select variant="light" className=" text-start border">
+                                        <option>Đặt phòng</option>
+                                        <option>Nhận phòng</option>
+                                        <option>Ngày đi</option>
+                                    </Form.Select>
+                                </Form.Group>
+                            </Form.Group>
+                        </div>
                     </div>
 
                     <div className="d-flex align-items-end gap-3">
@@ -36,7 +36,6 @@ export default function BookingManagePage() {
                             <div className="d-flex">
                                 <Form.Control type="date" placeholder="Từ ngày" />
                                 <Form.Control type="date" placeholder="Đến ngày" />
-
                             </div >
                         </Form.Group>
                         <div className="">
@@ -54,7 +53,7 @@ export default function BookingManagePage() {
                     </div>
 
 
-                    <div className="ms-auto d-flex">
+                    <div className="ms-auto d-flex mt-auto">
                         <Button variant="link" className="me-2 w-100 text-secondary">
                             <Printer size={16} />
                             <span className="ms-2 d-none d-lg-inline">In danh sách đặt phòng</span>
