@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 export const Step11 = ({ nextStep, prevStep }) => {
     const navigate = useNavigate();
     const ownerName = "son thai"; // Hardcoded for now
-    const hotelName = JSON.parse(sessionStorage.getItem("hotelName")) || "";
+    const hotelNameAndStar = JSON.parse(sessionStorage.getItem("hotelName&Star")) || "";
     const [invoiceInfo, setInvoiceInfo] = useState(
         JSON.parse(sessionStorage.getItem("hotelBillInfo")) || {
             invoiceType: "", // 'owner', 'hotel', or 'company'
@@ -49,7 +49,7 @@ export const Step11 = ({ nextStep, prevStep }) => {
                         />
                         <Form.Check
                             type="radio"
-                            label={hotelName}
+                            label={hotelNameAndStar.hotelName}
                             name="invoiceType"
                             checked={invoiceInfo.invoiceType === 'hotel'}
                             onChange={() => handleInputChange("invoiceType", 'hotel')}

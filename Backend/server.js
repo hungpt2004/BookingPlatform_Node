@@ -12,7 +12,7 @@ const FeedbackRouter = require("./src/routes/feedback.route");
 const RoomRouter = require("./src/routes/room.route");
 const BedRouter = require("./src/routes/bed.route");
 const HotelServiceRouter = require("./src/routes/hotel.service.route");
-const ServiceRouter = require('./src/routes/service.route');
+const hotelFacilityRouter = require("./src/routes/hotelFacility.route");
 require("dotenv").config();
 const fileupload = require("express-fileupload");
 const app = express(); //Create server
@@ -91,8 +91,8 @@ app.use("/hotel-service", HotelServiceRouter);
 //Monthly Payment
 app.use("/monthly-payment", MonthlyRouter)
 
-//Service
-app.use('/service', ServiceRouter)
+//facility
+app.use("/facility", hotelFacilityRouter);
 
 //Connect Mongo Config
 connectDB();

@@ -24,7 +24,7 @@ export const Step8 = ({ nextStep, prevStep }) => {
 
     // Store in sessionStorage whenever formData changes
     useEffect(() => {
-        sessionStorage.setItem("services", JSON.stringify(formData));
+        sessionStorage.setItem("hotelService", JSON.stringify(formData));
     }, [formData]);
 
     // Generic handler for radio / text inputs

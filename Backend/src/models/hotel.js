@@ -29,10 +29,16 @@ const hotelSchema = new Schema(
       enum: ['ACTIVE', 'NONACTIVE'],
       default: 'NONACTIVE',
     },
+    services: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "HotelService",
+      },
+    ],
     facilities: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Facility",
+        ref: "HotelFacility",
       },
     ],
     rating: {
@@ -50,37 +56,37 @@ const hotelSchema = new Schema(
     images: [
       { type: String }
     ],
-    
+
     //Thêm mảng lưu trữ hình ảnh
-    businessDocuments: [{ 
-      type: String, 
-      required: true 
+    businessDocuments: [{
+      title: { type: String, required: true },
+      url: { type: String, required: true }
     }],
 
     //Thêm comment từ admin
     adminStatus: {
-      type:String,
+      type: String,
       enum: ["PENDING", "APPROVED"], //Nếu admin reject thì xóa khỏi collection
       default: "PENDING"
     },
 
     ownerStatus: {
-      type:String,
+      type: String,
       enum: ["ACTIVE", "NONACTIVE"], //Nếu admin reject thì xóa khỏi collection
       default: "ACTIVE"
     },
 
-    requestDate: { 
-      type: Date, 
-      default: Date.now 
+    requestDate: {
+      type: Date,
+      default: Date.now
     }, // Ngày gửi yêu cầu
 
-    decisionDate: { 
-      type: Date 
+    decisionDate: {
+      type: Date
     } // Ngày quyết định (nếu có)
 
   },
   { versionKey: false }
 );
 
-module.exports = mongoose.model("Hotel", hotelSchema);
+module.exports = mongoose.model("Hotels", hotelSchema);
