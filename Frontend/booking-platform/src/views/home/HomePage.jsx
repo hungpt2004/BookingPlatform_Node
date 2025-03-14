@@ -436,18 +436,18 @@ export const HomePage = () => {
       >
         <h2 className="text-center fw-bold mb-4">Why Choose <span style={{ color: '#003b95' }}>Travelofy?</span></h2>
         <div className="col-md-3 text-center">
-          <img src="/icons/best-price.png" alt="Best Price" width="80" />
-          <h4 className="mt-3">Best Prices</h4>
+          <img src="/hotel/payment.jpg" alt="Best Price" width="100" />
+          <h3 className="mt-3 fw-bold" style={{color: '#003b95'}}>Best Prices</h3>
           <p>We offer the most competitive rates with no hidden fees.</p>
         </div>
         <div className="col-md-3 text-center">
-          <img src="/icons/security.png" alt="Secure Booking" width="80" />
-          <h4 className="mt-3">Secure Booking</h4>
+          <img src="/hotel/travel2.jpg" alt="Secure Booking" width="100" className='rounded-5'/>
+          <h3 className="mt-3 fw-bold" style={{color: '#003b95'}}>Securiting</h3>
           <p>Your information is encrypted and secure with us.</p>
         </div>
         <div className="col-md-3 text-center">
-          <img src="/icons/customer-support.png" alt="24/7 Support" width="80" />
-          <h4 className="mt-3">24/7 Support</h4>
+          <img src="/hotel/support.jpg" alt="24/7 Support" width="100" />
+          <h3 className="mt-3 fw-bold" style={{color: '#003b95'}}>24/7 Support</h3>
           <p>Our team is available round-the-clock to assist you.</p>
         </div>
       </motion.div>

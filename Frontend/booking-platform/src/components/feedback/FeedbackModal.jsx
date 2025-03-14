@@ -3,6 +3,7 @@ import { Button, Form, Modal } from 'react-bootstrap';
 import PropTypes from "prop-types";
 import axiosInstance from '../../utils/AxiosInstance';
 import { toast } from 'react-toastify';
+import { CustomFailedToast, CustomSuccessToast, CustomToast } from '../toast/CustomToast';
 
 export default function FeedbackModal({ show, onClose, reservationId, }) {
     const [content, setContent] = useState("");
@@ -51,24 +52,26 @@ export default function FeedbackModal({ show, onClose, reservationId, }) {
                     rating: Number(rating),
                 });
                 console.log(feedbackId),
-                    toast.success("Feedback updated successfully!");
+                CustomSuccessToast("Feedback updated successfully")
             } else {
                 // Tạo feedback mới
                 await axiosInstance.post(`/feedback/create-feedback/${reservationId}`, {
                     content: content.trim(),
                     rating: Number(rating),
                 });
-                toast.success("Feedback submitted successfully!");
+                CustomSuccessToast("Feedback submitted successfully!");
             }
             onClose();
         } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to submit feedback");
+            CustomFailedToast(error.response.data.message);
         } finally {
             setIsSubmitting(false);
         }
     };
 
     return (
+        <>
+        <CustomToast/>
         <Modal show={show} onHide={onClose}>
             <Form onSubmit={handleSubmit}>
                 <Modal.Header closeButton>
@@ -112,6 +115,7 @@ export default function FeedbackModal({ show, onClose, reservationId, }) {
                 </Modal.Footer>
             </Form>
         </Modal>
+        </>
     );
 }
 

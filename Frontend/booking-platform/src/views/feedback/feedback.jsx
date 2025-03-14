@@ -15,8 +15,8 @@ const FeedbackPage = () => {
 
     const fetchFeedbacks = async () => {
         try {
-            const response = await axiosInstance.get("/feedback/get"); // Cập nhật đúng 
-            setFeedbacks(response.data?.feedback || []); // Đảm bảo dữ liệu luôn là mảng
+            const response = await axiosInstance.get("/feedback/get-feedback"); // Cập nhật đúng 
+            setFeedbacks(response.data?.feedback); // Đảm bảo dữ liệu luôn là mảng
         } catch (error) {
             console.error("Error fetching feedbacks:", error);
             setFeedbacks([]); // Nếu lỗi xảy ra, đặt feedbacks về mảng rỗng

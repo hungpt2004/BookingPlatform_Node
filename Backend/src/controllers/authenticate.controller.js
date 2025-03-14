@@ -222,6 +222,7 @@ exports.resendEmailVerification = catchAsync(async (req, res, next) => {
   });
 });
 
+
 // Login
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
