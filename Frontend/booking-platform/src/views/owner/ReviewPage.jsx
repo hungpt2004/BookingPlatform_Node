@@ -50,7 +50,7 @@ export default function ReviewPage() {
                     </div>
 
 
-                    <div className="ms-auto d-flex">
+                    <div className="ms-auto mt-auto d-flex">
                         <Button variant="link" className="me-2 w-100 text-secondary">
                             <Printer size={16} />
                             <span className="ms-2 d-none d-lg-inline">In danh sách đặt phòng</span>
