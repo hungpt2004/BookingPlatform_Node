@@ -15,7 +15,7 @@ export default function BookingDashboard() {
                 </div>
 
                 {/* Warning Box */}
-                <Alert variant="warning" className="d-flex gap-3">
+                {/* <Alert variant="warning" className="d-flex gap-3">
                     <Clock size={20} className="" />
                     <div>
                         <Alert.Heading>Cần hành động: bổ sung thông tin ngân hàng cho chỗ nghỉ</Alert.Heading>
@@ -24,7 +24,7 @@ export default function BookingDashboard() {
                         </p>
                         <Button variant="link" className="p-0 text-decoration-none" style={{ width: "fit-content" }}>Thêm thông tin ngân hàng</Button>
                     </div>
-                </Alert>
+                </Alert> */}
 
                 {/* Filters */}
                 <div className="d-flex gap-3 mb-4">
