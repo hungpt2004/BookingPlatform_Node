@@ -39,7 +39,7 @@ function App() {
         <Route path="/forgot" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/success/:id" element={<SuccessPaymentPage />} />
-        <Route path="/cancel/:id" element={<SuccessPaymentPage />} />
+        <Route path="/cancel/:id" element={<CancelPaymentPage />} />
         <Route path="/favorite-list" element={<FavoriteHotelsList />} />
 
         <Route path="/update-customer" element={<CustomerProfileSetting />} />
@@ -51,6 +51,8 @@ function App() {
         <Route path='/edit-non-refundable' element={<PriceNoRefund />} />
         <Route path='/edit-weekly-price' element={<PricePerWeek />} />
         <Route path='/create-photo' element={<HotelPhotos />} />
+
+        <Route path="/dashboard/*" element={<DashboardPage />} />
         <Route path='booking-management' element={<BookingManagePage />} />
         <Route path='/reviews' element={<ReviewPage />} />
 

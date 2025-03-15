@@ -45,6 +45,7 @@ const RoomCards = ({ roomQuantities }) => {
 
                         <Card.Text className="d-flex align-items-center mb-2">
                             <span className="text-success me-2">✓</span>
+                            <span className="text-success me-1">{getRandomFacility(room.facilities)}</span>
                             <span className="text-success me-1">Free WiFi</span>
 =======
                         <Card.Text className="d-flex align-items-center mb-2">

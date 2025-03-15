@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { hotelStar, yesNo } from '../data/HotelOption';
 import { FaStar } from "react-icons/fa";
 import { services } from '../data/HotelOption';
-
+import axiosInstance from '../../utils/AxiosInstance'
 export const Step6 = ({ nextStep, prevStep }) => {
     const [hotelName, setHotelName] = useState("");
     const [selectedStar, setSelectedStar] = useState(null);
@@ -12,7 +12,13 @@ export const Step6 = ({ nextStep, prevStep }) => {
     const [hotelGroup, setHotelGroup] = useState("");
     // Save location data to sessionStorage when it changes
     const saveNameStarHotel = () => {
-        const star = hotelStar.find(item => item.id === selectedStar);
+        let star = null;
+        if (selectedStar === null) {
+            star = { id: 0, star: 0 }; // Tạo một đối tượng star mặc định khi chọn "Không áp dụng"
+        } else {
+            star = hotelStar.find(item => item.id === selectedStar);
+        }
+
         const hotelNameStar = {
             ...star,
             hotelName
@@ -130,19 +136,42 @@ export const Step6 = ({ nextStep, prevStep }) => {
         </Container>
     );
 };
+
 export const Step7 = ({ nextStep, prevStep }) => {
+    const [hotelFacilities, setHotelFacilities] = useState([]); // Dữ liệu từ API
     const [selectedOptions, setSelectedOptions] = useState([]);
 
-    const handleCheckboxChange = (service) => {
+    // Gọi API để lấy danh sách tiện ích khách sạn
+    useEffect(() => {
+        const fetchFacilities = async () => {
+            try {
+                const response = await axiosInstance.get("/facility/get-hotelfacilities");
+
+                // ✅ Đảm bảo lấy đúng dữ liệu
+                if (response.data && response.data.hotelFacilities) {
+                    setHotelFacilities(response.data.hotelFacilities);
+                } else {
+                    console.error("Dữ liệu trả về không hợp lệ:", response.data);
+                }
+            } catch (error) {
+                console.error("Lỗi khi lấy danh sách tiện ích khách sạn:", error);
+            }
+        };
+
+        fetchFacilities();
+    }, []);
+
+    // Xử lý khi chọn checkbox
+    const handleCheckboxChange = (facility) => {
         setSelectedOptions((prev) => {
-            const exists = prev.some((s) => s.id === service.id);
-            return exists ? prev.filter((s) => s.id !== service.id) : [...prev, service];
+            const exists = prev.some((f) => f._id === facility._id);
+            return exists ? prev.filter((f) => f._id !== facility._id) : [...prev, facility];
         });
     };
 
-    // Lưu cả ID và Name vào sessionStorage
+    // Lưu danh sách tiện ích đã chọn vào sessionStorage
     useEffect(() => {
-        sessionStorage.setItem("ServiceOptions", JSON.stringify(selectedOptions));
+        sessionStorage.setItem("hotelFacility", JSON.stringify(selectedOptions));
     }, [selectedOptions]);
 
     return (
@@ -152,23 +181,26 @@ export const Step7 = ({ nextStep, prevStep }) => {
             <Card className="p-4 mt-3">
                 <Form>
                     <Row>
-                        {services.map((service) => (
-                            <Col md={12} key={service.id}>
-                                <Form.Check
-                                    type="checkbox"
-                                    id={`service-${service.id}`}
-                                    label={service.name}
-                                    checked={selectedOptions.some((s) => s.id === service.id)}
-                                    onChange={() => handleCheckboxChange(service)}
-                                />
-                            </Col>
-                        ))}
+                        {hotelFacilities.length > 0 ? (
+                            hotelFacilities.map((facility) => (
+                                <Col md={12} key={facility._id}>
+                                    <Form.Check
+                                        type="checkbox"
+                                        id={`facility-${facility._id}`}
+                                        label={facility.name}
+                                        checked={selectedOptions.some((f) => f._id === facility._id)}
+                                        onChange={() => handleCheckboxChange(facility)}
+                                    />
+                                </Col>
+                            ))
+                        ) : (
+                            <p className="text-danger">Không có tiện ích nào được tìm thấy.</p>
+                        )}
                     </Row>
                 </Form>
 
                 <hr />
 
-                {/* Nút Back & Next */}
                 <div className="d-flex justify-content-between">
                     <Button variant="secondary" onClick={prevStep}>Quay lại</Button>
                     <Button variant="primary" onClick={nextStep} disabled={selectedOptions.length === 0}>
