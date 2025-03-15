@@ -26,8 +26,8 @@ const hotelSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ['ACTIVE', 'NONACTIVE'],
-      default: 'NONACTIVE',
+      enum: ["ACTIVE", "NONACTIVE"],
+      default: "NONACTIVE",
     },
     facilities: [
       {
@@ -41,7 +41,7 @@ const hotelSchema = new Schema(
     },
     star: {
       type: Number,
-      required: true
+      required: true,
     },
     pricePerNight: {
       type: Number,
@@ -52,12 +52,10 @@ const hotelSchema = new Schema(
       //   // public_ID: { type: String, required: true },
       //   url: { type: String, required: true }
       // },
-      { type: String, required: true}
+      { type: String, required: true },
     ],
-    
-    //Thêm mảng lưu trữ hình ảnh
-    
 
+    //Thêm mảng lưu trữ hình ảnh
   },
   { versionKey: false }
 );
