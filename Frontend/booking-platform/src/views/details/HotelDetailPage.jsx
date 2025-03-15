@@ -33,7 +33,6 @@ const amenities = [
    { icon: "❄️", text: "Điều hòa nhiệt độ" },
 ];
 
-
 export const HotelDetailPage = () => {
    const [currentHotel, setCurrentHotel] = useState(null);
    const [error, setError] = useState("");
@@ -51,6 +50,7 @@ export const HotelDetailPage = () => {
    const [capacityError, setCapacityError] = useState('');
    const [availabilityError, setAvailabilityError] = useState('');
    const [userId, setUserId] = useState(null); // State to store userId
+   const [validDate, setValidDate] = useState(true); // State to store date validity
 
    // Add this function to handle the search validation
    const handleSearch = async () => {
@@ -72,6 +72,37 @@ export const HotelDetailPage = () => {
          return;
       }
    };
+
+
+   // Add this useEffect to handle date parameters
+   useEffect(() => {
+      const today = new Date().toISOString().split('T')[0];
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowString = tomorrow.toISOString().split('T')[0];
+
+      const initialCheckIn = searchParams.get('checkin') || today;
+      let initialCheckOut = searchParams.get('checkout') || tomorrowString;
+
+      // Handle date dependencies
+      if (!searchParams.get('checkin') && searchParams.get('checkout')) {
+         initialCheckOut = searchParams.get('checkout');
+         if (new Date(initialCheckOut) < new Date(today)) {
+            initialCheckOut = tomorrowString;
+         }
+      }
+
+      if (new Date(initialCheckOut) <= new Date(initialCheckIn)) {
+         initialCheckOut = new Date(initialCheckIn);
+         initialCheckOut.setDate(initialCheckOut.getDate() + 1);
+         initialCheckOut = initialCheckOut.toISOString().split('T')[0];
+      }
+
+      setCheckInDate(initialCheckIn);
+      setCheckOutDate(initialCheckOut);
+      setNumberOfPeople(parseInt(searchParams.get('guests')) || 1);
+
+   }, [searchParams]);
 
    // Add the search bar components
    const handleDateChange = (type, value) => {
@@ -95,6 +126,8 @@ export const HotelDetailPage = () => {
             newErrors.checkOut = 'Check-out date cannot be in the past';
          } else if (checkInDate && value < checkInDate) {
             newErrors.checkOut = 'Check-out cannot be before check-in';
+         } else if (checkOutDate && value === checkInDate) {
+            newErrors.checkOut = 'Check-out cannot be same date as check-in';
          } else {
             newErrors.checkOut = '';
          }
@@ -193,6 +226,7 @@ export const HotelDetailPage = () => {
 
    }, [searchParams]);
 
+   // Log every property of currentHotel once it's set
    useEffect(() => {
       if (currentHotel) {
          console.log("Current Hotel object details:");
@@ -207,6 +241,8 @@ export const HotelDetailPage = () => {
    return (
       <>
          <CustomNavbar />
+
+         {/* Hiển thị loading khi đang tải dữ liệu */}
          {loading ? (
             <div className="text-center mt-5">
                <Spinner animation="border" variant="primary" />
@@ -336,11 +372,9 @@ export const HotelDetailPage = () => {
                            <ListGroup>
                               <ListGroupItem className="d-flex justify-content-end align-items-center">
                                  {RatingConsider(currentHotel.rating)}
-                                 <Card
-                                    style={{ backgroundColor: '#003b95' }}
-                                    className="mx-2">
-                                    <Card.Text className="px-3 py-2 text-center text-light">{currentHotel.rating}</Card.Text>
-                                 </Card>
+                                 <div className="d-flex justify-content-center align-items-center mx-1 rounded" style={{ width: '40px', height: '30px', backgroundColor: '#003b95' }}>
+                                    <p className="m-0 p-0 text-center text-light">{currentHotel.rating}</p>
+                                 </div>
                               </ListGroupItem>
                            </ListGroup>
                            <Card.Body>
@@ -390,7 +424,7 @@ export const HotelDetailPage = () => {
                      <p>
                         {`Với ${dataFacility[0]} và ${dataFacility[1]}, ${currentHotel.hotelName} tọa lạc ở 
 
-                        ${currentHotel.description}. Khăn tắm và ga trải giường có sẵn ở căn hộ.
+                        Căn hộ điều hòa này có 1 phòng ngủ, phòng khách, bếp đầy đủ tiện nghi với tủ lạnh và máy pha cà phê, 2 phòng tắm với vòi sen và máy sấy tóc. Khăn tắm và ga trải giường có sẵn ở căn hộ.
 
                         Các điểm tham quan nổi tiếng gần căn hộ bao gồm Vườn Turia Gardens, Vườn Jardines de Monforte và Bảo tàng Gốm sứ và Nghệ thuật Trang trí Quốc gia González Martí. Sân bay Valencia cách 9 km.
 
@@ -453,7 +487,7 @@ export const HotelDetailPage = () => {
                            value={numberOfPeople}
                            min={1}
                            onChange={(e) => {
-                              const value = Math.max(1, Math.min(currentHotel?.capacity || 16, e.target.value));
+                              const value = Math.max(1, Math.min(100, e.target.value));
                               setNumberOfPeople(value);
                            }}
                         />
@@ -468,8 +502,6 @@ export const HotelDetailPage = () => {
                   </div>
 
                </div>
-
-
                <Booking
                   setOpen={setOpen}
                   hotelId={id}

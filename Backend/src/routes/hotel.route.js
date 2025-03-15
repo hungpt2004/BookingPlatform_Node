@@ -7,7 +7,7 @@ const {
   protect,
 } = require("../controllers/authenticate.controller");
 const authController = require("./../controllers/authenticate.controller");
-
+const CloudinaryZipFile =require("../utils/uploadToCloudinary")
 router.use(authController.protect);
 
 HotelRouter.get("/get-all-hotel", HotelController.getAllHotels); //customer
@@ -24,6 +24,7 @@ HotelRouter.get(
 );
 
 HotelRouter.get("/top-hotel", HotelController.getTopHotel);
-
-
+HotelRouter.post("/create", protect, HotelController.createHotel);
+HotelRouter.post("/upload-zip", protect, CloudinaryZipFile.uploadZipFile);
+HotelRouter.post("/create-pending", protect, HotelController.createPendingHotel);
 module.exports = HotelRouter;

@@ -91,8 +91,8 @@ exports.createFeedback = async (req, res) => {
     // Cập nhật trạng thái reservation thành "COMPLETED"
 
     await Reservation.updateOne(
-      {_id: reservationId},
-      { $set: {status: "COMPLETED"}}
+      { _id: reservationId },
+      { $set: { status: "COMPLETED" } }
     )
 
     await reservation.save();
@@ -103,15 +103,15 @@ exports.createFeedback = async (req, res) => {
     //Update rating 
 
     const avgValueRatingUpdate = await calculateAvgRatingHotel(reservation.hotel._id);
-    console.log("AVG Rating:", avgValueRatingUpdate); 
+    console.log("AVG Rating:", avgValueRatingUpdate);
 
     const currentHotel = await Hotel.findOne(reservation.hotel._id);
 
     console.log(`Old Rating ${currentHotel.rating}`)
 
     await Hotel.updateOne(
-      {_id: reservation.hotel._id},
-      {$set: {rating: avgValueRatingUpdate}}
+      { _id: reservation.hotel._id },
+      { $set: { rating: avgValueRatingUpdate } }
     )
 
     res.status(201).json({
@@ -214,14 +214,14 @@ exports.getFeedbackByUserAndReservation = asyncHandler(async (req, res) => {
 const calculateAvgRatingHotel = async (hotelId) => {
   // Sử dụng aggregate để tính trung bình rating
   const result = await Feedback.aggregate([
-      { $match: { hotel: hotelId } }, // Lọc feedback theo hotelId
-      { 
-          $group: { 
-              _id: "$hotel", 
-              avgRating: { $avg: "$rating" }, // Tính trung bình rating
-              totalFeedbacks: { $sum: 1 } // Đếm số feedback
-          } 
+    { $match: { hotel: hotelId } }, // Lọc feedback theo hotelId
+    {
+      $group: {
+        _id: "$hotel",
+        avgRating: { $avg: "$rating" }, // Tính trung bình rating
+        totalFeedbacks: { $sum: 1 } // Đếm số feedback
       }
+    }
   ]);
 
   if (result.length === 0) return 0; // Nếu không có feedback, trả về 0
@@ -232,3 +232,30 @@ const calculateAvgRatingHotel = async (hotelId) => {
   return avgValueRating;
 };
 
+//get feedback by user_id
+exports.getFeedbackByUser = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const feedback = await Feedback.find({
+      user: userId
+    }).lean().populate("hotel");
+
+    if (!feedback) {
+      return res.status(404).json({
+        error: true,
+        message: "No feedback found for this reservation",
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      feedback,
+      message: "Feedback retrieved successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      message: "Server Error",
+    });
+  }
+});

@@ -6,15 +6,7 @@ import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 import axios from "axios";
 import { BASE_URL } from "../../utils/Constant";
 
-const HotelCard = ({ hotel, goToDetail }) => {
-
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [rooms, setRooms] = useState([])
-  const [totalQuantityRoom, setTotalQuantityRoom] = useState(0)
-
-  const addToFavorite = () => {
-    setIsFavorite(!isFavorite);
-  }
+const HotelCard = ({ hotel, goToDetail, isFavorite, toggleFavorite }) => {
 
   const fetchRoomByHotelId = async () => {
     try {
@@ -30,7 +22,7 @@ const HotelCard = ({ hotel, goToDetail }) => {
   }
 
   useEffect(() => {
-      fetchRoomByHotelId()
+    fetchRoomByHotelId()
   }, [])
 
   console.log(rooms.length)
@@ -61,7 +53,10 @@ const HotelCard = ({ hotel, goToDetail }) => {
               className=""
               color={isFavorite ? "red" : "white"}
               size={24}
-              onClick={() => addToFavorite()}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFavorite(hotel._id);
+              }}
             />
           </div>
         </Col>
