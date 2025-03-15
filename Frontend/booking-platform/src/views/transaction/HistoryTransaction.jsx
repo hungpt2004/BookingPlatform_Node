@@ -435,11 +435,11 @@ export const HistoryTransaction = () => {
                                              View Details
                                           </Button>
                                        </Row>
-                                    </Card>
-                                 </div>
+                                    </Card >
+                                 </div >
                               })) : <p className="alert alert-danger w-100">No have any transaction</p>}
-                           </div>
-                        </div>
+                           </div >
+                        </div >
                      </>
                   )}
                </div>

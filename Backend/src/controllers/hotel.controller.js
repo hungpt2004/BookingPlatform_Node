@@ -5,7 +5,9 @@ require("../models/hotelFacility");
 const Reservation = require("../models/reservation");
 const Bed = require("../models/bed");
 const { AUTH, GENERAL, HOTEL } = require("../utils/constantMessage");
-
+const { uploadMultipleImages, deleteImages, getPublicIdFromUrl } = require("../utils/uploadToCloudinary");
+const hotelFacility = require("../models/hotelFacility");
+const mongoose = require("mongoose");
 exports.getAllHotels = asyncHandler(async (req, res) => {
   const hotels = await Hotel.find();
 
@@ -103,4 +105,169 @@ exports.getTotalReservationByHotelId = asyncHandler(async (req, res) => {
     message: HOTEL.SUCCESS,
   });
 
+});
+
+
+exports.createHotel = asyncHandler(async (req, res) => {
+
+  try {
+    console.log(req.body);
+    const ownerID = req.user?.id || req.body.id;
+    const {
+      hotelName,
+      description,
+      address,
+      phoneNumber,
+      rating = 0,
+      star = 1,
+      pricePerNight = 0,
+      facilities,
+      businessDocuments
+    } = req.body;
+
+    // Kiểm tra các trường bắt buộc
+    if (!hotelName || !description || !address || !phoneNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "Vui lòng cung cấp đầy đủ thông tin khách sạn và tên công ty"
+      });
+    }
+    //chuyen json sang object
+    const parsedBusinessDocuments = JSON.parse(businessDocuments);
+    const parsedFacilities = JSON.parse(facilities);
+    // Kiểm tra xem mỗi phần tử trong facilities có phải là ObjectId hợp lệ không
+    for (const facilityId of parsedFacilities) {
+      // 1. Kiểm tra tính hợp lệ của ObjectId
+      if (!mongoose.Types.ObjectId.isValid(facilityId)) {
+        return res.status(400).json({
+          success: false,
+          message: `facilities chứa ID không hợp lệ: ${facilityId}`,
+        });
+      }
+
+      // 2. Kiểm tra sự tồn tại của facilityId trong collection hotelFacility
+      const facilityExists = await hotelFacility.exists({ _id: facilityId });
+      if (!facilityExists) {
+        return res.status(400).json({
+          success: false,
+          message: `facilities chứa ID không tồn tại: ${facilityId}`,
+        });
+      }
+    }
+    // Kiểm tra ảnh
+    // if (!req.files || Object.keys(req.files).length === 0) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Vui lòng tải lên ít nhất một ảnh khách sạn"
+    //   });
+    // }
+
+    // Lấy các files ảnh từ request
+    // const hotelImages = req.files.images
+    //   ? Array.isArray(req.files.images)
+    //     ? req.files.images
+    //     : [req.files.images]
+    //   : Object.values(req.files).flat();
+
+    // Tạo đường dẫn thư mục với tên công ty
+    // const folderPath = `hotels/${ownerID}`;
+
+    // Upload ảnh lên Cloudinary
+    // const imageUrls = await uploadMultipleImages(hotelImages, folderPath, {
+    //   width: 800,
+    //   crop: "fill",
+    //   quality: "auto:good"
+    // });
+
+    let imageUrls = [];
+    
+    if (req.files && Object.keys(req.files).length > 0) {
+      // Lấy các files ảnh từ request
+      const hotelImages = req.files.images
+        ? Array.isArray(req.files.images)
+          ? req.files.images
+          : [req.files.images]
+        : [];
+
+      if (hotelImages.length > 0) {
+        const folderPath = `hotels/${ownerID}`;
+        // Upload ảnh lên Cloudinary
+        imageUrls = await uploadMultipleImages(hotelImages, folderPath, {
+          width: 800,
+          crop: "fill",
+          quality: "auto:good"
+        });
+      }
+    }
+    // Tạo khách sạn mới
+    const newHotel = await Hotel.create({
+      hotelName,
+      description,
+      address,
+      phoneNumber,
+      rating,
+      star,
+      pricePerNight,
+      facilities: parsedFacilities,
+      images: imageUrls,
+      owner: ownerID,
+      businessDocuments: parsedBusinessDocuments
+    });
+
+    // Trả về phản hồi thành công
+    res.status(201).json({
+      success: true,
+      message: "Tạo khách sạn mới thành công",
+      hotel: newHotel,
+
+    });
+    console.log(newHotel);
+  } catch (error) {
+    console.error("Lỗi khi tạo khách sạn:", error);
+    res.status(500).json({
+      success: false,
+      message: "Lỗi máy chủ khi tạo khách sạn",
+      error: error.message
+    });
+  }
+});
+
+exports.uploadAllDocuments = asyncHandler(async (req, res) => {
+  try {
+    const ownerID = req.user?.id || req.body.ownerID;
+    const files = Array.isArray(req.files.files) ? req.files.files : [req.files.files];
+
+    let documentTypes = req.body.documentTypes;
+    if (typeof documentTypes === "string") {
+      documentTypes = documentTypes.split(",");
+    }
+
+    if (!Array.isArray(documentTypes) || files.length !== documentTypes.length) {
+      return res.status(400).json({ success: false, message: "Số lượng tài liệu không khớp." });
+    }
+
+    const folderPath = `hotels/${ownerID}/documents`;
+
+    // Upload tất cả tài liệu cùng một lúc
+    const uploadResults = await uploadMultipleImages(files, folderPath, {
+      width: 800,
+      crop: "fill",
+      quality: "auto:good"
+    });
+
+    // Lưu đúng định dạng mảng
+    const uploadedDocuments = documentTypes.map((type, index) => ({
+      title: type,
+      url: uploadResults[index]
+    }));
+
+    return res.status(200).json({
+      success: true,
+      message: "Tải tài liệu thành công!",
+      documentUrls: uploadedDocuments // Trả về mảng thay vì object
+    });
+  } catch (error) {
+    console.error("Lỗi khi tải tài liệu:", error);
+    return res.status(500).json({ success: false, message: "Lỗi máy chủ khi tải tài liệu." });
+  }
 });

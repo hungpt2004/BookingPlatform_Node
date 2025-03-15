@@ -114,11 +114,32 @@ exports.createFeedback = async (req, res) => {
 
     // Cập nhật trạng thái reservation thành "COMPLETED"
     await Reservation.updateOne({ _id: reservationId }, { $set: { status: "COMPLETED" } });
+
+    await Reservation.updateOne(
+      { _id: reservationId },
+      { $set: { status: "COMPLETED" } }
+    )
+
     await reservation.save();
 
     // Cập nhật rating khách sạn
     const avgValueRatingUpdate = await calculateAvgRatingHotel(reservation.hotel._id);
     await Hotel.updateOne({ _id: reservation.hotel._id }, { $set: { rating: avgValueRatingUpdate } });
+    console.log("AVG Rating:", avgValueRatingUpdate);
+
+    const currentHotel = await Hotel.findOne(reservation.hotel._id);
+
+    console.log(`Old Rating ${currentHotel.rating}`)
+
+    await Hotel.updateOne(
+      { _id: reservation.hotel._id },
+      { $set: { rating: avgValueRatingUpdate } }
+    )
+
+    res.status(201).json({
+      message: "Feedback đã được gửi thành công!",
+      feedback,
+    });
 
     res.status(201).json({ message: "Feedback đã được gửi thành công!", feedback });
   } catch (error) {

@@ -115,6 +115,10 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   const currentUser = req.user;
   const paymentLink = req.cookies["payment_link"];
 
+  console.log(`user ${currentUser.id}`)
+
+  console.log(`Page ${page}`);
+
   if (!status) {
     return res.status(400).json({
       error: true,

@@ -9,4 +9,4 @@ const HotelFacilitySchema = new Schema(
   { versionKey: false }
 );
 
-module.exports = mongoose.model("HotelFacility", HotelFacilitySchema);
+module.exports = mongoose.model("HotelFacilities", HotelFacilitySchema);

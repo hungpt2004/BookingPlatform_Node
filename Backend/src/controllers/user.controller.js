@@ -163,3 +163,4 @@ exports.getCurrentUser = asyncHandler(async (req, res) => {
     messsage: AUTH.GET_SUCCESS,
   });
 });
+

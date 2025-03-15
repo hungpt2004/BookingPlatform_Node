@@ -7,15 +7,7 @@ import axios from "axios";
 import { BASE_URL } from "../../utils/Constant";
 import './HotelCard.css'
 
-const HotelCard = ({ hotel, goToDetail }) => {
-
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [rooms, setRooms] = useState([])
-  const [totalQuantityRoom, setTotalQuantityRoom] = useState(0)
-
-  const addToFavorite = () => {
-    setIsFavorite(!isFavorite);
-  }
+const HotelCard = ({ hotel, goToDetail, isFavorite, toggleFavorite }) => {
 
   const fetchRoomByHotelId = async () => {
     try {

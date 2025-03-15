@@ -36,7 +36,6 @@ const amenities = [
    { icon: "❄️", text: "Điều hòa nhiệt độ" },
 ];
 
-
 export const HotelDetailPage = () => {
    const [currentHotel, setCurrentHotel] = useState(null);
    const [error, setError] = useState("");
@@ -59,7 +58,7 @@ export const HotelDetailPage = () => {
    //Show all image in modal
    const handleShowGalleryModal = () => setShowGalleryModal(true);
    const handleCloseGalleryModal = () => setShowGalleryModal(false);
-
+   const [validDate, setValidDate] = useState(true); // State to store date validity
 
    // Add this function to handle the search validation
 
@@ -82,6 +81,37 @@ export const HotelDetailPage = () => {
    //       return;
    //    }
    // };
+
+
+   // Add this useEffect to handle date parameters
+   useEffect(() => {
+      const today = new Date().toISOString().split('T')[0];
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowString = tomorrow.toISOString().split('T')[0];
+
+      const initialCheckIn = searchParams.get('checkin') || today;
+      let initialCheckOut = searchParams.get('checkout') || tomorrowString;
+
+      // Handle date dependencies
+      if (!searchParams.get('checkin') && searchParams.get('checkout')) {
+         initialCheckOut = searchParams.get('checkout');
+         if (new Date(initialCheckOut) < new Date(today)) {
+            initialCheckOut = tomorrowString;
+         }
+      }
+
+      if (new Date(initialCheckOut) <= new Date(initialCheckIn)) {
+         initialCheckOut = new Date(initialCheckIn);
+         initialCheckOut.setDate(initialCheckOut.getDate() + 1);
+         initialCheckOut = initialCheckOut.toISOString().split('T')[0];
+      }
+
+      setCheckInDate(initialCheckIn);
+      setCheckOutDate(initialCheckOut);
+      setNumberOfPeople(parseInt(searchParams.get('guests')) || 1);
+
+   }, [searchParams]);
 
    // Add the search bar components
 
@@ -107,6 +137,8 @@ export const HotelDetailPage = () => {
             newErrors.checkOut = 'Check-out date cannot be in the past';
          } else if (checkInDate && value < checkInDate) {
             newErrors.checkOut = 'Check-out cannot be before check-in';
+         } else if (checkOutDate && value === checkInDate) {
+            newErrors.checkOut = 'Check-out cannot be same date as check-in';
          } else {
             newErrors.checkOut = '';
          }
@@ -211,6 +243,7 @@ export const HotelDetailPage = () => {
 
    }, [searchParams]);
 
+   // Log every property of currentHotel once it's set
    useEffect(() => {
       if (currentHotel) {
          console.log("Current Hotel object details:");
@@ -225,6 +258,8 @@ export const HotelDetailPage = () => {
    return (
       <>
          <CustomNavbar />
+
+         {/* Hiển thị loading khi đang tải dữ liệu */}
          {loading ? (
             <div className="text-center mt-5">
                <Spinner animation="border" variant="primary" />
@@ -546,7 +581,7 @@ export const HotelDetailPage = () => {
                            value={numberOfPeople}
                            min={1}
                            onChange={(e) => {
-                              const value = Math.max(1, Math.min(currentHotel?.capacity || 16, e.target.value));
+                              const value = Math.max(1, Math.min(100, e.target.value));
                               setNumberOfPeople(value);
                            }}
                         />
@@ -561,8 +596,6 @@ export const HotelDetailPage = () => {
                   </div>
 
                </div>
-
-
                <Booking
                   setOpen={setOpen}
                   hotelId={id}

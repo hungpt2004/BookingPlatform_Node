@@ -51,6 +51,7 @@ const Booking = ({
                     numberOfPeople
                 }
             });
+            // console.log("numberOfPeople:", numberOfPeople);
             console.log(response.data.rooms)
             setRooms(response.data.rooms);
             setSelectedRooms({}); // Reset selections when new results load
@@ -212,12 +213,19 @@ const Booking = ({
             roomIds,
             currentHotel,
             distanceNight: distanceDay,
-            listFeedback
+            listFeedback,
+            numberOfPeople: numberOfPeople,
         };
 
         console.log("Booking Data", bookingData);
 
-        navigate('/booking-step2', { state: bookingData });
+        try {
+            await axiosInstance.post('/payment/create-booking', bookingData);
+            console.log("Booking created successfully");
+            navigate('/booking-step2', { state: bookingData });
+        } catch (error) {
+            console.error("Error creating booking:", error);
+        }
     };
 
 

@@ -11,6 +11,7 @@ import { HotelDetailPage } from "./views/details/HotelDetailPage";
 import ForgotPasswordPage from "./views/forgot_password/ForgotPasswordPage";
 import ResetPasswordPage from "./views/reset_password/ResetPasswordPage";
 import { SuccessPaymentPage } from "./views/status/SuccessPaymentPage";
+import FavoriteHotelsList from "./views/favorite/FavoriteHotelsList"
 import CustomerProfileSetting from "./views/customer/CustomerProfileSetting";
 import FeedbackPage from "./views/feedback/feedback";
 import CancelPaymentPage from "./views/status/CancelPaymentPage";
@@ -23,6 +24,13 @@ import { Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/authRoutes/ProtectedRoute";
 import AdminDashboard from "./views/admin/AdminDashboard";
 import { Spinner } from "react-bootstrap";
+import { Createhotel } from './views/hotel/Createhotel'
+import { CreateRoom } from './views/room/createRoom'
+import CancelPolicy from './views/room/roomPriceType/CancelPolicy'
+import PricePerPerson from './views/room/roomPriceType/PricePerCapacity'
+import PriceNoRefund from './views/room/roomPriceType/PriceNoRefund'
+import PricePerWeek from './views/room/roomPriceType/PricePerWeek'
+import HotelPhotos from './views/hotel/CreateHotelPhotos'
 
 function App() {
   const { user, isAuthenticated } = useAuthStore();
@@ -46,7 +54,7 @@ function App() {
   // Show loading state while checking authentication
   if (isLoading) {
     return (
-      <div 
+      <div
         className="d-flex justify-content-center align-items-center"
         style={{
           position: "fixed",
@@ -117,6 +125,15 @@ function App() {
 
         {/* Catch-all route - redirects to appropriate homepage based on role */}
         <Route path="*" element={<RoleRedirect />} />
+
+        <Route path="/create-hotel" element={<Createhotel />} />
+        <Route path='/create-room' element={<CreateRoom />} />
+        <Route path='/cancel-policy' element={<CancelPolicy />} />
+        <Route path='/edit-capacity-price' element={<PricePerPerson />} />
+        <Route path='/edit-non-refundable' element={<PriceNoRefund />} />
+        <Route path='/edit-weekly-price' element={<PricePerWeek />} />
+        <Route path='/create-photo' element={<HotelPhotos />} />
+
       </Routes>
     </Router>
   );

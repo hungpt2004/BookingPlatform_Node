@@ -225,7 +225,6 @@ exports.resendEmailVerification = catchAsync(async (req, res, next) => {
 // Login
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-
   if (!email || !password) {
     return next(new AppError("Please provide email and password!", 400));
   }

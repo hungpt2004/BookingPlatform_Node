@@ -16,6 +16,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import MapComponent from '../../components/map/MapComponent';
 import { IoIosArrowDropright, IoIosArrowDropleft } from "react-icons/io";
+import axiosInstance from '../../utils/AxiosInstance';
 import HotelCard from '../../components/card/HotelCard';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -26,6 +27,7 @@ import FeaturesSection from '../../components/card/FeatureCard';
 
 
 export const HomePage = () => {
+  const navigate = useNavigate();
   const [hotels, setHotels] = useState([]);
   const [hotelName, setHotelName] = useState('');
   const [address, setAddress] = useState('');
@@ -43,7 +45,42 @@ export const HomePage = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [vietCities, setVietCities] = useState([]);
-  const navigate = useNavigate();
+  const [favorites, setFavorites] = useState([]);
+
+  // Fetch user's favorites on component mount
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const response = await axiosInstance.get('/favorite/get-all-favorite');
+        setFavorites(response.data.favorites.map(hotel => hotel._id));
+      } catch (error) {
+        console.error('Error fetching favorites:', error);
+      }
+    };
+
+    if (showHotels) {
+      fetchFavorites();
+    }
+  }, [showHotels]);
+
+  // Toggle favorite function
+  const toggleFavorite = async (hotelId) => {
+    try {
+      if (favorites.includes(hotelId)) {
+        // Remove from favorites
+        await axiosInstance.delete('/favorite/remove-favorite', {
+          data: { hotelId }
+        });
+        setFavorites(favorites.filter(id => id !== hotelId));
+      } else {
+        // Add to favorites
+        await axiosInstance.post('/favorite/add-favorite', { hotelId });
+        setFavorites([...favorites, hotelId]);
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
+  };
 
 
   useEffect(() => {
@@ -201,7 +238,7 @@ export const HomePage = () => {
   };
 
   const goToDetail = (hotelId) => {
-    navigate(`/hotel-detail/${hotelId}`);
+    navigate(`/hotel-detail/${hotelId}?checkin=${checkinDate}&checkout=${checkoutDate}&guests=${numberOfPeople}`);
   }
 
   const handleSearch = () => {

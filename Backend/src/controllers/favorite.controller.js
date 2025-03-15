@@ -4,13 +4,12 @@ const asyncHandler = require('../middlewares/asyncHandler')
 
 
 exports.addFavoriteHotel = asyncHandler(async (req, res) => {
-
-   const currentUser = req.user;
+   const userId = req.user._id;
 
    const { hotelId } = req.body;
 
    // Validate input
-   if (!currentUser || !hotelId) {
+   if (!userId || !hotelId) {
       return res.status(400).json({
          error: true,
          message: "Missing required fields",
@@ -18,7 +17,7 @@ exports.addFavoriteHotel = asyncHandler(async (req, res) => {
    }
 
    // Check if the user exists
-   const user = await User.findById(currentUser.id);
+   const user = await User.findById(userId);
    if (!user) {
       return res.status(404).json({
          error: true,
@@ -55,8 +54,7 @@ exports.addFavoriteHotel = asyncHandler(async (req, res) => {
 
 // Get all favorite hotels of a user
 exports.getFavoriteHotels = asyncHandler(async (req, res) => {
-   
-   const userId = req.user;
+   const userId = req.user._id;
 
    console.log(userId);
    // Validate input
@@ -86,7 +84,7 @@ exports.getFavoriteHotels = asyncHandler(async (req, res) => {
 
 // Remove a hotel from user's favorites
 exports.removeFavoriteHotel = asyncHandler(async (req, res) => {
-   const userId = req.user;
+   const userId = req.user._id;
 
    const { hotelId } = req.body;
 
