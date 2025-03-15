@@ -22,6 +22,8 @@ import PricePerWeek from './views/room/roomPriceType/PricePerWeek'
 import HotelPhotos from './views/hotel/CreateHotelPhotos'
 import BookingManagePage from './views/owner/BookingManagePage'
 import ReviewPage from './views/owner/ReviewPage'
+import OwnerHomePage from './views/owner/HomePage'
+import FinancePage from './views/owner/FinancePage'
 
 function App() {
   return (
@@ -51,6 +53,8 @@ function App() {
         <Route path='/create-photo' element={<HotelPhotos />} />
         <Route path='booking-management' element={<BookingManagePage />} />
         <Route path='/reviews' element={<ReviewPage />} />
+        <Route path='/owner-homepage' element={<OwnerHomePage />} />
+        <Route path='/owner-finance' element={<FinancePage />} />
 
       </Routes>
     </Router>

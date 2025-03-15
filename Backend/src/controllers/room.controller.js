@@ -15,7 +15,7 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
     // Create and save the room
     const newRoom = new Room({
         ...req.body,
-        hotel: hotelId // Add the hotel reference explicitly
+        hotel: hotelId
     });
 
     const savedRoom = await newRoom.save();

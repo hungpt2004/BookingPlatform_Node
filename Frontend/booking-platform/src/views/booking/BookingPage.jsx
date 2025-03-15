@@ -16,7 +16,9 @@ const Booking = ({
     numberOfPeople,
     userId,
     currentHotel,
-    listFeedback
+    listFeedback,
+    checkInTime,
+    checkOutTime,
 }) => {
     const [selectedRooms, setSelectedRooms] = useState({});
     const [loading, setLoading] = useState(false);
@@ -47,7 +49,9 @@ const Booking = ({
                 params: {
                     checkInDate,
                     checkOutDate,
-                    numberOfPeople
+                    numberOfPeople,
+                    checkInTime,
+                    checkOutTime
                 }
             });
             // console.log("numberOfPeople:", numberOfPeople);
@@ -236,9 +240,6 @@ const Booking = ({
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2>Select Rooms - <span className="alert alert-warning">You want to have {distanceDay} nights</span></h2>
                 <p>Price per night: {formatCurrencyVND(currentHotel.pricePerNight)}</p>
-                {/* <Button variant="secondary" onClick={() => setOpen(false)}>
-                    Close
-                </Button> */}
             </div>
 
             {loading && (

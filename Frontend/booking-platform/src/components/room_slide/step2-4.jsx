@@ -3,6 +3,7 @@ import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import PropTypes from "prop-types";
 import { FaChevronLeft, FaTimes } from "react-icons/fa";
 import { FaLightbulb } from "react-icons/fa6";
+import axiosInstance from "../../utils/AxiosInstance";
 
 export const Step2 = ({ nextStep, prevStep }) => {
     const savedData = JSON.parse(sessionStorage.getItem("bathroomData")) || {
@@ -123,20 +124,42 @@ export const Step2 = ({ nextStep, prevStep }) => {
     );
 };
 export const Step3 = ({ nextStep, prevStep }) => {
-    const storageKey = "comfortOptions";
-    const generalOptions = ["Giá treo quần áo", "TV màn hình phẳng", "Điều hòa không khí", "Ra trải giường",
-        "Bàn làm việc", "Dịch vụ báo thức", "Khăn tắm", "Tủ hoặc phòng để quần áo",
-        "Hệ thống sưởi", "Quạt máy", "Két an toàn", "Khăn tắm/Bộ khăn trải giường (có thu phí)",
-        "Hoàn toàn nằm ở tầng trệt"
-    ]
-    const outsidesOptions = ["Ban công", "Sân hiên", "Tầm nhìn ra khung cảnh"];
-    const foodDrinkOptions = ["Ấm đun nước điện", "Máy pha trà/cà phê", "Khu vực phòng ăn", "Bàn ăn", "Lò vi sóng"];
-
-    // Load data from sessionStorage or set an empty array
+    const storageKey = "facilities";
+    const [generalOptions, setGeneralOptions] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState(() => {
         const savedSelections = sessionStorage.getItem(storageKey);
         return savedSelections ? JSON.parse(savedSelections) : [];
     });
+
+    // Fetch facilities from API
+    useEffect(() => {
+        const fetchFacilities = async () => {
+            try {
+                const response = await axiosInstance.get('/roomFacility/roomFacility-by-name');
+                const facilities = response.data.facilities.map(f => f._id);
+                setGeneralOptions(facilities);
+            } catch (error) {
+                console.error('Error fetching facilities:', error);
+                // Optionally set default facilities here
+                setGeneralOptions([
+                    "Giá treo quần áo",
+                    "TV màn hình phẳng",
+                    "Điều hòa không khí",
+                    "Ra trải giường",
+                    "Bàn làm việc",
+                    "Dịch vụ báo thức",
+                    "Khăn tắm",
+                    "Tủ hoặc phòng để quần áo",
+                    "Hệ thống sưởi",
+                    "Quạt máy",
+                    "Két an toàn",
+                    "Khăn tắm/Bộ khăn trải giường (có thu phí)",
+                    "Hoàn toàn nằm ở tầng trệt"
+                ]);
+            }
+        };
+        fetchFacilities();
+    }, []);
 
     const handleCheckboxChange = (option) => {
         const updatedSelections = selectedOptions.includes(option)
@@ -146,7 +169,6 @@ export const Step3 = ({ nextStep, prevStep }) => {
         setSelectedOptions(updatedSelections);
         sessionStorage.setItem(storageKey, JSON.stringify(updatedSelections));
     };
-
 
     return (
         <Container className="mt-4 w-50">
@@ -162,9 +184,10 @@ export const Step3 = ({ nextStep, prevStep }) => {
                             onChange={() => handleCheckboxChange(item)}
                         />
                     ))}
-
                 </div>
-                <hr />
+
+                {/* Commented out other sections */}
+                {/* <hr />
                 <div className="mt-3 mb-3">
                     <h5 className="fw-bold">Không gian ngoài trời và tầm nhìn</h5>
                     {outsidesOptions.map((item) => (
@@ -187,8 +210,7 @@ export const Step3 = ({ nextStep, prevStep }) => {
                             onChange={() => handleCheckboxChange(item)}
                         />
                     ))}
-
-                </div >
+                </div> */}
             </Card>
 
             <Row className="mt-3">
@@ -240,10 +262,10 @@ export const Step4 = ({ nextStep, prevStep }) => {
                         <Form.Group controlId="roomName">
                             <Form.Label><strong>Tên phòng</strong></Form.Label>
                             <Form.Select value={roomName} onChange={handleRoomChange}>
-                                <option value="Phòng Giường Đôi">Phòng Giường Đôi</option>
-                                <option value="Phòng Giường Đơn">Phòng Giường Đơn</option>
-                                <option value="Phòng Gia Đình">Phòng Gia Đình</option>
-                                <option value="Phòng Suite">Phòng Suite</option>
+                                <option value="Phòng giường đôi">Phòng giường đôi</option>
+                                <option value="Phòng giường đơn">Phòng giường đơn</option>
+                                <option value="Phòng giường 4 người">Phòng giường 4 người</option>
+                                <option value="Phòng 2 giường đơn">Phòng 2 giường đơn</option>
                             </Form.Select>
                         </Form.Group>
                     </Card>
