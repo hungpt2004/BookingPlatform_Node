@@ -22,6 +22,11 @@ ReservationRouter.get(
   ReservationController.getReservationByStatus
 );
 ReservationRouter.get(
+  '/detail/:reservationId',
+  protect,
+  ReservationController.getReservationDetailById
+)
+ReservationRouter.get(
   "/room/:reservationId",
   protect,
   ReservationController.getRoomByReservationId

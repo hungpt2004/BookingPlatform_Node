@@ -36,7 +36,7 @@ function App() {
         <Route path="/update-customer" element={<CustomerProfileSetting />} />
         <Route path="/feedback" element={<FeedbackPage />} />
         <Route path="/dashboard" element={<DashboardOverview />} />
-        <Route path="/receipt" element={<Receipt />}/> 
+        <Route path="/receipt/:id" element={<Receipt />}/> 
         <Route path="/monthly-owner" element={<MonthlyPayment/>}/>
       </Routes>
     </Router>

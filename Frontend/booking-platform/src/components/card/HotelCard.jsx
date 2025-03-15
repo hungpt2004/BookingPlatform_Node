@@ -30,7 +30,7 @@ const HotelCard = ({ hotel, goToDetail }) => {
   }
 
   useEffect(() => {
-      fetchRoomByHotelId()
+    fetchRoomByHotelId()
   }, [])
 
   console.log(rooms.length)
@@ -40,29 +40,38 @@ const HotelCard = ({ hotel, goToDetail }) => {
       <Row className="g-0">
         {/* Ảnh bên trái */}
         <Col md={4} className="position-relative">
-          <Card.Img
-            src={hotel.images || "default_image_url"}
-            className="img-fluid round-0 p-3"
-            style={{ objectFit: "cover", height: "100%" }}
-          />
-          <div
-            className="position-absolute w-100 h-100 top-0 start-0"
-          ></div>
-          <div
-            className="position-absolute top-0 end-0 m-4"
-            style={{
-              backdropFilter: 'blur(4px)',
-              backgroundColor: 'rgba(255, 255, 255, 0.3)',
-              padding: '8px',
-              borderRadius: '50%'
-            }}
-          >
-            <FaHeart
-              className=""
-              color={isFavorite ? "red" : "white"}
-              size={24}
-              onClick={() => addToFavorite()}
+          <div className="card-img-container" style={{
+            height: "240px",
+            overflow: "hidden",
+            position: "relative",
+            margin: "16px"
+          }}>
+            <Card.Img
+              src={hotel.images[0] || "default_image_url"}
+              className="img-fluid rounded-3"
+              style={{
+                objectFit: "cover",
+                width: "100%",
+                height: "100%",
+                position: "absolute",
+                top: "0",
+                left: "0"
+              }}
             />
+            <div className="position-absolute top-0 end-0 m-3"
+              style={{
+                backdropFilter: 'blur(4px)',
+                backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                padding: '8px',
+                borderRadius: '50%'
+              }}
+            >
+              <FaHeart
+                color={isFavorite ? "red" : "white"}
+                size={24}
+                onClick={() => addToFavorite()}
+              />
+            </div>
           </div>
         </Col>
 

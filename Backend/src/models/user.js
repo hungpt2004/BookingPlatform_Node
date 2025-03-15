@@ -22,19 +22,23 @@ const UserSchema = new Schema(
     },
     phoneNumber: {
       type: String,
+      default: "N/A"
     },
     createOn: { type: Date, default: new Date().getTime() },
     cmnd: { type: String, default: "N/A" },
     updatedAt: { type: Date, default: new Date().getTime() },
-    phone: { type: String, default: "N/A" },
+    // phone: { type: String, default: "N/A" },
     address: { type: String, default: "N/A" },
     role: {
       type: String,
       enum: ["CUSTOMER", "ADMIN", "OWNER"],
       default: "CUSTOMER",
     },
-
-    reservations: [{ type: Schema.Types.ObjectId, ref: "Reservation" }],
+    reservations: [
+      { 
+        type: Schema.Types.ObjectId, ref: "Reservation" 
+      }
+    ],
     ownedHotels: [
       {
         type: Schema.Types.ObjectId,

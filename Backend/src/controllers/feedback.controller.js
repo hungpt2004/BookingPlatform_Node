@@ -1,13 +1,14 @@
 "use strict"
+
 const Feedback = require("../models/feedback");
 const Reservation = require("../models/reservation");
 const Hotel = require('../models/hotel')
 const asyncHandler = require("../middlewares/asyncHandler");
-const axios = require('axios')
 const { FEEDBACK } = require("../utils/constantMessage");
 require('dotenv').config();
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
+//Create model
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
@@ -181,16 +182,17 @@ exports.deleteFeedback = asyncHandler(async (req, res) => {
 
 
 //get feedback by user_id
-exports.getFeedbackByUser = asyncHandler(async (req, res) => {
-
+exports.getFeedbackByUserAndReservation = asyncHandler(async (req, res) => {
   const userId = req.user.id;
+  const { reservationId } = req.params;
 
   try {
-    const feedbacks = await Feedback.find({
-      user: userId
+    const feedback = await Feedback.findOne({
+      user: userId,
+      reservation: reservationId,
     });
 
-    if (feedbacks.length <= 0) {
+    if (!feedback) {
       return res.status(404).json({
         error: true,
         message: "No feedback found for this reservation",
@@ -199,7 +201,7 @@ exports.getFeedbackByUser = asyncHandler(async (req, res) => {
 
     return res.status(200).json({
       error: false,
-      feedbacks,
+      feedback,
       message: "Feedback retrieved successfully",
     });
   } catch (error) {
@@ -214,14 +216,14 @@ exports.getFeedbackByUser = asyncHandler(async (req, res) => {
 const calculateAvgRatingHotel = async (hotelId) => {
   // Sử dụng aggregate để tính trung bình rating
   const result = await Feedback.aggregate([
-      { $match: { hotel: hotelId } }, // Lọc feedback theo hotelId
-      { 
-          $group: { 
-              _id: "$hotel", 
-              avgRating: { $avg: "$rating" }, // Tính trung bình rating
-              totalFeedbacks: { $sum: 1 } // Đếm số feedback
-          } 
+    { $match: { hotel: hotelId } }, // Lọc feedback theo hotelId
+    {
+      $group: {
+        _id: "$hotel",
+        avgRating: { $avg: "$rating" }, // Tính trung bình rating
+        totalFeedbacks: { $sum: 1 } // Đếm số feedback
       }
+    }
   ]);
 
   if (result.length === 0) return 0; // Nếu không có feedback, trả về 0
@@ -232,3 +234,30 @@ const calculateAvgRatingHotel = async (hotelId) => {
   return avgValueRating;
 };
 
+//get feedback by user_id
+exports.getFeedbackByUser = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const feedback = await Feedback.find({
+      user: userId
+    }).lean().populate("hotel");
+
+    if (!feedback) {
+      return res.status(404).json({
+        error: true,
+        message: "No feedback found for this reservation",
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      feedback,
+      message: "Feedback retrieved successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      message: "Server Error",
+    });
+  }
+});

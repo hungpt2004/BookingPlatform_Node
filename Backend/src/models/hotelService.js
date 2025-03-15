@@ -3,11 +3,6 @@ const { Schema } = mongoose;
 
 const HotelServiceSchema = new Schema(
   {
-    hotel: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Hotel",
-      required: true,
-    },
     name: {
       type: String,
       required: true,

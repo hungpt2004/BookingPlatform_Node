@@ -2,6 +2,7 @@ const asyncHandler = require("../middlewares/asyncHandler");
 const User = require("../models/user");
 const { AUTH } = require("../utils/constantMessage");
 const cloudinary = require("../utils/cloudinary");
+
 exports.getAllUser = asyncHandler(async (req, res) => {
   const users = await User.find().sort({ createOn: -1 });
 
@@ -41,7 +42,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   const updates = {};
 
   if (req.body.phone) {
-    updates.phone = req.body.phone;
+    updates.phoneNumber = req.body.phone;
   }
 
   if (req.body.address) {

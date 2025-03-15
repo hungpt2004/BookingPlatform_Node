@@ -10,6 +10,7 @@ import FeedbackModal from "../../components/feedback/FeedbackModal";
 import axiosInstance from "../../utils/AxiosInstance";
 import { useNavigate } from "react-router-dom";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
+import SquareSpinner from "../../components/animation/CustomSpinner";
 
 
 export const HistoryTransaction = () => {
@@ -301,6 +302,9 @@ export const HistoryTransaction = () => {
       );
    };
 
+   const goToReceipt = (id, user) => {
+      navigate(`/receipt/${id}`, {state: {user}});
+   }
 
    return (
       <>
@@ -323,10 +327,10 @@ export const HistoryTransaction = () => {
                </div>
             </div>
 
-            <div className="col-md-8">
+            <div className="col-md-8 mt-5">
                <div className="d-flex justify-content-center align-items-center">
                   {loading ? (
-                     <HashLoader className="mt-5" size={50} color="#6499E9" />
+                     <Spinner className="mt-5" size={50} color="#003b95" />
                   ) : (
                      <>
                         <div className="d-flex flex-column">
@@ -426,7 +430,7 @@ export const HistoryTransaction = () => {
                                              )
                                           )}
                                           <Button
-                                          onClick={() => navigate('/receipt')}
+                                          onClick={() => goToReceipt(item._id, item.user)}
                                           className="mt-1" variant="outline-dark">
                                              View Details
                                           </Button>
