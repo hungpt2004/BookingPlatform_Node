@@ -24,15 +24,16 @@ const hotelSchema = new Schema(
       type: String,
       required: true,
     },
-    status: {
-      type: String,
-      enum: ["ACTIVE", "NONACTIVE"],
-      default: "NONACTIVE",
-    },
+    services: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "HotelService",
+      },
+    ],
     facilities: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Facility",
+        ref: "HotelFacility",
       },
     ],
     rating: {

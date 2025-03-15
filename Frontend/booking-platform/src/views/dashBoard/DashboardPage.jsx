@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Card, Container, Alert, Form, InputGroup } from "react-bootstrap";
+import { Card, Container, Alert, Row, Col, Spinner, Badge, ProgressBar } from "react-bootstrap";
 import { Line } from "react-chartjs-2";
 import { Routes, Route, useParams, useNavigate } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "chart.js/auto";
 import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar";
-import { Sidebar } from "../../components/navbar/CustomeSidebar";
-import { FaBars, FaSearch } from "react-icons/fa";
-import axiosInstance from "../../utils/axiosInstance";
+import axiosInstance from "../../utils/AxiosInstance";
+import { formatCurrencyVND } from "../../utils/FormatPricePrint";
+import Sidebar from "../../components/navbar/CustomeSidebar";
 
 // Dashboard Overview Component
 const DashboardOverview = () => {
@@ -15,643 +14,332 @@ const DashboardOverview = () => {
     totalReservations: 0,
     revenue: 0,
     activeHotels: 0,
+    successBooking: 0,
     pendingBookings: 0,
     revenueData: [],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [timeRange, setTimeRange] = useState("yearly");
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // In a real app, you would fetch this data from an API
-        // For now, we'll simulate a successful API response with sample data
-        setDashboardData({
-          totalReservations: 1450,
-          revenue: 45670,
-          activeHotels: 3,
-          pendingBookings: 24,
-          revenueData: [1200, 1900, 3000, 5000, 2300, 3400],
-        });
-        setLoading(false);
+        const response = await axiosInstance("/monthly-payment");
+        if (response.data) {
+          setDashboardData({
+            totalReservations: response.data.totalReservationAmount,
+            revenue: formatCurrencyVND(response.data.totalRevenue),
+            activeHotels: response.data.activeHotel,
+            successBooking: response.data.normalReservations,
+            pendingBookings: response.data.cancelReservation,
+            revenueData: response.data.averageMonthlyRevenue,
+          });
+        }
+        setTimeout(() => {
+          setLoading(false);
+        }, 800);
       } catch (err) {
         setError("Failed to load dashboard data");
         setLoading(false);
       }
     };
-
     fetchDashboardData();
   }, []);
 
   const chartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     datasets: [
       {
         label: "Revenue",
         data: dashboardData.revenueData,
-        borderColor: "#6499E9", // Primary brand color
-        backgroundColor: "rgba(100, 153, 233, 0.1)",
+        borderColor: "#0071c2",
+        backgroundColor: "rgba(0, 113, 194, 0.1)",
         fill: true,
+        tension: 0.4,
+        pointBackgroundColor: "#0071c2",
+        pointBorderColor: "#fff",
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
       },
     ],
   };
 
-  if (loading)
-    return <div className="p-5 text-center">Loading dashboard data...</div>;
-
-  if (error)
-    return (
-      <Alert variant="danger" className="m-4">
-        {error}
-      </Alert>
-    );
-
-  return (
-    <>
-      <div className="row px-5 mx-5 mb-5 mt-4">
-        {[
-          {
-            title: "Total Reservations",
-            value: dashboardData.totalReservations.toLocaleString(),
-          },
-          {
-            title: "Revenue",
-            value: `$${dashboardData.revenue.toLocaleString()}`,
-          },
-          { title: "Active Hotels", value: dashboardData.activeHotels },
-          { title: "Pending Bookings", value: dashboardData.pendingBookings },
-        ].map((item, index) => (
-          <div key={index} className="col-md-3">
-            <Card className="shadow-lg mb-1">
-              <Card.Header
-                className="text-center text-white mb-1 fw-bold fs-5"
-                style={{ backgroundColor: "#6499E9" }}
-              >
-                {item.title}
-              </Card.Header>
-              <Card.Body style={{ backgroundColor: "#f0f9ff" }}>
-                <Card.Text className="text-center fs-4">{item.value}</Card.Text>
-              </Card.Body>
-            </Card>
-          </div>
-        ))}
-      </div>
-
-      <Container>
-        <h4 className="mb-3">Revenue Overview</h4>
-        <Line data={chartData} />
-      </Container>
-    </>
-  );
-};
-
-// Hotel Overview Component
-const HotelOverview = () => {
-  const { hotelId } = useParams();
-  const [hotelData, setHotelData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchHotelData = async () => {
-      try {
-        const sampleData = {
-          1: { name: "Grand Hotel", rooms: 120, occupancyRate: 75 },
-          2: { name: "Seaside Resort", rooms: 85, occupancyRate: 82 },
-          3: { name: "Mountain Lodge", rooms: 45, occupancyRate: 68 },
-        };
-
-        setHotelData(
-          sampleData[hotelId] || {
-            name: "Unknown Hotel",
-            rooms: 0,
-            occupancyRate: 0,
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: {
+          font: {
+            size: 14,
+            weight: 'bold'
           }
-        );
-        setLoading(false);
-      } catch (err) {
-        setError(`Failed to load hotel #${hotelId} data`);
-        setLoading(false);
-      }
-    };
-
-    fetchHotelData();
-  }, [hotelId]);
-
-  if (loading)
-    return <div className="p-5 text-center">Loading hotel data...</div>;
-
-  if (error)
-    return (
-      <Alert variant="danger" className="m-4">
-        {error}
-      </Alert>
-    );
-
-  if (!hotelData)
-    return (
-      <Alert variant="warning" className="m-4">
-        Hotel not found
-      </Alert>
-    );
-
-  const chartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    datasets: [
-      {
-        label: "Occupancy Rate %",
-        data: [65, 70, 80, 75, 85, hotelData.occupancyRate],
-        borderColor: "#9EDDFF", // Secondary brand color
-        backgroundColor: "rgba(158, 221, 255, 0.1)",
-        fill: true,
-      },
-    ],
-  };
-
-  return (
-    <div className="p-4">
-      <h3>{hotelData.name} Overview</h3>
-      <div className="row mb-4 mt-3">
-        <div className="col-md-4">
-          <Card className="shadow-sm">
-            <Card.Header
-              className="text-white"
-              style={{ backgroundColor: "#6499E9" }}
-            >
-              Rooms
-            </Card.Header>
-            <Card.Body style={{ backgroundColor: "#f0f9ff" }}>
-              <h3 className="text-center">{hotelData.rooms}</h3>
-            </Card.Body>
-          </Card>
-        </div>
-        <div className="col-md-4">
-          <Card className="shadow-sm">
-            <Card.Header
-              className="text-white"
-              style={{ backgroundColor: "#6499E9" }}
-            >
-              Occupancy Rate
-            </Card.Header>
-            <Card.Body style={{ backgroundColor: "#f0f9ff" }}>
-              <h3 className="text-center">{hotelData.occupancyRate}%</h3>
-            </Card.Body>
-          </Card>
-        </div>
-        <div className="col-md-4">
-          <Card className="shadow-sm">
-            <Card.Header
-              className="text-white"
-              style={{ backgroundColor: "#6499E9" }}
-            >
-              Active Bookings
-            </Card.Header>
-            <Card.Body style={{ backgroundColor: "#f0f9ff" }}>
-              <h3 className="text-center">
-                {Math.floor((hotelData.rooms * hotelData.occupancyRate) / 100)}
-              </h3>
-            </Card.Body>
-          </Card>
-        </div>
-      </div>
-
-      <Container>
-        <h4 className="mb-3">Occupancy Trend</h4>
-        <Line data={chartData} />
-      </Container>
-    </div>
-  );
-};
-
-// Service Management Component - Now with search and sequential IDs
-const ServiceManagement = () => {
-  const { hotelId, serviceType } = useParams();
-  const [services, setServices] = useState([]);
-  const [displayServices, setDisplayServices] = useState([]);
-  const [newService, setNewService] = useState({
-    name: "",
-    description: "",
-    price: "",
-  });
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentId, setCurrentId] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // Fetch services from API based on hotel ID
-  useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        setLoading(true);
-        const response = await axiosInstance.get(
-          `/hotel-service/get-all-hotel-services/${hotelId}`
-        );
-
-        if (response.data && response.data.hotelServices) {
-          // Filter services based on service type if needed
-          // This depends on how your backend structures the data
-          const filteredServices = response.data.hotelServices.filter(
-            (service) => service.type === serviceType || !service.type
-          );
-
-          // Assign sequential display IDs
-          const servicesWithDisplayIds = filteredServices.map(
-            (service, index) => ({
-              ...service,
-              displayId: index + 1,
-            })
-          );
-
-          setServices(servicesWithDisplayIds);
-          setDisplayServices(servicesWithDisplayIds);
         }
-
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching services:", err);
-        setError(err.response?.data?.message || "Failed to load services");
-        setLoading(false);
-      }
-    };
-
-    fetchServices();
-  }, [hotelId, serviceType]);
-
-  // Handle search functionality
-  useEffect(() => {
-    if (searchTerm.trim() === "") {
-      setDisplayServices(services);
-    } else {
-      const filtered = services.filter(
-        (service) =>
-          service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          service.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-
-      // Re-assign sequential display IDs
-      const filteredWithIds = filtered.map((service, index) => ({
-        ...service,
-        displayId: index + 1,
-      }));
-
-      setDisplayServices(filteredWithIds);
-    }
-  }, [searchTerm, services]);
-
-  // Function to update display IDs after operations
-  const updateDisplayIds = (servicesList) => {
-    return servicesList.map((service, index) => ({
-      ...service,
-      displayId: index + 1,
-    }));
-  };
-
-  const handleAddService = async () => {
-    if (newService.name.trim() === "") return;
-
-    try {
-      setLoading(true);
-
-      if (isEditing) {
-        // Update existing service
-        await axiosInstance.patch(
-          `/hotel-service/update-hotel-service/${currentId}`,
-          {
-            name: newService.name,
-            description: newService.description,
-            price: newService.price,
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleFont: {
+          size: 16,
+          weight: 'bold'
+        },
+        bodyFont: {
+          size: 14
+        },
+        padding: 12,
+        displayColors: false,
+        callbacks: {
+          label: function(context) {
+            return `Revenue: ${formatCurrencyVND(context.raw)}`;
           }
-        );
-
-        // Update the service in state
-        const updatedServices = services.map((service) =>
-          service._id === currentId
-            ? {
-                ...service,
-                name: newService.name,
-                description: newService.description,
-                price: newService.price,
-              }
-            : service
-        );
-
-        // Re-assign sequential display IDs
-        const servicesWithUpdatedIds = updateDisplayIds(updatedServices);
-
-        setServices(servicesWithUpdatedIds);
-        setDisplayServices(
-          searchTerm.trim() === ""
-            ? servicesWithUpdatedIds
-            : updateDisplayIds(
-                servicesWithUpdatedIds.filter(
-                  (service) =>
-                    service.name
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                    service.description
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase())
-                )
-              )
-        );
-
-        setSuccess("Service updated successfully");
-        setIsEditing(false);
-        setCurrentId(null);
-      } else {
-        // Add new service
-        const response = await axiosInstance.post(
-          `/hotel-service/create-hotel-service/${hotelId}`,
-          {
-            name: newService.name,
-            description: newService.description,
-            price: newService.price,
-            type: serviceType, // You might need to add this if your backend requires it
-          }
-        );
-
-        // Refresh the services list after adding
-        const updatedResponse = await axiosInstance.get(
-          `/hotel-service/get-all-hotel-services/${hotelId}`
-        );
-        const filteredServices = updatedResponse.data.hotelServices.filter(
-          (service) => service.type === serviceType || !service.type
-        );
-
-        // Re-assign sequential display IDs
-        const servicesWithDisplayIds = updateDisplayIds(filteredServices);
-
-        setServices(servicesWithDisplayIds);
-        setDisplayServices(
-          searchTerm.trim() === ""
-            ? servicesWithDisplayIds
-            : updateDisplayIds(
-                servicesWithDisplayIds.filter(
-                  (service) =>
-                    service.name
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                    service.description
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase())
-                )
-              )
-        );
-
-        setSuccess("Service added successfully");
+        }
       }
-
-      // Reset form
-      setNewService({ name: "", description: "", price: "" });
-      setLoading(false);
-
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
-      console.error("Error saving service:", err);
-      setError(err.response?.data?.message || "Failed to save service");
-      setLoading(false);
-
-      // Clear error message after 3 seconds
-      setTimeout(() => setError(null), 3000);
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: 'rgba(0, 0, 0, 0.05)'
+        },
+        ticks: {
+          callback: function(value) {
+            if (value >= 1000000) {
+              return (value / 1000000).toFixed(1) + 'M';
+            }
+            return value;
+          }
+        }
+      },
+      x: {
+        grid: {
+          display: false
+        }
+      }
     }
   };
 
-  const handleEditService = (service) => {
-    setNewService({
-      name: service.name,
-      description: service.description,
-      price: service.price,
-    });
-    setIsEditing(true);
-    setCurrentId(service._id);
-  };
+  // Calculate success rate
+  const successRate = dashboardData.totalReservations > 0 
+    ? Math.round((dashboardData.successBooking / dashboardData.totalReservations) * 100) 
+    : 0;
 
-  const handleDeleteService = async (id) => {
-    try {
-      setLoading(true);
-      await axiosInstance.delete(`/hotel-service/delete-hotel-service/${id}`);
-
-      // Update services state without the deleted item
-      const updatedServices = services.filter((service) => service._id !== id);
-
-      // Re-assign sequential display IDs
-      const servicesWithUpdatedIds = updateDisplayIds(updatedServices);
-
-      setServices(servicesWithUpdatedIds);
-      setDisplayServices(
-        searchTerm.trim() === ""
-          ? servicesWithUpdatedIds
-          : updateDisplayIds(
-              servicesWithUpdatedIds.filter(
-                (service) =>
-                  service.name
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase()) ||
-                  service.description
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase())
-              )
-            )
-      );
-
-      setSuccess("Service deleted successfully");
-      setLoading(false);
-
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
-      console.error("Error deleting service:", err);
-      setError(err.response?.data?.message || "Failed to delete service");
-      setLoading(false);
-
-      // Clear error message after 3 seconds
-      setTimeout(() => setError(null), 3000);
-    }
-  };
-
-  const capitalizedServiceType =
-    serviceType.charAt(0).toUpperCase() + serviceType.slice(1);
-
-  return (
-    <div className="p-4">
-      <h3>
-        {capitalizedServiceType} Management for Hotel #{hotelId}
-      </h3>
-
-      {success && <Alert variant="success">{success}</Alert>}
-      {error && <Alert variant="danger">{error}</Alert>}
-
-      <Card className="mb-4">
-        <Card.Header
-          className="text-white"
-          style={{ backgroundColor: "#6499E9" }}
-        >
-          {isEditing
-            ? `Edit ${capitalizedServiceType}`
-            : `Add New ${capitalizedServiceType}`}
-        </Card.Header>
-        <Card.Body style={{ backgroundColor: "#f0f9ff" }}>
-          <div className="row g-3">
-            <div className="col-md-4">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Name"
-                value={newService.name}
-                onChange={(e) =>
-                  setNewService({ ...newService, name: e.target.value })
-                }
-                disabled={loading}
-              />
-            </div>
-            <div className="col-md-4">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Description"
-                value={newService.description}
-                onChange={(e) =>
-                  setNewService({ ...newService, description: e.target.value })
-                }
-                disabled={loading}
-              />
-            </div>
-            <div className="col-md-2">
-              <input
-                type="number"
-                className="form-control"
-                placeholder="Price"
-                value={newService.price}
-                onChange={(e) =>
-                  setNewService({ ...newService, price: e.target.value })
-                }
-                disabled={loading}
-              />
-            </div>
-            <div className="col-md-2">
-              <button
-                className="w-100 text-white"
-                style={{
-                  backgroundColor: isEditing ? "#4a86d1" : "#6499E9",
-                  border: "none",
-                  padding: "8px",
-                  borderRadius: "4px",
-                }}
-                onClick={handleAddService}
-                disabled={loading}
-              >
-                {loading ? "Processing..." : isEditing ? "Update" : "Add"}
-              </button>
-            </div>
-          </div>
-        </Card.Body>
-      </Card>
-
-      {/* Search Box */}
-      <div className="mb-4">
-        <InputGroup>
-          <InputGroup.Text
-            style={{ backgroundColor: "#6499E9", color: "white" }}
-          >
-            <FaSearch />
-          </InputGroup.Text>
-          <Form.Control
-            placeholder={`Search ${capitalizedServiceType}...`}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            disabled={loading}
-          />
-        </InputGroup>
+  if (loading) return (
+    <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+      <div className="text-center">
+        <Spinner animation="border" variant="primary" style={{ width: "3rem", height: "3rem" }} />
+        <p className="mt-3">Loading dashboard data...</p>
       </div>
-
-      {loading && <div className="text-center p-3">Loading services...</div>}
-
-      <table className="table table-hover">
-        <thead style={{ backgroundColor: "#6499E9", color: "white" }}>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Price</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {displayServices.map((service) => (
-            <tr key={service._id} style={{ backgroundColor: "#f0f9ff" }}>
-              <td>{service.displayId}</td>
-              <td>{service.name}</td>
-              <td>{service.description}</td>
-              <td>${service.price}</td>
-              <td>
-                <button
-                  className="btn btn-sm me-2 text-white"
-                  style={{ backgroundColor: "#4a86d1" }}
-                  onClick={() => handleEditService(service)}
-                  disabled={loading}
-                >
-                  Edit
-                </button>
-                <button
-                  className="btn btn-sm text-white"
-                  style={{ backgroundColor: "#ff6b6b" }}
-                  onClick={() => handleDeleteService(service._id)}
-                  disabled={loading}
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-          {displayServices.length === 0 && !loading && (
-            <tr>
-              <td colSpan="5" className="text-center">
-                {searchTerm
-                  ? `No ${serviceType} found matching '${searchTerm}'`
-                  : `No ${serviceType} found`}
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
     </div>
   );
-};
-
-// Main Dashboard Page Component
-const DashboardPage = () => {
-  const [sidebarWidth, setSidebarWidth] = useState(300);
+  
+  if (error) return <Alert variant="danger" className="m-4">{error}</Alert>;
 
   return (
     <div className="d-flex">
-      {/* Sidebar */}
-      <Sidebar width={sidebarWidth} setWidth={setSidebarWidth} />
-
-      <div
-        className="content flex-grow-1"
-        style={{
-          marginLeft: sidebarWidth,
-          transition: "margin-left 0.3s",
-          backgroundColor: "#ffffff", // Clean white background for main content
-        }}
-      >
+      <Sidebar />
+      <div className="content w-100">
         <AdminCustomNavbar />
+        <div className="container-fluid px-4 py-3">
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 className="mb-0 fw-bold">Dashboard Overview</h2>
+              <p className="text-muted">Welcome to your hotel management dashboard</p>
+            </div>
+            <div className="d-flex gap-2">
+              <select 
+                className="form-select form-select-sm" 
+                value={timeRange}
+                onChange={(e) => setTimeRange(e.target.value)}
+                style={{ width: "120px" }}
+              >
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+              <button className="btn btn-sm btn-outline-primary">
+                <i className="bi bi-download me-1"></i> Export
+              </button>
+            </div>
+          </div>
 
-        {/* Nested Routes */}
-        <Routes>
-          <Route path="/" element={<DashboardOverview />} />
-          <Route path="/hotels/:hotelId" element={<HotelOverview />} />
-          <Route
-            path="/hotels/:hotelId/services/:serviceType"
-            element={<ServiceManagement />}
-          />
-        </Routes>
+          <Row className="g-4 mb-4">
+            <Col lg={3} md={6}>
+              <Card className="h-100 border-0 shadow-sm">
+                <Card.Body className="p-4">
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <div className="text-muted">Total Reservations</div>
+                    <div className="rounded-circle d-flex align-items-center justify-content-center" 
+                      style={{ width: "40px", height: "40px", backgroundColor: "rgba(0, 113, 194, 0.1)" }}>
+                      <i className="bi bi-calendar-check fs-5 text-primary"></i>
+                    </div>
+                  </div>
+                  <h3 className="fw-bold mb-0">{dashboardData.totalReservations}</h3>
+                  <div className="d-flex align-items-center mt-3">
+                    <span className="badge bg-success me-2">+5.2%</span>
+                    <small className="text-muted">from last period</small>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+            
+            <Col lg={3} md={6}>
+              <Card className="h-100 border-0 shadow-sm">
+                <Card.Body className="p-4">
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <div className="text-muted">Total Revenue</div>
+                    <div className="rounded-circle d-flex align-items-center justify-content-center" 
+                      style={{ width: "40px", height: "40px", backgroundColor: "rgba(25, 135, 84, 0.1)" }}>
+                      <i className="bi bi-currency-dollar fs-5 text-success"></i>
+                    </div>
+                  </div>
+                  <h3 className="fw-bold mb-0">{dashboardData.revenue}</h3>
+                  <div className="d-flex align-items-center mt-3">
+                    <span className="badge bg-success me-2">+8.4%</span>
+                    <small className="text-muted">from last period</small>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+            
+            <Col lg={3} md={6}>
+              <Card className="h-100 border-0 shadow-sm">
+                <Card.Body className="p-4">
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <div className="text-muted">Success Bookings</div>
+                    <div className="rounded-circle d-flex align-items-center justify-content-center" 
+                      style={{ width: "40px", height: "40px", backgroundColor: "rgba(13, 110, 253, 0.1)" }}>
+                      <i className="bi bi-check-circle fs-5 text-primary"></i>
+                    </div>
+                  </div>
+                  <h3 className="fw-bold mb-0">{dashboardData.successBooking}</h3>
+                  <div className="mt-3">
+                    <ProgressBar now={successRate} variant="primary" className="mb-2" style={{ height: "6px" }} />
+                    <small className="text-muted">{successRate}% success rate</small>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+            
+            <Col lg={3} md={6}>
+              <Card className="h-100 border-0 shadow-sm">
+                <Card.Body className="p-4">
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <div className="text-muted">Pending Bookings</div>
+                    <div className="rounded-circle d-flex align-items-center justify-content-center" 
+                      style={{ width: "40px", height: "40px", backgroundColor: "rgba(255, 193, 7, 0.1)" }}>
+                      <i className="bi bi-hourglass-split fs-5 text-warning"></i>
+                    </div>
+                  </div>
+                  <h3 className="fw-bold mb-0">{dashboardData.pendingBookings}</h3>
+                  <div className="d-flex align-items-center mt-3">
+                    <Badge bg={dashboardData.pendingBookings > 10 ? "warning" : "success"} className="me-2">
+                      {dashboardData.pendingBookings > 10 ? "Needs Attention" : "Normal"}
+                    </Badge>
+                    <small className="text-muted">
+                      {dashboardData.pendingBookings > 10 ? "Higher than usual" : "Within normal range"}
+                    </small>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          <Row className="mb-4">
+            <Col>
+              <Card className="border-0 shadow-sm">
+                <Card.Body className="p-4">
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h5 className="fw-bold mb-0">Revenue Overview</h5>
+                    <div className="btn-group btn-group-sm">
+                      <button className="btn btn-outline-secondary active">Monthly</button>
+                      <button className="btn btn-outline-secondary">Quarterly</button>
+                      <button className="btn btn-outline-secondary">Yearly</button>
+                    </div>
+                  </div>
+                  <div style={{ height: "350px" }}>
+                    <Line data={chartData} options={chartOptions} />
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          <Row className="g-4">
+            <Col lg={6}>
+              <Card className="border-0 shadow-sm h-100">
+                <Card.Body className="p-4">
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h5 className="fw-bold mb-0">Active Hotels</h5>
+                    <Badge bg="primary" pill>{dashboardData.activeHotels}</Badge>
+                  </div>
+                  <div className="table-responsive">
+                    <table className="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>Hotel Name</th>
+                          <th>Location</th>
+                          <th>Status</th>
+                          <th>Occupancy</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Grand Hotel</td>
+                          <td>Ho Chi Minh City</td>
+                          <td><Badge bg="success">Active</Badge></td>
+                          <td>87%</td>
+                        </tr>
+                        <tr>
+                          <td>Seaside Resort</td>
+                          <td>Da Nang</td>
+                          <td><Badge bg="success">Active</Badge></td>
+                          <td>92%</td>
+                        </tr>
+                        <tr>
+                          <td>Mountain View</td>
+                          <td>Da Lat</td>
+                          <td><Badge bg="success">Active</Badge></td>
+                          <td>78%</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+            
+            <Col lg={6}>
+              <Card className="border-0 shadow-sm h-100">
+                <Card.Body className="p-4">
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h5 className="fw-bold mb-0">Recent Activities</h5>
+                    <button className="btn btn-sm btn-link">View All</button>
+                  </div>
+                  <div className="timeline">
+                    {[
+                      { time: "2 hours ago", text: "New booking received for Grand Hotel", type: "success" },
+                      { time: "5 hours ago", text: "Payment confirmed for reservation #38291", type: "primary" },
+                      { time: "Yesterday", text: "Booking canceled for Mountain View Hotel", type: "danger" },
+                      { time: "2 days ago", text: "New hotel added to the system", type: "info" },
+                    ].map((activity, index) => (
+                      <div key={index} className="d-flex mb-3">
+                        <div className={`bg-${activity.type} rounded-circle me-3`} style={{ width: "10px", height: "10px", marginTop: "6px" }}></div>
+                        <div>
+                          <div className="fw-medium">{activity.text}</div>
+                          <div className="text-muted small">{activity.time}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        </div>
       </div>
     </div>
   );
 };
 
-export default DashboardPage;
+export default DashboardOverview;

@@ -17,6 +17,8 @@ const path = require("path");
 const fs = require("fs");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
+const MonthlyRouter = require("./src/routes/monthlypayment.route");
+const PDFRouter = require("./src/routes/pdf.route");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Hỗ trợ dữ liệu form-urlencoded
@@ -24,7 +26,7 @@ app.use(fileupload({ useTempFiles: true }));
 app.use(cookieParser());
 
 //Cors setting
-const allowedOrigins = ["http://localhost:5173", "https://mywebsite.com"];
+const allowedOrigins = ["http://localhost:5173"];
 
 app.use(
   cors({
@@ -80,6 +82,12 @@ app.use("/bed", BedRouter);
 
 //Hotel Service
 app.use("/hotel-service", HotelServiceRouter);
+
+//Monthly Payment
+app.use("/monthly-payment", MonthlyRouter)
+
+//PDF
+app.use("/pdf", PDFRouter)
 
 //Connect Mongo Config
 connectDB();

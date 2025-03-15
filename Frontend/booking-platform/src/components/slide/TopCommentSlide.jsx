@@ -7,7 +7,7 @@ import axios from 'axios';
 import { BASE_URL } from '../../utils/Constant';
 import { formatDate } from '../../utils/FormatDatePrint';
 import { renderStarIcon } from '../../utils/RenderPersonIcon';
-import { Card } from 'react-bootstrap';
+import { Card, Image } from 'react-bootstrap';
 
 export const TopCommentSlide = () => {
 
@@ -52,11 +52,11 @@ export const TopCommentSlide = () => {
                      <Card className='border-0 cursor-pointer mb-5'>
                         <div className='d-flex justify-content-center align-items-center mb-4'>
                            <div style={{ width: '100px', height: '100px', borderRadius: '50%' }}>
-                              {/* <Image
-                                 src={item.user.image?.url}
+                              <Image
+                                 src={item?.user?.image?.url || "/hotel/travel2.jpg"}
                                  fluid
                                  style={{ objectFit: 'cover', borderRadius: '50%' }}
-                              /> */}
+                              />
                            </div>
                         </div>
                         <Card.Title className='text-center'>{item.user.name}</Card.Title>

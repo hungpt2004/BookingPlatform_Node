@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Spinner, Alert, Table, Badge, DropdownButton, Dropdown } from "react-bootstrap";
+import { Button, Spinner, Alert, Badge, DropdownButton, Dropdown } from "react-bootstrap";
 import axiosInstance from "../../utils/AxiosInstance";
 import axios from "axios";
 import { BASE_URL } from "../../utils/Constant";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 import { renderPersonIcon } from "../../utils/RenderPersonIcon";
 import dayjs from "dayjs";
+import { Table, Select, Spin } from 'antd';
+const { Option } = Select;
 
 const Booking = ({
     setOpen,
@@ -160,9 +162,9 @@ const Booking = ({
 
         const hotelTotalPrice = currentHotel.pricePerNight * nightTotal;
 
-        if(roomTotalPrice > 0) {
+        if (roomTotalPrice > 0) {
             return roomTotalPrice + hotelTotalPrice
-        } 
+        }
         return roomTotalPrice;
     };
 
@@ -262,57 +264,67 @@ const Booking = ({
 
             {!loading && !error && (
                 <div className="table-responsive">
-
-                    <Table striped bordered className="align-middle">
-                        <thead>
-                            <tr className="text-center fs-4 bg-primary">
-                                <th>Accomodation Type</th>
-                                <th>Capacity</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {rooms.map((room, index) => (
-                                <tr key={index}>
-                                    <td>
-                                        <div>
-                                            <p className="text-decoration-underline text-primary fw-bold fs-5 cursor-pointer">{room.type}</p>
-                                            <p className="text-danger fw-bold">
-                                                Each room have {quantity && room._id in quantity ? quantity[room._id] : "N/A"} beds on our site
-                                            </p>
-                                            <p>{quantity && room._id in quantity ? quantity[room._id] : "N/A"} {loadingBeds ? <Spinner animation="border" size="sm" /> : bed[index]?.name || "N/A"}</p>
-                                        </div>
-                                    </td>
-                                    <td className="text-center">{renderPersonIcon(room.capacity)}</td>
-                                    <td className="text-center">{(formatCurrencyVND(room.price))}</td>
-                                    <td>
-                                        <div className="d-flex align-items-center justify-content-center">
-                                            <DropdownButton
-                                                className="rounded-0"
-                                                variant="outline-dark"
-                                                id={`dropdown-room-${index}`}
-                                                aria-placeholder="Select quantity"
-                                                title={selectedRooms[room._id] ?? 0}
-                                                onSelect={(eventKey) =>
-                                                    setSelectedRooms((prev) => ({
-                                                        ...prev,
-                                                        [room._id]: parseInt(eventKey),
-                                                    }))
-                                                }
-                                            >
-                                                {Array.from({ length: room.quantity + 1 }, (_, i) => i).map((num) => (
-                                                    <Dropdown.Item key={num} eventKey={num}>
-                                                        {num}
-                                                    </Dropdown.Item>
-                                                ))}
-                                            </DropdownButton>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
+                    <Table
+                        bordered
+                        dataSource={rooms}
+                        rowKey="_id"
+                        pagination={false}
+                        columns={[
+                            {
+                                title: 'Accommodation Type',
+                                dataIndex: 'type',
+                                key: 'type',
+                                render: (text, record, index) => (
+                                    <div>
+                                        <p className="text-decoration-underline text-primary fw-bold fs-6 cursor-pointer">{text}</p>
+                                        <p className="text-danger fw-bold">
+                                            Each room has {quantity?.[record._id] ?? "N/A"} beds on our site
+                                        </p>
+                                        <p>
+                                            {quantity?.[record._id] ?? "N/A"} {loadingBeds ? <Spin size="small" /> : bed[index]?.name || "N/A"}
+                                        </p>
+                                    </div>
+                                ),
+                            },
+                            {
+                                title: 'Capacity',
+                                dataIndex: 'capacity',
+                                key: 'capacity',
+                                align: 'center',
+                                render: (capacity) => renderPersonIcon(capacity),
+                            },
+                            {
+                                title: 'Price',
+                                dataIndex: 'price',
+                                key: 'price',
+                                align: 'center',
+                                render: (price) => formatCurrencyVND(price),
+                            },
+                            {
+                                title: 'Quantity',
+                                key: 'quantity',
+                                align: 'center',
+                                render: (_, record) => (
+                                    <Select
+                                        value={selectedRooms[record._id] ?? 0}
+                                        onChange={(value) =>
+                                            setSelectedRooms((prev) => ({
+                                                ...prev,
+                                                [record._id]: parseInt(value),
+                                            }))
+                                        }
+                                        style={{ width: 80 }}
+                                    >
+                                        {Array.from({ length: record.quantity + 1 }, (_, i) => (
+                                            <Option key={i} value={i}>
+                                                {i}
+                                            </Option>
+                                        ))}
+                                    </Select>
+                                ),
+                            },
+                        ]}
+                    />
                 </div>
             )}
 
@@ -329,7 +341,7 @@ const Booking = ({
                 <Button
                     variant="primary"
                     onClick={handleContinueBooking}
-                    disabled={(Object.keys(selectedRooms).length === 0 || calculateTotalPrice() <= 0)|| validDate}
+                    disabled={(Object.keys(selectedRooms).length === 0 || calculateTotalPrice() <= 0) || validDate}
                     size="lg"
                 >
                     Continue

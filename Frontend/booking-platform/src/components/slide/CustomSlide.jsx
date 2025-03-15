@@ -1,5 +1,5 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Button, Card, Container } from 'react-bootstrap';
+import { Button, Card, Container, Spinner } from 'react-bootstrap';
 import 'swiper/css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -8,6 +8,7 @@ import { RatingConsider } from '../../utils/RatingConsider';
 import { formatCurrencyVND } from '../../utils/FormatPricePrint';
 import { delay, disableInstantTransitions } from 'framer-motion';
 import { useNavigate, useNavigation } from 'react-router-dom';
+import { FaMapMarkerAlt, FaBed, FaHeart, FaThumbsUp } from "react-icons/fa";
 
 const CustomSlide = () => {
    const [hotels, setHotels] = useState([]);
@@ -71,7 +72,9 @@ const CustomSlide = () => {
          <h1 className='text-center fw-bold mt-5'>Top Ranking Hotels In Travelofy</h1>
          {error && <p className="text-danger text-center">{error}</p>}
          {loading ? (
-            <p className="text-center">Loading...</p>
+            <div className="d-flex flex-column justify-content-center align-items-center">
+               <Spinner size="30" style={{ color: '#003b95' }} />
+            </div>
          ) : (
             <Swiper
                className='p-5 mt-5'
@@ -85,13 +88,39 @@ const CustomSlide = () => {
             >
                {hotels.map((item, index) => (
                   <SwiperSlide key={index}>
-                     <Card className='shadow-lg mb-2 bg-body-tertiary rounded-0'>
-                        <Card.Img
-                           variant='top'
-                           className="object-fit-cover rounded-0"
-                           src={item.images?.[0] || '/hotel/default.jpg'} // ✅ Fix lỗi ảnh
-                           alt="Hotel"
-                        />
+                     <Card className='shadow-lg mb-2 bg-body-tertiary rounded-4'>
+                        <div className="card-img-container" style={{
+                           height: "240px",
+                           overflow: "hidden",
+                           position: "relative",
+                           margin: "16px"
+                        }}>
+                           <Card.Img
+                              src={item.images[0] || "default_image_url"}
+                              className="img-fluid rounded-3"
+                              style={{
+                                 objectFit: "cover",
+                                 width: "100%",
+                                 height: "100%",
+                                 position: "absolute",
+                                 top: "0",
+                                 left: "0"
+                              }}
+                           />
+                           <div className="position-absolute top-0 end-0 m-3"
+                              style={{
+                                 backdropFilter: 'blur(4px)',
+                                 backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                                 padding: '8px',
+                                 borderRadius: '50%'
+                              }}
+                           >
+                              <FaHeart
+                                 color={"white"}
+                                 size={24}
+                              />
+                           </div>
+                        </div>
                         <Card.Body>
                            <Card.Title className='fs-4 title text-start fw-bold' style={{
                               display: '-webkit-box',

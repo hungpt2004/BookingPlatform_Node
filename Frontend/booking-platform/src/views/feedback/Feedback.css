@@ -1,0 +1,169 @@
+/* FeedbackPage.css */
+
+:root {
+   --primary: #003b95;       /* Màu chủ đạo */
+   --primary-light: #0d4eab; /* Màu nhạt hơn một chút */
+   --primary-lighter: #1961c2; /* Màu nhạt hơn nữa */
+   --primary-lightest: #2674d9; /* Màu nhạt */
+   --primary-ultra-light: #3387ef; /* Màu rất nhạt */
+   --primary-bg: #e6f0ff;    /* Nền nhạt */
+   --warning: #ffc107;
+   --danger: #dc3545;
+   --white: #ffffff;
+   --light-gray: #f8f9fa;
+   --medium-gray: #e9ecef;
+   --dark-gray: #6c757d;
+ }
+ 
+ /* Card styling */
+ .feedback-card {
+   border: none;
+   box-shadow: 0 4px 15px rgba(0, 59, 149, 0.1);
+   border-radius: 12px;
+   overflow: hidden;
+ }
+ 
+ .feedback-header {
+   background-color: var(--white);
+   border-bottom: 2px solid var(--primary-bg);
+   padding: 1.5rem;
+ }
+ 
+ .feedback-title {
+   color: var(--primary);
+   font-weight: 600;
+ }
+ 
+ /* Table styling */
+ .feedback-table {
+   margin-bottom: 0;
+   border-collapse: separate;
+   border-spacing: 0;
+ }
+ 
+ .feedback-table thead tr {
+   background-color: var(--light-gray);
+ }
+ 
+ .feedback-table th {
+   border: none;
+   font-weight: 600;
+   color: var(--primary);
+   padding: 1rem;
+ }
+ 
+ .feedback-table td {
+   border-top: 1px solid var(--medium-gray);
+   border-bottom: none;
+   padding: 1rem;
+   vertical-align: middle;
+ }
+ 
+ .feedback-table tbody tr {
+   transition: all 0.2s;
+ }
+ 
+ .feedback-table tbody tr:hover {
+   background-color: var(--primary-bg);
+ }
+ 
+ /* Column widths */
+ .hotel-column {
+   width: 20%;
+ }
+ 
+ .content-column {
+   width: 45%;
+ }
+ 
+ .rating-column {
+   width: 15%;
+ }
+ 
+ .actions-column {
+   width: 20%;
+ }
+ 
+ /* Cell content styling */
+ .hotel-name {
+   font-weight: 500;
+   color: var(--primary);
+ }
+ 
+ .feedback-content {
+   font-size: 0.95rem;
+   color: #333;
+   max-width: 400px;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+ }
+ 
+ /* Star rating styling */
+ .star-icon {
+   font-size: 1rem;
+ }
+ 
+ .star-icon.filled {
+   color: #ffc107;
+ }
+ 
+ .star-icon.empty {
+   color: #d3d3d3;
+ }
+ 
+ .rating-number {
+   font-size: 0.85rem;
+   color: var(--dark-gray);
+   align-self: center;
+ }
+ 
+ /* Button styling */
+ .action-buttons {
+   display: flex;
+   gap: 8px;
+ }
+ 
+ .btn-action {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 5px;
+   padding: 6px 12px;
+   border-radius: 6px;
+   transition: all 0.2s;
+   font-size: 0.85rem;
+ }
+ 
+ .edit-btn {
+   border-color: var(--warning);
+   color: var(--warning);
+ }
+ 
+ .edit-btn:hover {
+   background-color: var(--warning);
+   color: var(--white);
+ }
+ 
+ .delete-btn {
+   border-color: var(--danger);
+   color: var(--danger);
+ }
+ 
+ .delete-btn:hover {
+   background-color: var(--danger);
+   color: var(--white);
+ }
+ 
+ /* Pagination styling */
+ .custom-pagination {
+   margin-bottom: 0;
+ }
+ 
+ .custom-pagination .page-link {
+   color: var(--primary);
+   border-color: var(--primary-bg);
+   margin: 0 3px;
+   border-radius: 4px;
+ }
+ 

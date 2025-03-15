@@ -5,7 +5,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import axios from "axios";
 import { BASE_URL } from "../../utils/Constant";
-import { Card, Col, Container, Image, ListGroup, ListGroupItem, Row, Spinner, Carousel, Modal, Placeholder, ProgressBar } from "react-bootstrap";
+import { Button, Card, Col, Container, Image, ListGroup, ListGroupItem, Row, Spinner, Carousel, Modal, Placeholder, ProgressBar, Alert } from "react-bootstrap";
 import { MdLocationPin } from "react-icons/md";
 import "swiper/css/navigation";
 import Rating from "../../components/animation/HotelRating";
@@ -14,7 +14,10 @@ import './HotelDetailPage.css'
 import { RatingConsider } from "../../utils/RatingConsider";
 import Booking from "../../views/booking/BookingPage";
 import CustomInput from "../../components/input/CustomInput";
-
+import './HotelDetailPage.css'
+import { FaConciergeBell } from "react-icons/fa";
+import { FaImages } from "react-icons/fa";
+import { FaMapMarkerAlt, FaCommentAlt, FaStar, FaInfoCircle, FaCalendarCheck } from "react-icons/fa";
 
 const dataFacility = [
    "Wi-Fi miễn phí",
@@ -230,121 +233,214 @@ export const HotelDetailPage = () => {
                      <span className="fw-bold" style={{ color: '#6499E9' }}>Show on Map</span>
                   </p>
 
-                  <Row>
-                     <Col xs={10} className="">
+                  <Row className="mt-4">
+                     {/* Phần hình ảnh - chiếm 60% */}
+                     <Col lg={6} md={12}>
                         {currentHotel?.images?.length > 0 ? (
-                           <>
+                           <div className="hotel-gallery">
+                              {/* Ảnh chính lớn */}
                               <motion.div
-                                 className="d-flex justify-content-center"
-                                 style={{ marginBottom: '20px' }}
-                                 initial={{ scale: 0 }}
-                                 animate={{ scale: 1 }}
-                                 transition={{ duration: 0.8 }}
+                                 className="main-image-container mb-3"
+                                 initial={{ opacity: 0 }}
+                                 animate={{ opacity: 1 }}
+                                 transition={{ duration: 0.5 }}
                               >
-                                 <Card className="w-100 p-2">
-                                    {loading ? (
-                                       <Placeholder as="div" animation="glow">
-                                          <Placeholder xs={12} style={{ height: '400px', backgroundColor: '#ddd' }} />
-                                       </Placeholder>
-                                    ) : (
-                                       <Image
-                                          src={currentHotel.images[0]}
-                                          className="img-fluid rounded"
-                                          style={{
-                                             objectFit: 'cover',
-                                             width: '100%',
-                                             maxHeight: '400px',
-                                             borderRadius: '10px',
-                                             transition: 'transform 0.3s',
-                                          }}
-                                          onError={(e) => (e.target.src = '/fallback-image.jpg')}
-                                          onClick={() => handleShowModalImage(currentHotel.images[0])}
-                                       />
-                                    )}
-                                 </Card>
+                                 {loading ? (
+                                    <Placeholder as="div" animation="glow">
+                                       <Placeholder xs={12} style={{ height: '350px', backgroundColor: '#eee', borderRadius: '12px' }} />
+                                    </Placeholder>
+                                 ) : (
+                                    <Image
+                                       src={currentHotel.images[0]}
+                                       className="main-hotel-image"
+                                       style={{
+                                          objectFit: 'cover',
+                                          width: '100%',
+                                          height: '350px',
+                                          borderRadius: '12px',
+                                          boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                                          transition: 'transform 0.3s',
+                                          cursor: 'pointer'
+                                       }}
+                                       onError={(e) => (e.target.src = '/fallback-image.jpg')}
+                                       onClick={() => handleShowModalImage(currentHotel.images[0])}
+                                    />
+                                 )}
                               </motion.div>
 
-                              <Row>
-                                 <Card className="p-2 border-none">
-                                    <Swiper
-                                       slidesPerView={4}
-                                       spaceBetween={5}
-                                    >
-                                       {currentHotel.images.map((item, index) => (
-                                          <SwiperSlide key={index}>
-                                             <div className="d-flex justify-content-center">
-                                                <motion.div
-                                                   whileHover={{ scale: 1.02 }}
-                                                   className="img-container"
-                                                >
-                                                   {loading
-                                                      ? (
-                                                         <Placeholder as="div" animation="glow">
-                                                            <Placeholder xs={12} style={{ height: '400px', backgroundColor: '#ddd' }} />
-                                                         </Placeholder>
-                                                      )
-                                                      : (
-                                                         <Image
-                                                            src={item}
-                                                            className="img-fluid"
-                                                            style={{
-                                                               objectFit: 'cover',
-                                                               width: '100%',
-                                                               marginBottom: '10px',
-                                                               borderRadius: '5px',
-                                                            }}
-                                                            onError={(e) => (e.target.src = '/fallback-image.jpg')}
-                                                            onClick={() => handleShowModalImage(item)}
-                                                         />
-                                                      )
-                                                   }
-                                                </motion.div>
-                                             </div>
-                                          </SwiperSlide>
-                                       ))}
-                                    </Swiper>
-                                 </Card>
+                              {/* Grid ảnh phụ */}
+                              <Row className="g-2 thumbnail-container">
+                                 {currentHotel.images.slice(1, 5).map((item, index) => (
+                                    <Col key={index} xs={3}>
+                                       <motion.div
+                                          className="thumbnail-wrapper"
+                                          whileHover={{ scale: 1.05 }}
+                                          transition={{ duration: 0.2 }}
+                                       >
+                                          {loading ? (
+                                             <Placeholder as="div" animation="glow">
+                                                <Placeholder xs={12} style={{ height: '80px', backgroundColor: '#eee', borderRadius: '8px' }} />
+                                             </Placeholder>
+                                          ) : (
+                                             <Image
+                                                src={item}
+                                                className="thumbnail-image"
+                                                style={{
+                                                   objectFit: 'cover',
+                                                   width: '100%',
+                                                   height: '80px',
+                                                   borderRadius: '8px',
+                                                   boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+                                                   cursor: 'pointer'
+                                                }}
+                                                onError={(e) => (e.target.src = '/fallback-image.jpg')}
+                                                onClick={() => handleShowModalImage(item)}
+                                             />
+                                          )}
+                                       </motion.div>
+                                    </Col>
+                                 ))}
                               </Row>
-                           </>
+
+                              {/* Xem thêm ảnh */}
+                              {currentHotel.images.length > 5 && (
+                                 <div className="more-images mt-3">
+                                    <Button
+                                       variant="outline-primary"
+                                       size="sm"
+                                       className="view-more-images"
+                                       onClick={() => handleShowGalleryModal()}
+                                    >
+                                       <FaImages className="me-1" />
+                                       View all {currentHotel.images.length} photos
+                                    </Button>
+                                 </div>
+                              )}
+                           </div>
                         ) : (
-                           <p>No images available</p>
+                           <div className="no-images-container p-5 text-center bg-light rounded">
+                              <FaImage size={40} className="text-secondary mb-3" />
+                              <p className="text-secondary">No images available</p>
+                           </div>
                         )}
                      </Col>
 
-                     <Col>
-                        <Card>
-                           <ListGroup>
-                              <ListGroupItem className="d-flex justify-content-end align-items-center">
-                                 {RatingConsider(currentHotel.rating)}
-                                 <Card
-                                    style={{ backgroundColor: '#003b95' }}
-                                    className="mx-2">
-                                    <Card.Text className="px-3 py-2 text-center text-light">{currentHotel.rating}</Card.Text>
-                                 </Card>
-                              </ListGroupItem>
-                           </ListGroup>
+                     {/* Phần thông tin chi tiết - chiếm 40% */}
+                     <Col lg={6} md={12}>
+                        <Card className="hotel-details-card h-100 border-0 shadow-sm">
+                           <Card.Header className="bg-white border-bottom-0 pt-3">
+                              <div className="d-flex justify-content-between align-items-center mb-3">
+                                 <h3 className="hotel-name mb-0">{currentHotel.hotelName}</h3>
+                                 <div className="d-flex align-items-center">
+                                    <div className="rating-label me-2">
+                                       {RatingConsider(currentHotel.rating)}
+                                    </div>
+                                    <div className="rating-badge" style={{ backgroundColor: '#003b95' }}>
+                                       <span className="rating-score">{currentHotel.rating}</span>
+                                    </div>
+                                 </div>
+                              </div>
+                              <p className="hotel-location text-secondary mb-0">
+                                 <FaMapMarkerAlt className="me-1" />
+                                 {currentHotel.location}
+                              </p>
+                           </Card.Header>
+
                            <Card.Body>
-                              <Card.Text className="fw-bold">Visitors like what?</Card.Text>
-                              <Carousel indicators={false} interval={5000}>
-                                 {listFeedback.map((feedback) => (
-                                    <Carousel.Item key={feedback.id}>
-                                       <div className="row justify-content-center text-center mb-3">
-                                          <h6 className="mb-1">"{feedback.content}"</h6>
-                                          <Rating rating={feedback.rating} />
-                                       </div>
-                                       <div className="d-flex justify-content-center align-items-center">
-                                          <img
-                                             src={feedback.user.avatar}
-                                             alt={feedback.user.name}
-                                             className="rounded-circle me-2"
-                                             style={{ width: "40px", height: "40px" }}
-                                          />
-                                          <p className="align-content-center" style={{ fontSize: '12px' }}>{feedback.user.name}</p>
-                                       </div>
-                                    </Carousel.Item>
-                                 ))}
-                              </Carousel>
+                              <div className="mb-4">
+                                 <h5 className="section-title">
+                                    <FaCommentAlt className="me-2" />
+                                    Visitors Reviews
+                                 </h5>
+                                 {listFeedback.length <= 0 ? (
+                                    <Alert className="alert-warning text-center">No have any feedback</Alert>
+                                 ) : (
+                                    <div className="reviews-carousel p-2">
+                                       <Carousel indicators={false} controls={true} interval={2000}>
+                                          {listFeedback.map((feedback) => (
+                                             <Carousel.Item key={feedback.id}>
+                                                <div className="review-item p-3">
+                                                   <div className="review-content">
+                                                      <p className="review-text mb-2">"{feedback.content}"</p>
+                                                      <Rating rating={feedback.rating} />
+                                                   </div>
+                                                   <div className="reviewer d-flex align-items-center mt-3">
+                                                      <img
+                                                         src={feedback.user.avatar}
+                                                         alt={feedback.user.name}
+                                                         className="reviewer-avatar rounded-circle me-2"
+                                                         style={{ width: "40px", height: "40px", objectFit: "cover" }}
+                                                      />
+                                                      <p className="reviewer-name mb-0">{feedback.user.name}</p>
+                                                   </div>
+                                                </div>
+                                             </Carousel.Item>
+                                          ))}
+                                       </Carousel>
+                                    </div>
+                                 )}
+                              </div>
+
+                              <div className="mb-4">
+                                 <h5 className="section-title">
+                                    <FaStar className="me-2" />
+                                    Popular Amenities
+                                 </h5>
+                                 <Row className="g-2 amenities-container">
+                                    {dataFacility.slice(0, 6).map((item, index) => (
+                                       <Col key={index} xs={6} md={4}>
+                                          <div className="amenity-badge p-2 mb-2">
+                                             <span className="amenity-text">{item}</span>
+                                          </div>
+                                       </Col>
+                                    ))}
+                                 </Row>
+                              </div>
+
+                              <div className="hotel-description">
+                                 <h5 className="section-title">
+                                    <FaInfoCircle className="me-2" />
+                                    Hotel Description
+                                 </h5>
+                                 <p className="description-text">
+                                    {`Với ${dataFacility[0]} và ${dataFacility[1]}, ${currentHotel.hotelName} tọa lạc ở 
+                  ${currentHotel.description.substring(0, 150)}...`}
+                                 </p>
+                                 <Button
+                                    variant="link"
+                                    className="read-more p-0 text-decoration-none"
+                                    onClick={() => handleShowDescriptionModal()}
+                                 >
+                                    Read more
+                                 </Button>
+                              </div>
                            </Card.Body>
+                        </Card>
+                     </Col>
+                  </Row>
+
+                  {/* Row thứ hai chứa các tiện nghi nổi bật */}
+                  <Row className="mt-4">
+                     <Col>
+                        <Card className="border-0 shadow-sm p-3">
+                           <Card.Title className="mb-3">
+                              <FaConciergeBell className="me-2" />
+                              Featured Amenities
+                           </Card.Title>
+                           <Row className="g-3">
+                              {amenities.map((item, index) => (
+                                 <Col xs={6} md={3} lg={2} key={index}>
+                                    <div className="featured-amenity p-2 text-center">
+                                       <div className="amenity-icon mb-2">
+                                          {item.icon}
+                                       </div>
+                                       <div className="amenity-name">
+                                          {item.text}
+                                       </div>
+                                    </div>
+                                 </Col>
+                              ))}
+                           </Row>
                         </Card>
                      </Col>
                   </Row>
@@ -466,7 +562,7 @@ export const HotelDetailPage = () => {
                <h2 className="px-5 fw-bolder">Đánh giá của khách hàng</h2>
                <h4 className="px-5 fw-bold mt-3">Hạng mục</h4>
 
-               <p className="fw-bold px-5 mb-1">Đánh giá 5 {"(⭐)"} 1.400<span className="text-muted"> total feedback</span></p>
+               <p className="fw-bold px-5 mb-1">Đánh giá 5 {"(⭐)"} {listFeedback.length}<span className="text-muted"> total feedback</span></p>
                <ProgressBar className="mx-5" variant="primary" now={60} />
 
                <p className="fw-bold px-5 mb-1">Đánh giá 4 {"(⭐)"} </p>

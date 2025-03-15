@@ -144,6 +144,7 @@ export const useAuthStore = create((set) => ({
       await axiosInstance.post(`${BASE_URL}/user/logout`);
       // Clear token from sessionStorage
       sessionStorage.removeItem("token");
+      sessionStorage.removeItem("payment_link");
       set({
         user: null,
         isAuthenticated: false,

@@ -1,19 +1,222 @@
-/* .card-facility {
-   font-size: 10;
-   font-weight: bold;
-   transition: ease-in 0.5s;
-   height: 50px;
+/* Thêm file CSS này vào project của bạn */
+
+:root {
+   --primary: #003b95;
+   --primary-light: #1266ca;
+   --primary-lighter: #edf5ff;
+   --secondary: #6c757d;
+   --light: #f8f9fa;
+   --dark: #343a40;
+   --success: #28a745;
+   --border-radius: 12px;
+   --box-shadow: 0 4px 12px rgba(0, 59, 149, 0.12);
+ }
+ 
+ /* Gallery styling */
+ .hotel-gallery {
+   margin-bottom: 1.5rem;
+ }
+ 
+ .main-image-container {
+   overflow: hidden;
+   border-radius: var(--border-radius);
+ }
+ 
+ .main-hotel-image:hover {
+   transform: scale(1.02);
+ }
+ 
+ .thumbnail-wrapper {
+   overflow: hidden;
+   border-radius: 8px;
+ }
+ 
+ .thumbnail-image:hover {
+   transform: scale(1.1);
+ }
+ 
+ .view-more-images {
+   border-color: var(--primary);
+   color: var(--primary);
+   border-radius: 20px;
+   font-size: 0.9rem;
+   padding: 0.25rem 0.75rem;
+ }
+ 
+ .view-more-images:hover {
+   background-color: var(--primary);
+   color: white;
+ }
+ 
+ /* Hotel details card styling */
+ .hotel-details-card {
+   border-radius: var(--border-radius);
+   overflow: hidden;
+   height: 100%;
+ }
+ 
+ .hotel-name {
+   color: var(--primary);
+   font-weight: 600;
+   font-size: 1.5rem;
+ }
+ 
+ .hotel-location {
+   font-size: 0.9rem;
+   color: var(--secondary);
+ }
+ 
+ .rating-badge {
    display: flex;
-   justify-content: center;
    align-items: center;
-   align-content: center;
-   background-color: rgb(229, 226, 226);
-   border-color: rgb(229, 226, 226);;
-}
-
-.card-facility:hover{
-   transition: ease-in 0.5s;
-   background-color: rgb(181, 125, 233);
-   color: white
-} */
-
+   justify-content: center;
+   min-width: 40px;
+   height: 40px;
+   border-radius: 8px;
+   padding: 0 10px;
+ }
+ 
+ .rating-score {
+   color: white;
+   font-weight: bold;
+   font-size: 1.1rem;
+ }
+ 
+ /* Section styling */
+ .section-title {
+   color: var(--primary);
+   font-size: 1.1rem;
+   font-weight: 600;
+   margin-bottom: 1rem;
+   display: flex;
+   align-items: center;
+ }
+ 
+ /* Reviews carousel */
+ .reviews-carousel {
+   background-color: var(--primary-lighter);
+   border-radius: 10px;
+ }
+ 
+ .review-item {
+   background-color: white;
+   border-radius: 8px;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+ }
+ 
+ .review-text {
+   font-style: italic;
+   font-size: 0.95rem;
+ }
+ 
+ .reviewer-name {
+   font-size: 0.9rem;
+   font-weight: 500;
+ }
+ 
+ /* Amenities styling */
+ .amenity-badge {
+   background-color: var(--light);
+   border-radius: 6px;
+   text-align: center;
+   transition: all 0.2s;
+   border: 1px solid #eaeaea;
+   height: 100%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+ }
+ 
+ .amenity-badge:hover {
+   background-color: var(--primary-lighter);
+   border-color: var(--primary-light);
+ }
+ 
+ .amenity-text {
+   font-size: 0.8rem;
+   font-weight: 500;
+ }
+ 
+ /* Hotel description */
+ .description-text {
+   font-size: 0.95rem;
+   line-height: 1.6;
+   color: var(--dark);
+ }
+ 
+ .read-more {
+   color: var(--primary);
+   font-weight: 500;
+   font-size: 0.9rem;
+ }
+ 
+ /* Book now button */
+ .book-now-btn {
+   background-color: var(--primary);
+   border-color: var(--primary);
+   border-radius: 8px;
+   font-weight: 500;
+   padding: 0.6rem 1rem;
+   transition: all 0.2s;
+ }
+ 
+ .book-now-btn:hover {
+   background-color: var(--primary-light);
+   transform: translateY(-2px);
+   box-shadow: 0 4px 8px rgba(0, 59, 149, 0.25);
+ }
+ 
+ /* Featured amenities */
+ .featured-amenity {
+   background-color: white;
+   border-radius: 8px;
+   border: 1px solid #eaeaea;
+   transition: all 0.2s;
+   height: 100%;
+ }
+ 
+ .featured-amenity:hover {
+   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+   border-color: var(--primary-light);
+ }
+ 
+ .amenity-icon {
+   font-size: 1.5rem;
+   color: var(--primary);
+ }
+ 
+ .amenity-name {
+   font-size: 0.85rem;
+   font-weight: 500;
+ }
+ 
+ /* Responsive adjustments */
+ @media (max-width: 992px) {
+   .hotel-details-card {
+     margin-top: 2rem;
+   }
+ }
+ 
+ @media (max-width: 768px) {
+   .main-hotel-image {
+     height: 250px;
+   }
+   
+   .amenity-text, .amenity-name {
+     font-size: 0.75rem;
+   }
+ }
+ 
+ @media (max-width: 576px) {
+   .main-hotel-image {
+     height: 200px;
+   }
+   
+   .thumbnail-image {
+     height: 60px;
+   }
+   
+   .hotel-name {
+     font-size: 1.3rem;
+   }
+ }
