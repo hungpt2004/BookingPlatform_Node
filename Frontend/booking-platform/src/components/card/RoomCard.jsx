@@ -1,14 +1,5 @@
 import React, { useState } from "react";
 import { Card, Row, Col } from "react-bootstrap";
-<<<<<<< HEAD
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faQuestionCircle, faUser } from '@fortawesome/free-regular-svg-icons';
-import { FaSmokingBan, FaBroom } from "react-icons/fa";
-
-const RoomCards = ({ roomQuantities }) => {
-    const [guestNames, setGuestNames] = useState({});
-
-=======
 import { renderPersonIcon } from "../../utils/RenderPersonIcon";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle, faUser } from '@fortawesome/free-regular-svg-icons';
@@ -21,9 +12,6 @@ const RoomCards = ({ roomQuantities }) => {
         // const randomIndex = Math.floor(Math.random() * facilities.length);
         return facilities[1];
     };
-
-
->>>>>>> cf18d23b2c444373f5e955ebe652554585001e8d
     // Get random facility or default to Free WiFi
     const handleGuestNameChange = (roomId, name) => {
         setGuestNames(prev => ({
@@ -40,18 +28,7 @@ const RoomCards = ({ roomQuantities }) => {
                         <Card.Title className="fs-5 fw-bold mb-3">
                             {room.type}
                         </Card.Title>
-
-<<<<<<< HEAD
-
                         <Card.Text className="d-flex align-items-center mb-2">
-                            <span className="text-success me-2">✓</span>
-                            <span className="text-success me-1">{getRandomFacility(room.facilities)}</span>
-                            <span className="text-success me-1">Free WiFi</span>
-=======
-                        <Card.Text className="d-flex align-items-center mb-2">
-                            <span className="text-success me-2">✓</span>
-                            <span className="text-success me-1">{getRandomFacility(room.facilities)}</span>
->>>>>>> cf18d23b2c444373f5e955ebe652554585001e8d
                             <span className="text-primary">
                                 <FontAwesomeIcon icon={faQuestionCircle} />
                             </span>

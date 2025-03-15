@@ -34,6 +34,8 @@ const signToken = (id) =>
 // Send JWT Token in Response
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
+  console.log("Generated Token:", token); // Debugging log
+
   const cookieOptions = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
@@ -47,10 +49,11 @@ const createSendToken = (user, statusCode, res) => {
 
   res.status(statusCode).json({
     status: "success",
-    token,
+    token, // Make sure token is in the response
     data: { user },
   });
 };
+
 
 // Send OTP
 const sendOTP = async (email, verificationToken) => {

@@ -1,6 +1,7 @@
 import React from 'react'
 import { Container, Nav, Navbar } from 'react-bootstrap'
 
+
 export const OwnerNavbar = () => {
     return (
         <Navbar bg="primary" variant="dark" expand="lg">

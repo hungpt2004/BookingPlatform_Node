@@ -24,6 +24,8 @@ import PricePerWeek from './views/room/roomPriceType/PricePerWeek'
 import HotelPhotos from './views/hotel/CreateHotelPhotos'
 import BookingManagePage from './views/owner/BookingManagePage'
 import ReviewPage from './views/owner/ReviewPage'
+import HotelReservations from './views/owner/BookingSchedule'
+import HotelDetailOwnerPage from './views/owner/HotelDetailOwner'
 
 function App() {
   return (
@@ -53,9 +55,10 @@ function App() {
         <Route path='/create-photo' element={<HotelPhotos />} />
 
         <Route path="/dashboard/*" element={<DashboardPage />} />
-        <Route path='booking-management' element={<BookingManagePage />} />
+        <Route path='/booking-management' element={<BookingManagePage />} />
         <Route path='/reviews' element={<ReviewPage />} />
-
+        <Route path='/booking-schedule/:hotelId' element={<HotelReservations/>}/>
+        <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage/>}/>
       </Routes>
     </Router>
   );

@@ -155,7 +155,6 @@ export const LoginPage = () => {
       img.onload = () => setIsImageLoaded(true);
    }, []);
 
-   // Handle login form submission
    const handleLogin = async (e) => {
       e.preventDefault();
 
@@ -170,19 +169,19 @@ export const LoginPage = () => {
       setLoading(true);
 
       try {
-
-         await login(email, password);
-
+         const userData = await login(email, password);
          toast.success("Đăng nhập thành công", {
             position: "top-center",
             autoClose: 2000,
          });
-
-         // Close modal after successful login
          setTimeout(() => {
             setLoading(false);
             setShowLoginModal(false);
-            navigate("/home");
+            if (userData.data.user.role === 'OWNER') {
+               navigate("/booking-management");
+            } else {
+               navigate("/home");
+            }
          }, 2000);
 
       } catch (err) {
@@ -470,7 +469,7 @@ export const LoginPage = () => {
             <Modal.Body className="px-4 pt-0">
                <form onSubmit={handleSignUp}>
 
-               <div className="d-flex align-items-center justify-content-center my-4">
+                  <div className="d-flex align-items-center justify-content-center my-4">
                      <GoogleLogin
                         onSuccess={handleGoogleLogin}
                         onError={() => console.log("Google login failed")}

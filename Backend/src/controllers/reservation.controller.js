@@ -3,6 +3,7 @@ const Reservation = require("../models/reservation");
 const RefundingReservation = require('../models/refundingReservation')
 const Room = require('../models/room')
 const cron = require("node-cron");
+const Hotel = require('../models/hotel');
 
 exports.getALlReservation = asyncHandler(async (req, res) => {
   let perPage = 9;
@@ -193,6 +194,59 @@ const autoUpdateReservationStatus = asyncHandler(async () => {
   }
 });
 
+exports.getHotelReservations = asyncHandler(async (req, res) => {
+  const { hotelId } = req.params;
+  const user = req.user;
+  if (!hotelId || hotelId === 'undefined') {
+    return res.status(400).json({
+      error: true,
+      message: "Valid Hotel ID is required",
+    });
+  }
+
+  try {
+    const hotel = await Hotel.findOne({
+      _id: hotelId,
+      owner: user.id
+    });
+
+    if (!hotel) {
+      return res.status(403).json({
+        error: true,
+        message: "You do not have permission to view reservations for this hotel or the hotel does not exist",
+      });
+    }
+    const reservations = await Reservation.find({
+      hotel: hotelId
+    })
+      .populate({
+        path: "rooms",
+        select: "name type", 
+      })
+      .populate('user', 'name email')
+      .sort({ checkInDate: -1 }); 
+    const formattedReservations = reservations.map(reservation => {
+      const resObj = reservation.toObject();
+      resObj.guest = {
+        name: resObj.user?.name || resObj.user?.email || 'Guest',
+        email: resObj.user?.email
+      };
+      return resObj;
+    });
+
+    return res.status(200).json({
+      error: false,
+      reservations: formattedReservations,
+      message: "Successfully retrieved hotel reservations",
+    });
+  } catch (err) {
+    console.error("Error fetching hotel reservations:", err);
+    return res.status(500).json({
+      error: true,
+      message: "Failed to fetch hotel reservations: " + err.message,
+    });
+  }
+});
 exports.cancelReservation = asyncHandler(async (req, res) => {
   const { reservationId } = req.params;
   const userId = req.user.id;
@@ -253,7 +307,7 @@ exports.cancelReservation = asyncHandler(async (req, res) => {
 
     //Setting reservation become pending status
     await reservation.updateOne({
-      $set: {status: "PENDING"}
+      $set: { status: "PENDING" }
     })
 
     await reservation.save();
@@ -268,7 +322,7 @@ exports.cancelReservation = asyncHandler(async (req, res) => {
       });
       await refund.save();
     }
-    
+
     for (const roomItem of reservation.rooms) {
       const room = await Room.findById(roomItem.room._id);
       if (room) {
@@ -324,7 +378,7 @@ const autoDeleteNotPaidReservation = asyncHandler(async () => {
 cron.schedule("*/5 * * * *", () => {
   // autoUpdateReservationStatus();
   // autoDeleteNotPaidReservation();
-},{
+}, {
   timezone: "Asia/Ho_Chi_Minh"
 }
 );
