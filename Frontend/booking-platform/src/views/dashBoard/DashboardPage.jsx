@@ -7,6 +7,7 @@ import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar";
 import axiosInstance from "../../utils/AxiosInstance";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 import Sidebar from "../../components/navbar/CustomeSidebar";
+import axios from "axios";
 
 // Dashboard Overview Component
 const DashboardOverview = () => {
@@ -21,7 +22,25 @@ const DashboardOverview = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState("yearly");
+  const [listHotel, setListHotel] = useState([]);
 
+  //Get data of hotel ownner
+  useEffect(() => {
+    const fetchOwnerHotel = async () => {
+      try {
+        
+        const response = await axiosInstance.get('/hotel/get-owned-hotel')
+          if(response.data && response.data.hotels) {
+
+          }
+      } catch (error) {
+        
+      }
+    }
+  })
+
+
+  //Get data chart dashboard
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -144,7 +163,7 @@ const DashboardOverview = () => {
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div>
               <h2 className="mb-0 fw-bold">Dashboard Overview</h2>
-              <p className="text-muted">Welcome to your hotel management dashboard</p>
+              <p className="text-muted">Nơi này sẽ giúp quản lý doanh thu của bạn</p>
             </div>
             <div className="d-flex gap-2">
               <select 
@@ -168,7 +187,7 @@ const DashboardOverview = () => {
               <Card className="h-100 border-0 shadow-sm">
                 <Card.Body className="p-4">
                   <div className="d-flex justify-content-between align-items-center mb-3">
-                    <div className="text-muted">Total Reservations</div>
+                    <div className="text-muted">Tổng Hóa Đơn</div>
                     <div className="rounded-circle d-flex align-items-center justify-content-center" 
                       style={{ width: "40px", height: "40px", backgroundColor: "rgba(0, 113, 194, 0.1)" }}>
                       <i className="bi bi-calendar-check fs-5 text-primary"></i>
@@ -187,7 +206,7 @@ const DashboardOverview = () => {
               <Card className="h-100 border-0 shadow-sm">
                 <Card.Body className="p-4">
                   <div className="d-flex justify-content-between align-items-center mb-3">
-                    <div className="text-muted">Total Revenue</div>
+                    <div className="text-muted">Tổng doanh thu</div>
                     <div className="rounded-circle d-flex align-items-center justify-content-center" 
                       style={{ width: "40px", height: "40px", backgroundColor: "rgba(25, 135, 84, 0.1)" }}>
                       <i className="bi bi-currency-dollar fs-5 text-success"></i>

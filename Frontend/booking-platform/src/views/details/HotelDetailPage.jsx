@@ -17,7 +17,7 @@ import CustomInput from "../../components/input/CustomInput";
 import './HotelDetailPage.css'
 import { FaConciergeBell } from "react-icons/fa";
 import { FaImages } from "react-icons/fa";
-import { FaMapMarkerAlt, FaCommentAlt, FaStar, FaInfoCircle, FaCalendarCheck } from "react-icons/fa";
+import { FaMapMarkerAlt, FaCommentAlt, FaStar, FaInfoCircle, FaCalendarCheck, FaImage } from "react-icons/fa";
 
 const dataFacility = [
    "Wi-Fi miễn phí",
@@ -53,30 +53,39 @@ export const HotelDetailPage = () => {
    const [dateErrors, setDateErrors] = useState({ checkIn: '', checkOut: '' });
    const [capacityError, setCapacityError] = useState('');
    const [availabilityError, setAvailabilityError] = useState('');
-   const [userId, setUserId] = useState(null); // State to store userId
+   const [userId, setUserId] = useState(null);
+   const [showGalleryModal, setShowGalleryModal] = useState(false);
+
+   //Show all image in modal
+   const handleShowGalleryModal = () => setShowGalleryModal(true);
+   const handleCloseGalleryModal = () => setShowGalleryModal(false);
+
 
    // Add this function to handle the search validation
-   const handleSearch = async () => {
-      setCapacityError('');
-      setAvailabilityError('');
-      if (!checkInDate || !checkOutDate) {
-         setAvailabilityError('Please select both check-in and check-out dates');
-         return;
-      }
-      // Validate capacity
-      if (numberOfPeople > currentHotel?.capacity) {
-         setCapacityError(`This hotel only accommodates up to ${currentHotel?.capacity} guests`);
-         return;
-      }
 
-      // Validate dates are logical
-      if (new Date(checkOutDate) <= new Date(checkInDate)) {
-         setAvailabilityError('Check-out date must be after check-in date');
-         return;
-      }
-   };
+   // const handleSearch = async () => {
+   //    setCapacityError('');
+   //    setAvailabilityError('');
+   //    if (!checkInDate || !checkOutDate) {
+   //       setAvailabilityError('Please select both check-in and check-out dates');
+   //       return;
+   //    }
+   //    // Validate capacity
+   //    if (numberOfPeople > currentHotel?.capacity) {
+   //       setCapacityError(`This hotel only accommodates up to ${currentHotel?.capacity} guests`);
+   //       return;
+   //    }
+
+   //    // Validate dates are logical
+   //    if (new Date(checkOutDate) <= new Date(checkInDate)) {
+   //       setAvailabilityError('Check-out date must be after check-in date');
+   //       return;
+   //    }
+   // };
 
    // Add the search bar components
+
+
    const handleDateChange = (type, value) => {
       const today = new Date().toISOString().split('T')[0];
       const newErrors = { ...dateErrors };
@@ -107,6 +116,7 @@ export const HotelDetailPage = () => {
       setDateErrors(newErrors);
    };
 
+   //Input date custom
    const CustomDateValidator = ({ label, error, ...props }) => (
       <div className="mb-0">
          {label && <label className="form-label">{label}</label>}
@@ -139,6 +149,7 @@ export const HotelDetailPage = () => {
       }
    };
 
+   //Get Feedback from Hotel
    const getFeedbackByHotelId = async () => {
       try {
          const response = await axios.get(`${BASE_URL}/feedback/get-feedback-hotel/${id}`);
@@ -153,19 +164,23 @@ export const HotelDetailPage = () => {
       }
    };
 
+   //Show 1 image in center
    const handleShowModalImage = (image) => {
       setSelectedImage(image);
       setShowModal(true);
    }
 
+   //Close modal 1 image
    const handleCloseModal = () => {
       setShowModal(false);
    }
 
+   //Effect load Hotel and Feedback
    useEffect(() => {
       getCurrentHotelDetail();
       getFeedbackByHotelId();
    }, []);
+
 
    useEffect(() => {
       const today = new Date().toISOString().split('T')[0];
@@ -309,13 +324,39 @@ export const HotelDetailPage = () => {
                                        variant="outline-primary"
                                        size="sm"
                                        className="view-more-images"
-                                       onClick={() => handleShowGalleryModal()}
+                                       onClick={handleShowGalleryModal}
                                     >
                                        <FaImages className="me-1" />
                                        View all {currentHotel.images.length} photos
                                     </Button>
                                  </div>
                               )}
+
+                              <Modal show={showGalleryModal} onHide={handleCloseGalleryModal} size="lg" centered>
+                                 <Modal.Header closeButton>
+                                    <Modal.Title>All Photos</Modal.Title>
+                                 </Modal.Header>
+                                 <Modal.Body>
+                                    <Row className="g-2">
+                                       {currentHotel.images.map((img, index) => (
+                                          <Col key={index} xs={6} md={4} lg={3}>
+                                             <Image
+                                                src={img}
+                                                style={{
+                                                   width: "100%",
+                                                   height: "150px",
+                                                   objectFit: "cover",
+                                                   borderRadius: "8px",
+                                                   cursor: "pointer",
+                                                }}
+                                                onClick={() => window.open(img, "_blank")}
+                                             />
+                                          </Col>
+                                       ))}
+                                    </Row>
+                                 </Modal.Body>
+                              </Modal>;
+
                            </div>
                         ) : (
                            <div className="no-images-container p-5 text-center bg-light rounded">
@@ -323,6 +364,7 @@ export const HotelDetailPage = () => {
                               <p className="text-secondary">No images available</p>
                            </div>
                         )}
+
                      </Col>
 
                      {/* Phần thông tin chi tiết - chiếm 40% */}
@@ -461,32 +503,8 @@ export const HotelDetailPage = () => {
                      </Col>
                   </Row>
 
-                  <Row>
-                     <p><span className="text-decoration-underline text-primary fw-bold">Legit Information: </span> Khách nói rằng mô tả và hình ảnh chỗ nghỉ này rất đúng với sự thật.</p>
-                     <p>
-                        {`Với ${dataFacility[0]} và ${dataFacility[1]}, ${currentHotel.hotelName} tọa lạc ở 
-
-                        ${currentHotel.description}. Khăn tắm và ga trải giường có sẵn ở căn hộ.
-
-                        Các điểm tham quan nổi tiếng gần căn hộ bao gồm Vườn Turia Gardens, Vườn Jardines de Monforte và Bảo tàng Gốm sứ và Nghệ thuật Trang trí Quốc gia González Martí. Sân bay Valencia cách 9 km.
-
-                        Các cặp đôi đặc biệt thích địa điểm này — họ cho điểm ${currentHotel.rating} khi đánh giá chuyến đi hai người.`}
-                     </p>
-                     <p className="text-muted">Các khoảng cách nêu trong mô tả chỗ nghỉ được tính toán bằng © OpenStreetMap</p>
-                     <p className="fw-bolder">Các tiện nghi được ưu chuộng nhất</p>
-                  </Row>
 
                   <Row className="m-0 p-0 mt-4">
-                     {amenities.map((item, index) => {
-                        return (
-                           <Col className="mb-5" xs={2} key={index}>
-                              <Card className="card-facility">
-                                 <Card.Text style={{ fontSize: 14 }} className="text-center p-2 fw-bold">{item.icon} {item.text}</Card.Text>
-                              </Card>
-                           </Col>
-                        )
-                     })}
-
                      <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
                         <Modal.Body>
                            <Image
@@ -497,7 +515,6 @@ export const HotelDetailPage = () => {
                            />
                         </Modal.Body>
                      </Modal>
-
                   </Row>
 
                </Container>

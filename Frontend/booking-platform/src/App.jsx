@@ -22,6 +22,7 @@ import { useAuthStore } from "./store/authStore";
 import { Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/authRoutes/ProtectedRoute";
 import AdminDashboard from "./views/admin/AdminDashboard";
+import { Spinner } from "react-bootstrap";
 
 function App() {
   const { user, isAuthenticated } = useAuthStore();
@@ -36,7 +37,7 @@ function App() {
       // For now we'll just simulate that with a timeout
       setTimeout(() => {
         setIsLoading(false);
-      }, 500);
+      }, 800);
     } else {
       setIsLoading(false);
     }
@@ -44,7 +45,22 @@ function App() {
 
   // Show loading state while checking authentication
   if (isLoading) {
-    return <div>Loading...</div>; // Or a proper loading component
+    return (
+      <div 
+        className="d-flex justify-content-center align-items-center"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(255, 255, 255, 0.8)", // Nền mờ nhẹ
+          zIndex: 9999,
+        }}
+      >
+        <Spinner animation="border" size="lg" style={{ color: "#003b95" }} />
+      </div>
+    );
   }
 
   // Role-based redirect component

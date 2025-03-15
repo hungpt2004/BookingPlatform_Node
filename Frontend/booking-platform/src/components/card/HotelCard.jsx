@@ -5,6 +5,7 @@ import { CiStar } from "react-icons/ci";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 import axios from "axios";
 import { BASE_URL } from "../../utils/Constant";
+import './HotelCard.css'
 
 const HotelCard = ({ hotel, goToDetail }) => {
 

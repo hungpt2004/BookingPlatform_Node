@@ -24,6 +24,7 @@ exports.getAllHotels = asyncHandler(async (req, res) => {
 });
 
 exports.getOwnedHotels = asyncHandler(async (req, res) => {
+  
   const user = req.user;
 
   const hotels = await Hotel.find({ owner: user.id });

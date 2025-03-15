@@ -235,7 +235,7 @@ const Booking = ({
     return (
         <div className="p-5">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>Select Rooms - <span className="alert alert-warning">You want to have {distanceDay} nights</span></h2>
+                <h5>Select Rooms - <span className="alert alert-warning">You want to have {distanceDay} nights</span></h5>
                 <p>Price per night: {formatCurrencyVND(currentHotel.pricePerNight)}</p>
                 {/* <Button variant="secondary" onClick={() => setOpen(false)}>
                     Close

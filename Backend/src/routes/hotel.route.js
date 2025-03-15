@@ -11,7 +11,7 @@ const authController = require("./../controllers/authenticate.controller");
 router.use(authController.protect);
 
 HotelRouter.get("/get-all-hotel", HotelController.getAllHotels); //customer
-HotelRouter.get("/get-owned-hotel", protect, HotelController.getOwnedHotels); //owned
+HotelRouter.get("/get-owned-hotel", protect, restrictTo("OWNER") ,HotelController.getOwnedHotels); //owned
 
 HotelRouter.get(
   "/total/:hotelId",
