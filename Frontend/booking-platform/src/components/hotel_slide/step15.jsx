@@ -162,7 +162,7 @@ const Step15 = ({ prevStep }) => {
             const hotelDescription = JSON.parse(sessionStorage.getItem('hotelDes'));
             //const hotelBillInfo = JSON.parse(sessionStorage.getItem('hotelBillInfo'));
             const hotelFacilities = JSON.parse(sessionStorage.getItem('hotelFacility'));
-
+            const hotelServiceData = JSON.parse(sessionStorage.getItem('hotelService'));
             // Tạo FormData để gửi thông tin khách sạn
             const formData = new FormData();
             formData.append('hotelName', hotelNameAndStar.hotelName);
@@ -172,23 +172,23 @@ const Step15 = ({ prevStep }) => {
             formData.append('phoneNumber', user ? user.phone : phone);
             formData.append('businessDocuments', JSON.stringify(documentUrls));
             formData.append('facilities', JSON.stringify(hotelFacilities.map(facility => facility._id)));
-           
+            formData.append('services', JSON.stringify(hotelServiceData));
             const response = await axiosInstance.post('/hotel/create', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
-
+            console.log('services:', hotelServiceData);
             if (response.data.success) {
 
                 CustomSuccessToast('Khách sạn đã được tạo thành công! Vui lòng chờ đợi xét duyệt đăng ký của bạn.');
-                sessionStorage.removeItem('hotelStep');
-                sessionStorage.removeItem('hotelFacility');
-                sessionStorage.removeItem('hotelDes');
-                sessionStorage.removeItem('hotelLocation');
-                sessionStorage.removeItem('hotelName&Star');
-                sessionStorage.removeItem('step15FormData');
-                navigate('/home');
+                // sessionStorage.removeItem('hotelStep');
+                // sessionStorage.removeItem('hotelFacility');
+                // sessionStorage.removeItem('hotelDes');
+                // sessionStorage.removeItem('hotelLocation');
+                // sessionStorage.removeItem('hotelName&Star');
+                // sessionStorage.removeItem('step15FormData');
+                // navigate('/home');
             } else {
                 CustomFailedToast(`Lỗi: ${response.data.message}`);
             }

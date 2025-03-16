@@ -49,6 +49,10 @@ const hotelSchema = new Schema(
       type: Number,
       required: true
     },
+    rooms: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Room",
+    }],
     pricePerNight: {
       type: Number,
       required: true,

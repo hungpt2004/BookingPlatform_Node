@@ -122,11 +122,11 @@ exports.createHotel = asyncHandler(async (req, res) => {
       pricePerNight = 0,
       facilities,
       businessDocuments,
-      services = {},
-      rooms = []
-
+      services = [],
+      rooms = [],
+      roomFacility,
     } = req.body;
-
+    console.log("get from FE", req.body);
     // Kiểm tra các trường bắt buộc
     if (!hotelName || !description || !address || !phoneNumber) {
       return res.status(400).json({
@@ -137,25 +137,26 @@ exports.createHotel = asyncHandler(async (req, res) => {
     //chuyen json sang object
     const parsedBusinessDocuments = JSON.parse(businessDocuments);
     const parsedFacilities = JSON.parse(facilities);
-    // Kiểm tra xem mỗi phần tử trong facilities có phải là ObjectId hợp lệ không
-    for (const facilityId of parsedFacilities) {
-      // 1. Kiểm tra tính hợp lệ của ObjectId
-      if (!mongoose.Types.ObjectId.isValid(facilityId)) {
-        return res.status(400).json({
-          success: false,
-          message: `facilities chứa ID không hợp lệ: ${facilityId}`,
-        });
-      }
 
-      // 2. Kiểm tra sự tồn tại của facilityId trong collection hotelFacility
-      const facilityExists = await hotelFacility.exists({ _id: facilityId });
-      if (!facilityExists) {
-        return res.status(400).json({
-          success: false,
-          message: `facilities chứa ID không tồn tại: ${facilityId}`,
-        });
-      }
-    }
+    // Kiểm tra xem mỗi phần tử trong facilities có phải là ObjectId hợp lệ không
+    // for (const facilityId of parsedFacilities) {
+    //   // 1. Kiểm tra tính hợp lệ của ObjectId
+    //   if (!mongoose.Types.ObjectId.isValid(facilityId)) {
+    //     return res.status(400).json({
+    //       success: false,
+    //       message: `facilities chứa ID không hợp lệ: ${facilityId}`,
+    //     });
+    //   }
+
+    //   // 2. Kiểm tra sự tồn tại của facilityId trong collection hotelFacility
+    //   const facilityExists = await hotelFacility.exists({ _id: facilityId });
+    //   if (!facilityExists) {
+    //     return res.status(400).json({
+    //       success: false,
+    //       message: `facilities chứa ID không tồn tại: ${facilityId}`,
+    //     });
+    //   }
+    // }
 
     let imageUrls = [];
     if (req.files && Object.keys(req.files).length > 0) {
@@ -176,22 +177,6 @@ exports.createHotel = asyncHandler(async (req, res) => {
         });
       }
     }
-
-    // Tạo khách sạn mới
-    const newHotel = new Hotel({
-      hotelName,
-      description,
-      address,
-      phoneNumber,
-      rating,
-      star,
-      pricePerNight,
-      facilities: parsedFacilities,
-      images: imageUrls,
-      owner: ownerID,
-    });      businessDocuments: parsedBusinessDocuments
-    await newHotel.save({ session });
-
     // Create Hotel Services
     const hotelServices = [];
     if (services.serveBreakfast === "Có" && services.includedInPrice === "Không" && services.breakfastPrice) {
@@ -212,6 +197,24 @@ exports.createHotel = asyncHandler(async (req, res) => {
       await parkingService.save({ session });
       hotelServices.push(parkingService);
     }
+    console.log("hotelServices", services);
+    // Tạo khách sạn mới
+    const newHotel = new Hotel({
+      hotelName,
+      description,
+      address,
+      phoneNumber,
+      rating,
+      star,
+      pricePerNight,
+      facilities: parsedFacilities,
+      images: imageUrls,
+      owner: ownerID,
+      businessDocuments: parsedBusinessDocuments,
+      services: hotelServices.objectId,
+    });
+    await newHotel.save({ session });
+
 
     // Create Rooms
     const createdRooms = [];
@@ -299,3 +302,4 @@ exports.uploadAllDocuments = asyncHandler(async (req, res) => {
     return res.status(500).json({ success: false, message: "Lỗi máy chủ khi tải tài liệu." });
   }
 });
+

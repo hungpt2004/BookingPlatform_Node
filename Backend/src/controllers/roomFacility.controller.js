@@ -1,8 +1,8 @@
 const asyncHandler = require("../middlewares/asyncHandler.js");
-const HotelFacility = require('../models/hotelFacility');
+const roomFacility = require('../models/roomFacility');
 
 exports.getAllHotelFacilities = asyncHandler(async (req, res) => {
-    const facilities = await HotelFacility.find();
+    const facilities = await roomFacility.find();
 
     if (facilities.length === 0) {
         return res.status(404).json({
@@ -20,7 +20,7 @@ exports.getAllHotelFacilities = asyncHandler(async (req, res) => {
 
 exports.getAllHotelFacilitiesSortByName = asyncHandler(async (req, res) => {
     try {
-        const facilities = await HotelFacility.aggregate([
+        const facilities = await roomFacility.aggregate([
             {
                 $group: {
                     _id: "$name", // Group by name to remove duplicates
