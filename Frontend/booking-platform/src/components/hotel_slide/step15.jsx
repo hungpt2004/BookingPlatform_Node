@@ -172,8 +172,7 @@ const Step15 = ({ prevStep }) => {
             formData.append('phoneNumber', user ? user.phone : phone);
             formData.append('businessDocuments', JSON.stringify(documentUrls));
             formData.append('facilities', JSON.stringify(hotelFacilities.map(facility => facility._id)));
-            console.log(JSON.stringify(hotelFacilities.map(facility => facility._id)));
-
+           
             const response = await axiosInstance.post('/hotel/create', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
