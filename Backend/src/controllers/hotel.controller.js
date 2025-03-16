@@ -122,45 +122,29 @@ exports.createHotel = asyncHandler(async (req, res) => {
       pricePerNight = 0,
       facilities,
       businessDocuments,
-      services = [],
+      services = "{}", // Default to an empty JSON string if not provided
       rooms = [],
       roomFacility,
     } = req.body;
+
     console.log("get from FE", req.body);
-    // Kiểm tra các trường bắt buộc
+
+    // Validate required fields
     if (!hotelName || !description || !address || !phoneNumber) {
       return res.status(400).json({
         success: false,
-        message: "Vui lòng cung cấp đầy đủ thông tin khách sạn và tên công ty"
+        message: "Vui lòng cung cấp đầy đủ thông tin khách sạn và tên công ty",
       });
     }
-    //chuyen json sang object
+
+    // Parse JSON strings into objects
     const parsedBusinessDocuments = JSON.parse(businessDocuments);
     const parsedFacilities = JSON.parse(facilities);
+    const parsedServices = JSON.parse(services); // Parse the services JSON string
 
-    // Kiểm tra xem mỗi phần tử trong facilities có phải là ObjectId hợp lệ không
-    // for (const facilityId of parsedFacilities) {
-    //   // 1. Kiểm tra tính hợp lệ của ObjectId
-    //   if (!mongoose.Types.ObjectId.isValid(facilityId)) {
-    //     return res.status(400).json({
-    //       success: false,
-    //       message: `facilities chứa ID không hợp lệ: ${facilityId}`,
-    //     });
-    //   }
-
-    //   // 2. Kiểm tra sự tồn tại của facilityId trong collection hotelFacility
-    //   const facilityExists = await hotelFacility.exists({ _id: facilityId });
-    //   if (!facilityExists) {
-    //     return res.status(400).json({
-    //       success: false,
-    //       message: `facilities chứa ID không tồn tại: ${facilityId}`,
-    //     });
-    //   }
-    // }
-
+    // Upload images
     let imageUrls = [];
     if (req.files && Object.keys(req.files).length > 0) {
-      // Lấy các files ảnh từ request
       const hotelImages = req.files.images
         ? Array.isArray(req.files.images)
           ? req.files.images
@@ -169,36 +153,15 @@ exports.createHotel = asyncHandler(async (req, res) => {
 
       if (hotelImages.length > 0) {
         const folderPath = `hotels/${ownerID}`;
-        // Upload ảnh lên Cloudinary
         imageUrls = await uploadMultipleImages(hotelImages, folderPath, {
           width: 800,
           crop: "fill",
-          quality: "auto:good"
+          quality: "auto:good",
         });
       }
     }
-    // Create Hotel Services
-    const hotelServices = [];
-    if (services.serveBreakfast === "Có" && services.includedInPrice === "Không" && services.breakfastPrice) {
-      const breakfastService = new HotelService({
-        hotel: newHotel._id,
-        name: "Breakfast",
-        price: parseFloat(services.breakfastPrice)
-      });
-      await breakfastService.save({ session });
-      hotelServices.push(breakfastService);
-    }
-    if (services.hasParking === "Có, tính phí" && services.parkingFee) {
-      const parkingService = new HotelService({
-        hotel: newHotel._id,
-        name: "Parking",
-        price: parseFloat(services.parkingFee)
-      });
-      await parkingService.save({ session });
-      hotelServices.push(parkingService);
-    }
-    console.log("hotelServices", services);
-    // Tạo khách sạn mới
+
+    // Create new hotel
     const newHotel = new Hotel({
       hotelName,
       description,
@@ -211,10 +174,45 @@ exports.createHotel = asyncHandler(async (req, res) => {
       images: imageUrls,
       owner: ownerID,
       businessDocuments: parsedBusinessDocuments,
-      services: hotelServices.objectId,
+      services: [], // Initialize services as an empty array
     });
-    await newHotel.save({ session });
 
+    // Create Hotel Services
+    const hotelServices = [];
+    if (
+      parsedServices.serveBreakfast === "Có" &&
+      parsedServices.includedInPrice === "Không" &&
+      parsedServices.breakfastPrice
+    ) {
+      const breakfastService = new HotelService({
+        hotel: newHotel._id,
+        name: "Breakfast",
+        description: `Breakfast types: ${parsedServices.breakfastTypes.join(", ")}`,
+        price: parseFloat(parsedServices.breakfastPrice),
+      });
+      await breakfastService.save({ session });
+      hotelServices.push(breakfastService._id); // Save the ObjectId
+    }
+    if (
+      parsedServices.hasParking === "Có, tính phí" &&
+      parsedServices.parkingFee
+    ) {
+      const parkingService = new HotelService({
+        hotel: newHotel._id,
+        name: "Parking",
+        description: `Parking location: ${parsedServices.parkingLocation}, Parking type: ${parsedServices.parkingTypes}`,
+        price: parseFloat(parsedServices.parkingFee),
+      });
+      await parkingService.save({ session });
+      hotelServices.push(parkingService._id); // Save the ObjectId
+    }
+    console.log("hotelServices", hotelServices);
+
+    // Assign the service ObjectIds to the hotel
+    newHotel.services = hotelServices;
+
+    // Save the hotel
+    await newHotel.save({ session });
 
     // Create Rooms
     const createdRooms = [];
@@ -229,28 +227,31 @@ exports.createHotel = asyncHandler(async (req, res) => {
         quantity: roomDetails.roomQuantity,
         hotel: newHotel._id,
         facilities: roomFacilities,
-        bed: roomDetails.bedTypes.map(bed => ({
+        bed: roomDetails.bedTypes.map((bed) => ({
           bed: bed.bedId,
-          quantity: bed.count
-        }))
+          quantity: bed.count,
+        })),
       });
       await newRoom.save({ session });
-      createdRooms.push(newRoom);
+      createdRooms.push(newRoom._id); // Save the ObjectId
     }
+    
+    // Assign the room ObjectIds to the hotel
+    newHotel.rooms = createdRooms;
+    await newHotel.save({ session });
 
     // Commit transaction
     await session.commitTransaction();
     session.endSession();
-
-    // Trả về phản hồi thành công
+    console.log("createdRooms", createdRooms);
+    // Return success response
     res.status(201).json({
       success: true,
       message: "Hotel created with services and rooms",
       hotel: newHotel,
       services: hotelServices,
-      rooms: createdRooms
+      rooms: createdRooms,
     });
-
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
@@ -258,7 +259,7 @@ exports.createHotel = asyncHandler(async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Server error creating hotel",
-      error: error.message
+      error: error.message,
     });
   }
 });
