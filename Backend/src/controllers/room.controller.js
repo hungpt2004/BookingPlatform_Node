@@ -7,16 +7,16 @@ const asyncHandler = require("../middlewares/asyncHandler.js");
 exports.createRoom = asyncHandler(async (req, res, next) => {
   const hotelId = req.params.hotelId;
 
-  // Validate if hotel exists
-  const hotel = await Hotel.findById(hotelId);
-  if (!hotel) {
-    return next(createError(404, "Hotel not found"));
-  }
-  // Create and save the room
-  const newRoom = new Room({
-    ...req.body,
-    hotel: hotelId, // Add the hotel reference explicitly
-  });
+    // Validate if hotel exists
+    const hotel = await Hotel.findById(hotelId);
+    if (!hotel) {
+        return next(createError(404, "Hotel not found"));
+    }
+    // Create and save the room
+    const newRoom = new Room({
+        ...req.body,
+        hotel: hotelId
+    });
 
   const savedRoom = await newRoom.save();
 

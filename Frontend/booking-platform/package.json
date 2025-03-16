@@ -24,6 +24,7 @@
     "booking-platform": "file:",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.8",
+    "bootstrap-icons": "^1.11.3",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
     "flowbite": "^3.1.1",
