@@ -73,7 +73,7 @@ function CustomNavbar() {
             <Nav.Link className="nav-item" href="#">Về Travelofy</Nav.Link>
             <NavDropdown title="Dịch Vụ" id="service-dropdown" className="custom-dropdown">
               <div className="dropdown-inner">
-                <NavDropdown.Item href="#action/3.1">
+                <NavDropdown.Item href="/favorite">
                   <i className="fas fa-heart me-2"></i>
                   DS Yêu Thích 
                 </NavDropdown.Item>

@@ -9,11 +9,14 @@ import './HotelCard.css'
 
 const HotelCard = ({ hotel, goToDetail, isFavorite, toggleFavorite }) => {
 
+  const [rooms, setRooms] = useState([]);
+  const [totalQuantityRoom, setTotalQuantityRoom] = useState();
+
   const fetchRoomByHotelId = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/room/get-room-by-hotel/${hotel._id}`)
-      if (response.data && response.data.rooms) {
-        setRooms(response.data.rooms);
+      if (response.data && response.data?.rooms) {
+        setRooms(response.data?.rooms);
       }
       const totalQuantity = response.data.rooms.reduce((sum, room) => sum + room.quantity, 0);
       setTotalQuantityRoom(totalQuantity);

@@ -341,12 +341,12 @@ const autoUpdateReservationStatus = asyncHandler(async () => {
     if (r.status === "COMPLETED" || r.status === "CHECKED OUT") continue;
 
     //1. Update from Booked to CheckIn
-    // if (currentDate < r.checkInDate) r.status = "CHECKED IN";
+    if (currentDate < r.checkInDate) r.status = "CHECKED IN";
 
-    // //2. Update from CheckIn to CheckOut
-    // if (currentDate > r.checkOutDate) r.status = "CHECKED OUT";
+    //2. Update from CheckIn to CheckOut
+    if (currentDate > r.checkOutDate) r.status = "CHECKED OUT";
 
-    // await Reservation.updateOne({ _id: r._id }, { $set: { status: r.status } });
+    await Reservation.updateOne({ _id: r._id }, { $set: { status: r.status } });
 
     console.log(`Updated status for reservation ID ${r._id} to ${r.status}`);
   }

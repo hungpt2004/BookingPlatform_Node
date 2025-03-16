@@ -1,6 +1,8 @@
 const asyncHandler = require("../middlewares/asyncHandler");
 const PDFDocument = require("pdfkit-table");
 const Reservation = require("../models/reservation");
+const path = require("path");
+
 
 exports.downloadReservationPDF = asyncHandler(async (req, res) => {
    const { reservationId } = req.params;
@@ -21,14 +23,19 @@ exports.downloadReservationPDF = asyncHandler(async (req, res) => {
  
      // **📄 Khởi tạo PDF**
      const doc = new PDFDocument({ margin: 50 });
- 
+
+     // **📌 Đường dẫn font từ assets/fonts/**
+     const fontPath = path.join(__dirname, "../../assets/fonts/SF-Mono-Regular.otf");
+     doc.registerFont("SFMono", fontPath);
+     doc.font("SFMono");
+
      // **Gửi Header cho Response**
      res.setHeader("Content-Disposition", `attachment; filename="reservation_${reservationId}.pdf"`);
      res.setHeader("Content-Type", "application/pdf");
  
      // **Ghi PDF vào response**
      doc.pipe(res);
- 
+
      // **📌 Tiêu đề chính**
      doc.fontSize(20).text("Reservation Details", { align: "center" }).moveDown(2);
  
@@ -54,20 +61,16 @@ exports.downloadReservationPDF = asyncHandler(async (req, res) => {
          `$${room.room.price}`,
        ]),
      };
- 
+
      // **📌 Thêm bảng vào PDF**
      await doc.table(table, { width: 500 });
- 
+
      doc.moveDown(2);
      doc.text(`Total Price: $${reservation.totalPrice}`, { bold: true });
- 
+
      // **Đóng stream sau khi hoàn tất**
      doc.end();
 
-     return res.status(200).json({
-      message:"Download file success! Please check"
-     })
- 
    } catch (error) {
      return res.status(500).json({ message: error.message });
    }

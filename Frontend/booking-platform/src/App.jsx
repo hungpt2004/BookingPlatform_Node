@@ -109,6 +109,7 @@ function App() {
           <Route path="/update-customer" element={<CustomerProfileSetting />} />
           <Route path="/feedback" element={<FeedbackPage />} />
           <Route path="/receipt/:id" element={<Receipt />} />
+          <Route path="/favorite" element={<FavoriteHotelsList />} />
         </Route>
 
         {/* Owner routes */}
