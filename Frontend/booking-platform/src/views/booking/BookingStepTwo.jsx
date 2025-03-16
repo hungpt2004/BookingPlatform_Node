@@ -158,7 +158,7 @@ const BookingStepTwo = () => {
     return (
         <>
             <CustomNavbar />
-            <div className="container-fluid mt-3" style={{ maxWidth: '85%' }}>
+            <div className="container-fluid" style={{ maxWidth: '85%', marginTop: '100px'}}>
                 <div className="row w-100">
                     <div className="col-md-8">
                         <Card className="rounded-1 px-2">
