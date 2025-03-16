@@ -150,6 +150,7 @@ export const LoginPage = () => {
   // Auth store
   const { login, googleLogin, signup } = useAuthStore();
 
+
   // Preload background image
   useEffect(() => {
     const img = new Image();
@@ -160,14 +161,6 @@ export const LoginPage = () => {
   // Handle login form submission
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    if (!email || !password) {
-      toast.error("Vui lòng nhập đầy đủ thông tin!", {
-        position: "top-center",
-        autoClose: 2000,
-      });
-      return;
-    }
 
     setLoading(true);
 
@@ -205,6 +198,28 @@ export const LoginPage = () => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+    try {
+      const userData = await login(email, password);
+      toast.success("Đăng nhập thành công", {
+        position: "top-center",
+        autoClose: 2000,
+      });
+      setTimeout(() => {
+        setLoading(false);
+        setShowLoginModal(false);
+        if (userData.data.user.role === 'OWNER') {
+          navigate("/booking-management");
+        } else {
+          navigate("/home");
+        }
+      }, 2000);
+    } catch (err) {
+      setLoading(false);
+      toast.error(err.message || "Đăng nhập thất bại", {
+        position: "top-center",
+        autoClose: 2000,
+      });
+    }
 
     if (!fullName || !registerEmail || !registerPassword || !confirmPassword) {
       toast.error("Vui lòng nhập đầy đủ thông tin!", {
@@ -252,7 +267,7 @@ export const LoginPage = () => {
       setTimeout(() => {
         setLoading(false); // Tắt loading sau 1.5s
 
-        toast.error("Register Failed! Try again", {
+        toast.error("Đăng ký thất bại", {
           position: "top-center",
           autoClose: 2000,
         });
@@ -457,7 +472,7 @@ export const LoginPage = () => {
                 }}
                 onClick={() => navigate("/forgot")}
               >
-                Forgot Password?
+                Quên mật khẩu?
               </p>
             </div>
 

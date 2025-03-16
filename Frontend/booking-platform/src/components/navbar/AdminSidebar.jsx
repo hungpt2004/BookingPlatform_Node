@@ -33,8 +33,8 @@ const Sidebar = () => {
       title: "Quản lý khách sạn",
       icon: <FaHotel />,
       submenus: [
-        { title: "Danh sách khách sạn", path: "/hotels" },
-        { title: "Thêm khách sạn", path: "/hotels/add" },
+        { title: "Lịch Booking", path: "/booking-management" },
+        { title: "Booking Management", path: "/hotels/add" },
       ],
     },
     {
@@ -154,7 +154,7 @@ const Sidebar = () => {
       </div>
 
       <div className="sidebar-footer">
-        <NavLink to="/profile" className="profile-link">
+        <NavLink to="/dashboard" className="profile-link">
           <div className="menu-icon">
             <FaUserCog />
           </div>
@@ -171,4 +171,4 @@ const Sidebar = () => {
   );
 };
 
-export default AdminSidebar;
+export default Sidebar;

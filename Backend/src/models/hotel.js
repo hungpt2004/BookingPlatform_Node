@@ -55,7 +55,6 @@ const hotelSchema = new Schema(
       // },
       { type: String, required: true },
     ],
-
     //Thêm mảng lưu trữ hình ảnh
     businessDocuments: [{
       title: { type: String, required: true },

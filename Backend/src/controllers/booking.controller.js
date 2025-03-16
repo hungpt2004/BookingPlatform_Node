@@ -23,13 +23,10 @@ exports.createBooking = asyncHandler(async (req, res) => {
         // Validate that the rooms exist, belong to the hotel, and have quantity > 0
         const rooms = await Room.find({ _id: { $in: roomId }, hotel: hotelId, quantity: { $gt: 0 } });
 
-       // // Validate that the rooms exist and belong to the hotel
-       // const rooms = await Room.find({ _id: { $in: roomId }, hotel: hotelId });
+        if (rooms.length !== roomId.length) {
+            return res.status(404).json({ error: true, message: "Some rooms were not found or do not belong to the specified hotel" });
+        }
 
-       // console.log(rooms.length, roomId.length);
-       if (rooms.length !== roomId.length) {
-           return res.status(404).json({ error: true, message: "Some rooms were not found or do not belong to the specified hotel" });
-       }
 
         const checkIn = new Date(checkInDate);
         const checkOut = new Date(checkOutDate);

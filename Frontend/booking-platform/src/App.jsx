@@ -31,6 +31,11 @@ import PricePerPerson from './views/room/roomPriceType/PricePerCapacity'
 import PriceNoRefund from './views/room/roomPriceType/PriceNoRefund'
 import PricePerWeek from './views/room/roomPriceType/PricePerWeek'
 import HotelPhotos from './views/hotel/CreateHotelPhotos'
+import BookingManagePage from './views/owner/BookingManagePage'
+import ReviewPage from './views/owner/ReviewPage'
+import HotelReservations from './views/owner/BookingSchedule'
+import HotelDetailOwnerPage from './views/owner/HotelDetailOwner'
+import BookingSchedule from "./views/owner/BookingSchedule";
 
 function App() {
   const { user, isAuthenticated } = useAuthStore();
@@ -135,6 +140,10 @@ function App() {
         <Route path='/edit-weekly-price' element={<PricePerWeek />} />
         <Route path='/create-photo' element={<HotelPhotos />} />
 
+        <Route path='/booking-management' element={<BookingManagePage />} />
+        <Route path='/reviews' element={<ReviewPage />} />
+        <Route path='/booking-schedule/:hotelId' element={<HotelReservations/>}/>
+        <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage/>}/>
       </Routes>
     </Router>
   );
