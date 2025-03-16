@@ -39,7 +39,6 @@ const Step15 = ({ prevStep }) => {
         const selectedGroupData = typeOption.find(item => item.id === selectedGroup);
         const formData = {
             ...selectedGroupData,
-            hotelParent,
             isValid,
             isButtonEnabled,
         };
@@ -49,7 +48,7 @@ const Step15 = ({ prevStep }) => {
     // Lưu dữ liệu vào sessionStorage mỗi khi có sự thay đổi
     useEffect(() => {
         saveToSessionStorage();
-    }, [selectedGroup, hotelParent, isValid, isButtonEnabled]);
+    }, [selectedGroup, isValid, isButtonEnabled]);
 
     // Khôi phục dữ liệu từ sessionStorage khi component được tải và data user
     useEffect(() => {
@@ -67,7 +66,6 @@ const Step15 = ({ prevStep }) => {
         if (savedData) {
             const parsedData = JSON.parse(savedData);
             setSelectedGroup(parsedData.selectedGroup);
-            setHotelParent(parsedData.hotelParent);
             setIsValid(parsedData.isValid);
             setIsButtonEnabled(parsedData.isButtonEnabled);
         }
@@ -80,6 +78,15 @@ const Step15 = ({ prevStep }) => {
         }
         // Call fetchUser
         fetchUser();
+        //get hotelGroup from sessionStorage
+        const savedHotelGroup = sessionStorage.getItem("hotelGroup");
+        if (savedHotelGroup) {
+            setSelectedGroup(2);
+            setHotelParent(savedHotelGroup);
+        }
+        else{
+            setSelectedGroup(1);
+        }
     }, []);
 
     const handleChange = (value) => {
@@ -163,6 +170,7 @@ const Step15 = ({ prevStep }) => {
             //const hotelBillInfo = JSON.parse(sessionStorage.getItem('hotelBillInfo'));
             const hotelFacilities = JSON.parse(sessionStorage.getItem('hotelFacility'));
             const hotelServiceData = JSON.parse(sessionStorage.getItem('hotelService'));
+            const imageUrls = JSON.parse(sessionStorage.getItem('hotelPhotos'));
             // Tạo FormData để gửi thông tin khách sạn
             const formData = new FormData();
             formData.append('hotelName', hotelNameAndStar.hotelName);
@@ -173,6 +181,8 @@ const Step15 = ({ prevStep }) => {
             formData.append('businessDocuments', JSON.stringify(documentUrls));
             formData.append('facilities', JSON.stringify(hotelFacilities.map(facility => facility._id)));
             formData.append('services', JSON.stringify(hotelServiceData));
+            formData.append('imageUrls', JSON.stringify(imageUrls));
+            formData.append('hotelGroup', hotelParent ? hotelParent : '');
             const response = await axiosInstance.post('/hotel/create', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'

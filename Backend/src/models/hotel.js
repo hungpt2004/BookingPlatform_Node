@@ -87,7 +87,11 @@ const hotelSchema = new Schema(
 
     decisionDate: {
       type: Date
-    } // Ngày quyết định (nếu có)
+    },// Ngày quyết định (nếu có)
+
+    hotelParent: {
+      type: String
+    }// cty cha (neu co)
 
   },
   { versionKey: false }

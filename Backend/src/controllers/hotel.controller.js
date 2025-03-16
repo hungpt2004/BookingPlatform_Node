@@ -125,6 +125,8 @@ exports.createHotel = asyncHandler(async (req, res) => {
       services = "{}", // Default to an empty JSON string if not provided
       rooms = [],
       roomFacility,
+      imageUrls,
+      hotelParent
     } = req.body;
 
     console.log("get from FE", req.body);
@@ -141,25 +143,7 @@ exports.createHotel = asyncHandler(async (req, res) => {
     const parsedBusinessDocuments = JSON.parse(businessDocuments);
     const parsedFacilities = JSON.parse(facilities);
     const parsedServices = JSON.parse(services); // Parse the services JSON string
-
-    // Upload images
-    let imageUrls = [];
-    if (req.files && Object.keys(req.files).length > 0) {
-      const hotelImages = req.files.images
-        ? Array.isArray(req.files.images)
-          ? req.files.images
-          : [req.files.images]
-        : [];
-
-      if (hotelImages.length > 0) {
-        const folderPath = `hotels/${ownerID}`;
-        imageUrls = await uploadMultipleImages(hotelImages, folderPath, {
-          width: 800,
-          crop: "fill",
-          quality: "auto:good",
-        });
-      }
-    }
+    const parsedimageUrls = JSON.parse(imageUrls);
 
     // Create new hotel
     const newHotel = new Hotel({
@@ -171,10 +155,11 @@ exports.createHotel = asyncHandler(async (req, res) => {
       star,
       pricePerNight,
       facilities: parsedFacilities,
-      images: imageUrls,
+      images: parsedimageUrls,
       owner: ownerID,
       businessDocuments: parsedBusinessDocuments,
-      services: [], // Initialize services as an empty array
+      services: [],// Initialize services as an empty array
+      hotelParent 
     });
 
     // Create Hotel Services
@@ -206,7 +191,7 @@ exports.createHotel = asyncHandler(async (req, res) => {
       await parkingService.save({ session });
       hotelServices.push(parkingService._id); // Save the ObjectId
     }
-    console.log("hotelServices", hotelServices);
+    console.log("hotelServices", services);
 
     // Assign the service ObjectIds to the hotel
     newHotel.services = hotelServices;
@@ -235,7 +220,7 @@ exports.createHotel = asyncHandler(async (req, res) => {
       await newRoom.save({ session });
       createdRooms.push(newRoom._id); // Save the ObjectId
     }
-    
+
     // Assign the room ObjectIds to the hotel
     newHotel.rooms = createdRooms;
     await newHotel.save({ session });
@@ -304,3 +289,40 @@ exports.uploadAllDocuments = asyncHandler(async (req, res) => {
   }
 });
 
+
+/**
+ * Upload tất cả ảnh từ request lên Cloudinary và trả về URL
+ */
+exports.uploadAllImages = asyncHandler(async (req, res) => {
+  try {
+    const ownerID = req.user?.id || req.body.ownerID;
+
+    // Kiểm tra và xử lý tệp hình ảnh
+    let imageUrls = [];
+    if (req.files && Object.keys(req.files).length > 0) {
+      const hotelImages = req.files.images
+        ? Array.isArray(req.files.images)
+          ? req.files.images
+          : [req.files.images]
+        : [];
+
+      if (hotelImages.length > 0) {
+        const folderPath = `hotels/${ownerID}/photos`;
+        imageUrls = await uploadMultipleImages(hotelImages, folderPath, {
+          width: 800,
+          crop: "fill",
+          quality: "auto:good",
+        });
+      }
+    }
+    // Trả về kết quả chỉ với hình ảnh
+    return res.status(200).json({
+      success: true,
+      message: "Tải hình ảnh thành công!",
+      imageUrls: imageUrls, // Chỉ trả về mảng hình ảnh
+    });
+  } catch (error) {
+    console.error("Lỗi khi tải hình ảnh:", error);
+    return res.status(500).json({ success: false, message: "Lỗi máy chủ khi tải hình ảnh." });
+  }
+});

@@ -25,4 +25,5 @@ HotelRouter.get(
 HotelRouter.get("/top-hotel", HotelController.getTopHotel);
 HotelRouter.post("/create", protect, HotelController.createHotel);
 HotelRouter.post("/upload-documents", protect, HotelController.uploadAllDocuments);
+HotelRouter.post("/upload-images", protect, HotelController.uploadAllImages);
 module.exports = HotelRouter;

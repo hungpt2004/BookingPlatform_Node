@@ -24,11 +24,12 @@ export const Step6 = ({ nextStep, prevStep }) => {
             hotelName
         };
         sessionStorage.setItem("hotelName&Star", JSON.stringify(hotelNameStar));
+        sessionStorage.setItem("hotelGroup", hotelGroup);
     }
 
     useEffect(() => {
         saveNameStarHotel()
-    }, [hotelName, selectedStar]);
+    }, [hotelName, selectedStar, hotelGroup]);
     return (
         <Container>
             <h4 className="fw-bold mt-4">Cho chúng tôi biết thêm về hotel của Quý vị</h4>
