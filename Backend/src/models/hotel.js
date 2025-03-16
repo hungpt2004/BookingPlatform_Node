@@ -24,11 +24,6 @@ const hotelSchema = new Schema(
       type: String,
       required: true,
     },
-    status: {
-      type: String,
-      enum: ['ACTIVE', 'NONACTIVE'],
-      default: 'NONACTIVE',
-    },
     services: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -47,14 +42,18 @@ const hotelSchema = new Schema(
     },
     star: {
       type: Number,
-      required: true
+      required: true,
     },
     pricePerNight: {
       type: Number,
       required: true,
     },
     images: [
-      { type: String }
+      // {
+      //   // public_ID: { type: String, required: true },
+      //   url: { type: String, required: true }
+      // },
+      { type: String, required: true },
     ],
     //Thêm mảng lưu trữ hình ảnh
     businessDocuments: [{

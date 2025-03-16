@@ -8,6 +8,7 @@ module.exports = {
   },
   RESERVATION: {
     NOT_FOUND: "No reservations found.",
+    INVALID_ID: "Invalid id! Try again",
     INVALID_STATUS: "Invalid reservation status.",
   },
   USER: {
@@ -21,6 +22,10 @@ module.exports = {
   },
   HOTEL: {
     NOT_FOUND: "No hotel found",
+    INVALID_ID: "Invalid id!",
+    SUCCESS: "Get hotel data success",
+    CHECK_IN_DATE: "Check-in date cannot be before check-out date.",
+    CHECK_OUT_DATE: "Check-out date cannot be in the past.",
     INVALID_ID: "Invalid id !",
     SUCCESS: "Get hotel data success",
     CHECK_IN_DATE: "CheckInDate cannot be before CheckOutDate",
@@ -33,14 +38,13 @@ module.exports = {
   },
   ROOM: {
     NOT_FOUND: "No room found.",
-    INVALID_ID: "Invalid id !",
-    SUCCESS: "Get bed success"
+    INVALID_ID: "Invalid id!",
+    SUCCESS: "Get room success"
   },
   PAYMENT: {
-    SUCCESS: "Payment Success",
-    FAIL: "Payment Failed ! Check Error In Server",
-    CANCEL_SUCCESS: 'Cancel Payment Success',
-    CANCEL_FAIL: 'Cancel Payment Failed !'
-   }
- };
- 
+    SUCCESS: "Payment success.",
+    FAIL: "Payment failed! Check error in server.",
+    CANCEL_SUCCESS: "Cancel payment success.",
+    CANCEL_FAIL: "Cancel payment failed!"
+  }
+};

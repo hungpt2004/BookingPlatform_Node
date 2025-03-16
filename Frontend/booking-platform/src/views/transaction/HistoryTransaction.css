@@ -1,5 +1,5 @@
 .btn-active {
-   background-color: #6499E9;
+   background-color: #003b95;
    border-radius: 5px;
    border-width: 0px;
    transition: ease 1s;
@@ -9,7 +9,7 @@
 .btn-non-active {
    border-radius: 5px;
    border-width: 1px;
-   border-color: #6499E9;
+   border-color: #003b95;
 }
 
 .btn-active:hover{
@@ -21,7 +21,7 @@
 .btn-non-active:hover{
    transform: translateY(-5px);
    transition: ease-in 0.2s;
-   box-shadow: 0px 2px 8px #6499E9;
+   box-shadow: 0px 2px 8px #003b95;
 }
 
 button {
@@ -29,12 +29,9 @@ button {
    padding: 5px 20px;
    width: 150px;
    background-color: white;
-   border-color: #6499E9;
+   border-color: #003b95;
 }
 
-.badge-status {
-   
-}
 
 .fade-in {
    animation: fadeIn 0.5s ease-in;

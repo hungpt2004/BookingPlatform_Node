@@ -1,7 +1,7 @@
 require("dotenv").config();
 const PayOs = require("@payos/node");
 const asyncHandler = require("../middlewares/asyncHandler");
-const Hotel = require("../models/hotel");
+const User = require('../models/user')
 const Room = require("../models/room");
 const Reservation = require("../models/reservation");
 const cron = require('node-cron')
@@ -32,8 +32,7 @@ exports.createBooking = asyncHandler(async (req, res) => {
 
     //Check not paid reservation
     
-
-
+    
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -105,6 +104,13 @@ exports.createBooking = asyncHandler(async (req, res) => {
 
       await reservation.save({ session });
 
+      //add to set check duplicate
+      //push is not check
+
+      await User.findByIdAndUpdate(user._id, {
+        $addToSet: { reservations: reservation._id }
+      });
+
       await session.commitTransaction();
       session.endSession();
 
@@ -134,7 +140,7 @@ exports.createPaymentLink = asyncHandler(async (req, res) => {
   //user
   const currentUser = req.user;
 
-  const { amount, rooms, hotelId, roomIds, reservationId } = req.body;
+  const { amount, rooms, reservationId } = req.body;
 
   console.log(`Room Selected: ${rooms}`);
 

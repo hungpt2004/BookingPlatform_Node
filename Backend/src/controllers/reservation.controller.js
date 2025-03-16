@@ -1,8 +1,9 @@
 const asyncHandler = require("../middlewares/asyncHandler");
-const Reservation = require("../models/reservation");
-const RefundingReservation = require('../models/refundingReservation')
-const Room = require('../models/room')
+const Reservation = require('../models/reservation')
+const RefundingReservation = require("../models/refundingReservation");
+const Room = require("../models/room");
 const cron = require("node-cron");
+const { RESERVATION } = require("../utils/constantMessage");
 const Hotel = require('../models/hotel');
 
 exports.getALlReservation = asyncHandler(async (req, res) => {
@@ -156,6 +157,7 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
     user: currentUser.id,
   })
     .populate("hotel")
+    .populate("user", "name email phoneNumber")
     .sort({ totalPrice: -1 })
     .skip((page - 1) * perPage)
     .limit(perPage);
@@ -172,27 +174,6 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   });
 });
 
-
-//automatic update status of reservations
-const autoUpdateReservationStatus = asyncHandler(async () => {
-  const currentDate = new Date();
-
-  const reservations = await Reservation.find();
-
-  for (const r of reservations) {
-    if (r.status === "COMPLETED" || r.status === "CHECKED OUT") continue;
-
-    //1. Update from Booked to CheckIn
-    // if (currentDate < r.checkInDate) r.status = "CHECKED IN";
-
-    // //2. Update from CheckIn to CheckOut
-    // if (currentDate > r.checkOutDate) r.status = "CHECKED OUT";
-
-    // await Reservation.updateOne({ _id: r._id }, { $set: { status: r.status } });
-
-    console.log(`Updated status for reservation ID ${r._id} to ${r.status}`);
-  }
-});
 
 exports.getHotelReservations = asyncHandler(async (req, res) => {
   const { hotelId } = req.params;
@@ -247,14 +228,16 @@ exports.getHotelReservations = asyncHandler(async (req, res) => {
     });
   }
 });
+
+
 exports.cancelReservation = asyncHandler(async (req, res) => {
   const { reservationId } = req.params;
   const userId = req.user.id;
 
   try {
     const reservation = await Reservation.findById(reservationId)
-      .populate('hotel')
-      .populate('rooms.room');
+      .populate("hotel")
+      .populate("rooms.room");
 
     if (!reservation) {
       return res.status(404).json({
@@ -279,7 +262,9 @@ exports.cancelReservation = asyncHandler(async (req, res) => {
 
     const checkInDate = new Date(reservation.checkInDate);
     const currentDate = new Date();
-    const daysUntilCheckIn = Math.floor((checkInDate - currentDate) / (1000 * 60 * 60 * 24));
+    const daysUntilCheckIn = Math.floor(
+      (checkInDate - currentDate) / (1000 * 60 * 60 * 24)
+    );
 
     let refundPercentage = 0;
     let cancellationFee = 0;
@@ -307,8 +292,8 @@ exports.cancelReservation = asyncHandler(async (req, res) => {
 
     //Setting reservation become pending status
     await reservation.updateOne({
-      $set: { status: "PENDING" }
-    })
+      $set: { status: "PENDING" },
+    });
 
     await reservation.save();
 
@@ -317,8 +302,8 @@ exports.cancelReservation = asyncHandler(async (req, res) => {
       const refund = new RefundingReservation({
         reservation: reservation._id,
         refundAmount: refundAmount,
-        status: 'PENDING',
-        requestDate: new Date()
+        status: "PENDING",
+        requestDate: new Date(),
       });
       await refund.save();
     }
@@ -346,18 +331,84 @@ exports.cancelReservation = asyncHandler(async (req, res) => {
           refundPercentage: refundPercentage,
           refundAmount: refundAmount,
           cancellationFee: cancellationFee,
-          daysUntilCheckIn: daysUntilCheckIn
-        }
-      }
+          daysUntilCheckIn: daysUntilCheckIn,
+        },
+      },
     });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
       error: true,
-      message: "Failed to cancel reservation"
+      message: "Failed to cancel reservation",
     });
   }
 });
+
+
+/*
+Thông tin của hóa đơn thanh toán gồm 
+- Mã reservation
+- Tên khách sạn, địa chỉ, số điện thoại
+- Tên người dùng, email, điện thoại
+- thông tin reservation
+
+*/
+
+exports.getReservationDetailById = asyncHandler(async (req, res) => {
+  const { reservationId } = req.params;
+
+  if(!reservationId) {
+    return res.status(400).json({
+      message: RESERVATION.INVALID_STATUS
+    })
+  }
+
+  try {
+
+    const reservation = await Reservation.findById(reservationId)
+      .populate("user", "name email phoneNumber") // Chỉ lấy các trường cần thiết
+      .populate("hotel", "hotelName address rating star pricePerNight") // Chỉ lấy các trường cần thiết
+      .populate("rooms.room", "name type price"); // Populate chi tiết phòng đặt
+
+    if (!reservation) {
+      return res.status(404).json({ message: RESERVATION.NOT_FOUND });
+    }
+
+    return res.status(200).json({
+      reservation,
+      message: "Get detail reservation successfully"
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+});
+
+
+
+//automatic update status of reservations
+const autoUpdateReservationStatus = asyncHandler(async () => {
+  const currentDate = new Date();
+
+  const reservations = await Reservation.find();
+
+  for (const r of reservations) {
+    if (r.status === "COMPLETED" || r.status === "CHECKED OUT") continue;
+
+    //1. Update from Booked to CheckIn
+    if (currentDate < r.checkInDate) r.status = "CHECKED IN";
+
+    //2. Update from CheckIn to CheckOut
+    if (currentDate > r.checkOutDate) r.status = "CHECKED OUT";
+
+    await Reservation.updateOne({ _id: r._id }, { $set: { status: r.status } });
+
+    console.log(`Updated status for reservation ID ${r._id} to ${r.status}`);
+  }
+});
+
 
 const autoDeleteNotPaidReservation = asyncHandler(async () => {
   const currentDate = new Date();
@@ -375,10 +426,13 @@ const autoDeleteNotPaidReservation = asyncHandler(async () => {
 });
 
 // setinterval auto run after each minutes
-cron.schedule("*/5 * * * *", () => {
-  // autoUpdateReservationStatus();
-  // autoDeleteNotPaidReservation();
-}, {
-  timezone: "Asia/Ho_Chi_Minh"
-}
+cron.schedule(
+  "*/5 * * * *",
+  () => {
+    // autoUpdateReservationStatus();
+    // autoDeleteNotPaidReservation();
+  },
+  {
+    timezone: "Asia/Ho_Chi_Minh",
+  }
 );

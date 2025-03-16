@@ -1,6 +1,7 @@
 const asyncHandler = require("../middlewares/asyncHandler");
 const Hotel = require("../models/hotel");
 const Room = require("../models/room");
+require("../models/hotelFacility"); 
 const Reservation = require("../models/reservation");
 const Bed = require("../models/bed");
 const { AUTH, GENERAL, HOTEL } = require("../utils/constantMessage");
@@ -25,6 +26,7 @@ exports.getAllHotels = asyncHandler(async (req, res) => {
 });
 
 exports.getOwnedHotels = asyncHandler(async (req, res) => {
+  
   const user = req.user;
 
   const hotels = await Hotel.find({ owner: user.id });
@@ -54,8 +56,9 @@ exports.getHotelDetailById = asyncHandler(async (req, res) => {
   }
 
   const [currentHotel, listCurrentHotelRoom] = await Promise.all([
-    Hotel.findOne({ _id: hotelId }),
-    Room.find({ hotel: hotelId }).populate("bed.bed"),
+    Hotel.findOne({ _id: hotelId }).populate('services').populate('facilities'),
+    Room.find({ hotel: hotelId })
+    .populate("bed.bed"),
   ]);
 
   if (!currentHotel) {

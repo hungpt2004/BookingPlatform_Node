@@ -10,6 +10,7 @@ import FeedbackModal from "../../components/feedback/FeedbackModal";
 import axiosInstance from "../../utils/AxiosInstance";
 import { useNavigate } from "react-router-dom";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
+import SquareSpinner from "../../components/animation/CustomSpinner";
 
 
 export const HistoryTransaction = () => {
@@ -29,6 +30,8 @@ export const HistoryTransaction = () => {
    const [selectedReservation, setSelectedReservation] = useState(null);
    const [cancellationStep, setCancellationStep] = useState(1);
    const [cancellationStatus, setCancellationStatus] = useState('idle');
+
+   const navigate = useNavigate();
 
    const handleChangeStatus = (newStatus) => {
       setStatus(newStatus);
@@ -299,6 +302,9 @@ export const HistoryTransaction = () => {
       );
    };
 
+   const goToReceipt = (id, user) => {
+      navigate(`/receipt/${id}`, {state: {user}});
+   }
 
    return (
       <>
@@ -321,10 +327,10 @@ export const HistoryTransaction = () => {
                </div>
             </div>
 
-            <div className="col-md-8">
+            <div className="col-md-8 mt-5">
                <div className="d-flex justify-content-center align-items-center">
                   {loading ? (
-                     <HashLoader className="mt-5" size={50} color="#6499E9" />
+                     <Spinner className="mt-5" size={50} color="#003b95" />
                   ) : (
                      <>
                         <div className="d-flex flex-column">
@@ -362,9 +368,9 @@ export const HistoryTransaction = () => {
                                           : "col-md-4"
                                     }`
                                  }>
-                                    <Card className="card-search-hotel p-3 m-3">
-                                       <Card.Title className="text-center">{item.hotel.hotelName || "Unknown Hotel"}</Card.Title>
-                                       <Card.Body>
+                                    <Card className="card-search-hotel m-3 rounded-4">
+                                       <Card.Header style={{backgroundColor: '#003b95'}} className="text-center text-light fs-4 rounded-top-4">{item.hotel.hotelName || "Unknown Hotel"}</Card.Header>
+                                       <Card.Body className="p-4">
                                           <p style={{
                                              display: '-webkit-box',
                                              WebkitBoxOrient: 'vertical',
@@ -378,7 +384,7 @@ export const HistoryTransaction = () => {
                                              {statusText[item.status] || "Unknown Status"}
                                           </Badge>
                                        </Card.Body>
-                                       <Row className="m-2">
+                                       <Row className="m-2 p-3">
                                           {item.status === "CHECKED OUT" && (
                                              <Button
                                                 className="mb-1"
@@ -423,7 +429,9 @@ export const HistoryTransaction = () => {
                                                 </Badge>
                                              )
                                           )}
-                                          <Button className="mt-1" variant="outline-dark">
+                                          <Button
+                                          onClick={() => goToReceipt(item._id, item.user)}
+                                          className="mt-1" variant="outline-dark">
                                              View Details
                                           </Button>
                                        </Row>

@@ -26,7 +26,7 @@ export default function CustomerProfileSetting() {
     try {
       const response = await axiosInstance.get("/customer/current-user");
       const userData = response.data.user;
-      setPhone(userData.phone || "");
+      setPhone(userData.phoneNumber || "");
       setAddress(userData.address || "");
       setAvatar(userData.image?.url || null);
       setName(userData.name || "");
