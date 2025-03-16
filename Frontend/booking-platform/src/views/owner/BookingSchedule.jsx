@@ -10,6 +10,7 @@ import '../owner/BookingSchedule.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { AdminCustomNavbar } from '../../components/navbar/AdminCustomNavbar';
 
 const localizer = momentLocalizer(moment);
 
@@ -296,7 +297,7 @@ const BookingSchedule = () => {
 
     return (
         <div>
-            <OwnerNavbar />
+            <AdminCustomNavbar />
             <Container className="py-4">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h3 className="mb-0">Booking Schedule</h3>

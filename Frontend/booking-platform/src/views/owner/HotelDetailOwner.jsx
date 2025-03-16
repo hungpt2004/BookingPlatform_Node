@@ -4,6 +4,7 @@ import { Container, Row, Col, Card, Spinner, Alert, Button, Badge, Form } from '
 import axios from 'axios';
 import { BASE_URL } from '../../utils/Constant';
 import { OwnerNavbar } from '../../components/navbar/OwnerNavbar';
+import { AdminCustomNavbar } from '../../components/navbar/AdminCustomNavbar';
 
 const HotelDetailOwnerPage = () => {
     const { hotelId } = useParams();
@@ -99,7 +100,7 @@ const HotelDetailOwnerPage = () => {
 
     return (
         <>
-            <OwnerNavbar />
+            <AdminCustomNavbar />
             <Container className="py-4">
                 <Button
                     variant="outline-secondary"

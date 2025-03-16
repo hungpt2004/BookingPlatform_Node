@@ -3,6 +3,7 @@ import { Navbar, Nav, Container, Row, Col, Form, Button, Dropdown, Card } from "
 import { Printer, Download, Filter, FileIcon as FileEarmark, Hotel, Building, User } from "lucide-react"
 import { OwnerNavbar } from "../../components/navbar/OwnerNavbar"
 import { BASE_URL } from '../../utils/Constant';
+import {AdminCustomNavbar} from'../../components/navbar/AdminCustomNavbar';
 import axios from "axios"
 
 export default function BookingManagePage() {
@@ -55,7 +56,7 @@ export default function BookingManagePage() {
 
     return (
         <div className="booking-app">
-            <OwnerNavbar />
+            <AdminCustomNavbar/>
             <Container className="py-4">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <label className="text-dark fw-bold fs-3">Khách sạn của tôi</label>
