@@ -2,6 +2,7 @@ const asyncHandler = require("../middlewares/asyncHandler");
 const Hotel = require("../models/hotel");
 const HotelService = require("../models/hotelService");
 const Room = require("../models/room");
+require("../models/hotelFacility"); 
 const Reservation = require("../models/reservation");
 const Bed = require("../models/bed");
 const { AUTH, GENERAL, HOTEL } = require("../utils/constantMessage");
@@ -26,6 +27,7 @@ exports.getAllHotels = asyncHandler(async (req, res) => {
 });
 
 exports.getOwnedHotels = asyncHandler(async (req, res) => {
+  
   const user = req.user;
 
   const hotels = await Hotel.find({ owner: user.id });
@@ -55,8 +57,9 @@ exports.getHotelDetailById = asyncHandler(async (req, res) => {
   }
 
   const [currentHotel, listCurrentHotelRoom] = await Promise.all([
-    Hotel.findOne({ _id: hotelId }),
-    Room.find({ hotel: hotelId }).populate("bed.bed"),
+    Hotel.findOne({ _id: hotelId }).populate('services').populate('facilities'),
+    Room.find({ hotel: hotelId })
+    .populate("bed.bed"),
   ]);
 
   if (!currentHotel) {
@@ -142,7 +145,7 @@ exports.createHotel = asyncHandler(async (req, res) => {
     // Parse JSON strings into objects
     const parsedBusinessDocuments = JSON.parse(businessDocuments);
     const parsedFacilities = JSON.parse(facilities);
-    const parsedServices = JSON.parse(services); // Parse the services JSON string
+    const parsedServices = JSON.parse(services); 
     const parsedimageUrls = JSON.parse(imageUrls);
 
     // Create new hotel
@@ -249,6 +252,9 @@ exports.createHotel = asyncHandler(async (req, res) => {
   }
 });
 
+/**
+ * Upload tất cả document từ request lên Cloudinary và trả về URL
+ */
 exports.uploadAllDocuments = asyncHandler(async (req, res) => {
   try {
     const ownerID = req.user?.id || req.body.ownerID;

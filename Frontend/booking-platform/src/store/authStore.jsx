@@ -4,10 +4,10 @@ import { BASE_URL } from "../utils/Constant";
 const API_URL = "/user";
 
 export const useAuthStore = create((set) => ({
-  user: null,
-  isAuthenticated: false,
-  error: null,
+  user: JSON.parse(sessionStorage.getItem("user")) || null,
+  isAuthenticated: !!sessionStorage.getItem("token"),
   isLoading: false,
+  error: null,
   isCheckingAuth: true,
   message: null,
 
@@ -88,16 +88,24 @@ export const useAuthStore = create((set) => ({
         email,
         password,
       });
+
+      const userData = response.data.data.user;
+      const token = response.data.token;
+
+      // Store both token AND user data in sessionStorage
+      if (token) {
+        sessionStorage.setItem("token", token);
+        sessionStorage.setItem("user", JSON.stringify(userData));
+      }
+
+      // Update state
       set({
         isAuthenticated: true,
-        user: response.data.data.user,
+        user: userData,
         error: null,
         isLoading: false,
       });
-      // Store token in sessionStorage after successful login
-      if (response.data.token) {
-        sessionStorage.setItem("token", response.data.token);
-      }
+
       return response.data;
     } catch (error) {
       set({
@@ -108,25 +116,32 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-  // Google login
   googleLogin: async (credential) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axiosInstance.post(`${BASE_URL}/user/google-login`, {
-        credential,
-      });
+      const response = await axiosInstance.post(
+        `${BASE_URL}/user/google-login`,
+        {
+          credential,
+        }
+      );
 
-      // Store user data and token
+      const userData = response.data.data.user;
+      const token = response.data.token;
+
+      // Store both token AND user data in sessionStorage
+      if (token) {
+        sessionStorage.setItem("token", token);
+        sessionStorage.setItem("user", JSON.stringify(userData));
+      }
+
+      // Update state
       set({
         isAuthenticated: true,
-        user: response.data.data.user,
+        user: userData,
         error: null,
         isLoading: false,
       });
-
-      if (response.data.token) {
-        sessionStorage.setItem("token", response.data.token);
-      }
 
       return response.data;
     } catch (error) {
@@ -143,6 +158,8 @@ export const useAuthStore = create((set) => ({
     try {
       await axiosInstance.post(`${BASE_URL}/user/logout`);
       // Clear token from sessionStorage
+
+      sessionStorage.removeItem("user");
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("payment_link");
       set({
@@ -163,9 +180,12 @@ export const useAuthStore = create((set) => ({
   forgotPassword: async (email) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axiosInstance.post(`${BASE_URL}/user/forgot-password`, {
-        email,
-      });
+      const response = await axiosInstance.post(
+        `${BASE_URL}/user/forgot-password`,
+        {
+          email,
+        }
+      );
       set({
         message: response.data.message,
         isLoading: false,

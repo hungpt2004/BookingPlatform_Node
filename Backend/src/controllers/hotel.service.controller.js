@@ -5,6 +5,7 @@ const HotelService = require("../models/hotelService.js");
 require("dotenv").config();
 
 exports.getAllHotelServicesByHotelId = catchAsync(async (req, res) => {
+  
   const { hotelId } = req.params;
 
   if (!hotelId) {

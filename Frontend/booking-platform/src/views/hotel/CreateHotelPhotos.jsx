@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axiosInstance from "../../components/utils/AxiosInstance";
+import axiosInstance from "../../utils/AxiosInstance"
 import { Container, Card, Button, Row, Col } from "react-bootstrap";
 import { FaChevronLeft, FaTimesCircle, FaUpload } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";

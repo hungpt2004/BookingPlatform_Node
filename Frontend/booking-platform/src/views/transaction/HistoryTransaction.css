@@ -1,5 +1,5 @@
 .btn-active {
-   background-color: #6499E9;
+   background-color: #003b95;
    border-radius: 5px;
    border-width: 0px;
    transition: ease 1s;
@@ -9,7 +9,7 @@
 .btn-non-active {
    border-radius: 5px;
    border-width: 1px;
-   border-color: #6499E9;
+   border-color: #003b95;
 }
 
 .btn-active:hover{
@@ -21,7 +21,7 @@
 .btn-non-active:hover{
    transform: translateY(-5px);
    transition: ease-in 0.2s;
-   box-shadow: 0px 2px 8px #6499E9;
+   box-shadow: 0px 2px 8px #003b95;
 }
 
 button {
@@ -29,9 +29,53 @@ button {
    padding: 5px 20px;
    width: 150px;
    background-color: white;
-   border-color: #6499E9;
+   border-color: #003b95;
 }
 
-.badge-status {
-   
-}
+
+.fade-in {
+   animation: fadeIn 0.5s ease-in;
+ }
+ 
+ @keyframes fadeIn {
+   from { opacity: 0; transform: translateY(-10px); }
+   to { opacity: 1; transform: translateY(0); }
+ }
+ 
+ .success-checkmark {
+   width: 40px;
+   height: 40px;
+ }
+ 
+ .checkmark__circle {
+   stroke-dasharray: 166;
+   stroke-dashoffset: 166;
+   stroke-width: 2;
+   stroke-miterlimit: 10;
+   stroke: #28a745;
+   fill: none;
+   animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+ }
+ 
+ .checkmark__check {
+   transform-origin: 50% 50%;
+   stroke-dasharray: 48;
+   stroke-dashoffset: 48;
+   animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards,
+              scale 0.3s ease-in-out 0.9s both;
+ }
+ 
+ @keyframes stroke {
+   100% {
+     stroke-dashoffset: 0;
+   }
+ }
+ 
+ @keyframes scale {
+   0%, 100% {
+     transform: none;
+   }
+   50% {
+     transform: scale3d(1.1, 1.1, 1);
+   }
+ }

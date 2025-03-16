@@ -1,38 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import PropTypes from "prop-types";
-import axiosInstance from '../../utils/AxiosInstance';
 import { toast } from 'react-toastify';
+import { CustomFailedToast, CustomSuccessToast, CustomToast } from '../toast/CustomToast';
+import { FaStar } from 'react-icons/fa';
+import axiosInstance from '../../utils/AxiosInstance';
+import './FeedbackModal.css'
 
-export default function FeedbackModal({ show, onClose, reservationId, }) {
+export default function FeedbackModal({ show, onClose, reservationId }) {
     const [content, setContent] = useState("");
     const [rating, setRating] = useState(5);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [feedbackExists, setFeedbackExists] = useState(false); // Kiểm tra có feedback chưa
-    const [feedbackId, setFeedbackId] = useState([]); // ID của feedback nếu có
-
-    //  useEffect(() => {
-    //      if (reservationId) {
-    //          fetchFeedback();
-    //      }
-    //  }, [reservationId]);
-
-    const fetchFeedback = async () => {
-        try {
-            const response = await axiosInstance.get(`/feedback/get-feedback/${reservationId}`);
-            if (response.data && response.data.feedback) {
-                setContent(response.data.feedback.content);
-                setRating(response.data.feedback.rating);
-                setFeedbackExists(true);
-                setFeedbackId(response.data.feedback._id);
-            } else {
-                setFeedbackExists(false);
-            }
-        } catch (err) {
-            setFeedbackExists(false);
-            console.error(err);
-        }
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -43,75 +21,88 @@ export default function FeedbackModal({ show, onClose, reservationId, }) {
         setIsSubmitting(true);
 
         try {
-            if (feedbackExists) {
-                // Update feedback nếu đã tồn tại
-                await axiosInstance.patch(`/feedback/update-feedback/${feedbackId}`, {
 
-                    content: content.trim(),
-                    rating: Number(rating),
-                });
-                console.log(feedbackId),
-                    toast.success("Feedback updated successfully!");
-            } else {
-                // Tạo feedback mới
-                await axiosInstance.post(`/feedback/create-feedback/${reservationId}`, {
-                    content: content.trim(),
-                    rating: Number(rating),
-                });
-                toast.success("Feedback submitted successfully!");
-            }
+            // Tạo feedback mới
+            await axiosInstance.post(`/feedback/create-feedback/${reservationId}`, {
+                content: content.trim(),
+                rating: Number(rating),
+            });
+            CustomSuccessToast("Gửi đánh giá thành công!");
+
+            // Đóng modal và reload trang
             onClose();
+            setTimeout(() => window.location.reload(), 500); // Reload sau 0.5 giây để hiển thị toast
         } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to submit feedback");
+            CustomFailedToast(error.response.data.message || "Có lỗi xảy ra!");
         } finally {
             setIsSubmitting(false);
         }
     };
 
     return (
-        <Modal show={show} onHide={onClose}>
-            <Form onSubmit={handleSubmit}>
-                <Modal.Header closeButton>
-                    <Modal.Title>{feedbackExists ? "Update Feedback" : "Leave Feedback"}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form.Group className="mb-3">
-                        <Form.Label>Rating</Form.Label>
-                        <div className="d-flex gap-3 mb-3">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <Button
-                                    key={star}
-                                    variant={rating >= star ? "warning" : "light"}
-                                    onClick={() => setRating(star)}
-                                    className="px-3"
-                                >
-                                    ★
-                                </Button>
-                            ))}
+        <>
+            <CustomToast />
+            <Modal show={show} onHide={onClose} centered className="feedback-modal">
+                <Form onSubmit={handleSubmit}>
+                    <Modal.Header closeButton className="border-0 pb-0">
+                        <Modal.Title className="fw-bold text-primary">Đánh giá trải nghiệm</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body className="pt-2">
+                        <Form.Group className="mb-4">
+                            <Form.Label className="fw-medium text-secondary mb-3">Xếp hạng của bạn</Form.Label>
+                            <div className="d-flex justify-content-center gap-3 mb-2">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <Button
+                                        key={star}
+                                        variant="link"
+                                        onClick={() => setRating(star)}
+                                        className="p-0 m-0 star-button"
+                                        aria-label={`${star} sao`}
+                                    >
+                                        <FaStar
+                                            size={28}
+                                            color={rating >= star ? "#FFD700" : "#e4e5e9"}
+                                            className="star-icon"
+                                        />
+                                    </Button>
+                                ))}
+                            </div>
+                            <div className="text-center text-muted small">
+                                {["Chọn xếp hạng", "Rất không hài lòng", "Không hài lòng", "Bình thường", "Hài lòng", "Rất hài lòng"][rating]}
+                            </div>
+                        </Form.Group>
+
+                        <Form.Group className="mb-4">
+                            <Form.Label className="fw-medium text-secondary mb-2">Nội dung đánh giá</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={4}
+                                placeholder="Chia sẻ cảm nhận của bạn về trải nghiệm..."
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                                required
+                                className="border-light shadow-sm rounded-3"
+                            />
+                        </Form.Group>
+                    </Modal.Body>
+                    <Modal.Footer className="border-0 pt-0">
+                        <div className="d-flex justify-content-between w-100">
+                            <Button variant="light" onClick={onClose} disabled={isSubmitting} className="px-4 py-2 rounded-pill">
+                                Huỷ
+                            </Button>
+                            <Button variant="primary" type="submit" disabled={isSubmitting || rating === 0} className="px-4 py-2 rounded-pill shadow-sm">
+                                {isSubmitting ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Đang xử lý...
+                                    </>
+                                ) : "Gửi đánh giá"}
+                            </Button>
                         </div>
-                    </Form.Group>
-                    <Form.Group className="mb-3">
-                        <Form.Label>Your Feedback</Form.Label>
-                        <Form.Control
-                            as="textarea"
-                            rows={3}
-                            placeholder="Tell us about your experience..."
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            required
-                        />
-                    </Form.Group>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-                        Cancel
-                    </Button>
-                    <Button variant="primary" type="submit" disabled={isSubmitting}>
-                        {isSubmitting ? "Processing..." : feedbackExists ? "Update Feedback" : "Submit Feedback"}
-                    </Button>
-                </Modal.Footer>
-            </Form>
-        </Modal>
+                    </Modal.Footer>
+                </Form>
+            </Modal>
+        </>
     );
 }
 
@@ -119,5 +110,4 @@ FeedbackModal.propTypes = {
     show: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     reservationId: PropTypes.string.isRequired,
-
 };

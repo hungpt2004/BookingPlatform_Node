@@ -8,17 +8,33 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Card } from 'react-bootstrap';
 import { useAuthStore } from '../../store/authStore';
 import { generateShortCutName } from '../../utils/GenerateShortName';
-import '../navbar/CustomNavbar.css'; // Import file CSS mới
+import './CustomNavbar.css'
 
 function CustomNavbar() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const { logout } = useAuthStore();
+  const [scrolled, setScrolled] = useState(false);
+  
+  // Xử lý sự kiện scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const handleLogout = () => {
     logout();
     setUser(null);
-    
     navigate('/');
   };
 
@@ -36,49 +52,89 @@ function CustomNavbar() {
   }, []);
 
   return (
-    <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary sticky-top">
-      <Container className='d-flex align-items-center justify-content-center'>
-        <Navbar.Brand className='fs-1 fw-bold' style={{ color: '#003b95' }} href="/home">Travelofy</Navbar.Brand>
+    <Navbar 
+      collapseOnSelect 
+      expand="lg" 
+      className={`navbar-custom ${scrolled ? 'navbar-scrolled' : ''}`}
+      fixed="top"
+    >
+      <Container>
+        <Navbar.Brand className='brand-logo' href="/home">
+          Travelofy
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link className="custom-nav-link fs-4" href="#deets">Website Scope</Nav.Link>
-            <Nav.Link className="custom-nav-link fs-4" eventKey={2} href="#memes">Achievements</Nav.Link>
+            <Nav.Link className="nav-item" href="#deets">Website Scope</Nav.Link>
+            <Nav.Link className="nav-item" href="#memes">Achievements</Nav.Link>
           </Nav>
-          <Nav>
-            <Nav.Link className="custom-nav-link fs-4" href="/home">Home</Nav.Link>
-            <Nav.Link className="custom-nav-link fs-4" href="#">About</Nav.Link>
-            <NavDropdown className="fs-4" title="Service" id="collapsible-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Favorite List</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="/transaction">Transaction History</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="/feedback">My Feedback</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="/create-hotel">Create Hotel</NavDropdown.Item>
+          <Nav className='d-flex justify-content-center align-items-center'>
+            <Nav.Link className="nav-item" href="/home">Trang chủ</Nav.Link>
+            <Nav.Link className="nav-item" href="#">Về Travelofy</Nav.Link>
+            <NavDropdown title="Dịch Vụ" id="service-dropdown" className="custom-dropdown">
+              <div className="dropdown-inner">
+                <NavDropdown.Item href="/favorite">
+                  <i className="fas fa-heart me-2"></i>
+                  DS Yêu Thích 
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item href="/transaction">
+                  <i className="fas fa-history me-2"></i>
+                  Lịch sử giao dịch
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item href="/feedback">
+                  <i className="fas fa-comment me-2"></i>
+                  Đánh giá của tôi
+                </NavDropdown.Item>
+              </div>
+
             </NavDropdown>
-            <Container className="d-flex align-items-center">
-              {user ? (
-                <>
-                  <Card className="profile-card rounded-5">
-                    {user.image?.url ? (
-                      <img src={user.image.url} alt={user.name} className="profile-img" />
-                    ) : (
-                      <span className="profile-text fs-4">{generateShortCutName(user.name.charAt(0).toUpperCase())}</span>
-                    )}
-                  </Card>
-                  <NavDropdown className="" title={user.name} id="collapsible-nav-dropdown">
-                    <NavDropdown.Item href="/update-customer">Setting</NavDropdown.Item>
+            
+            {user ? (
+              <div className="profile-section">
+                <div className="user-avatar" onClick={() => document.getElementById('profile-dropdown').click()}>
+                  {user.image?.url ? (
+                    <img src={user.image.url} alt={user.name} className="avatar-img" />
+                  ) : (
+                    <span className="avatar-text">{generateShortCutName(user.name.charAt(0).toUpperCase())}</span>
+                  )}
+                </div>
+                <NavDropdown title={user.name} id="profile-dropdown" className="custom-dropdown user-dropdown">
+                  <div className="dropdown-inner">
+                    <div className="user-info">
+                      <div className="user-avatar-large">
+                        {user.image?.url ? (
+                          <img src={user.image.url} alt={user.name} />
+                        ) : (
+                          <span>{generateShortCutName(user.name.charAt(0).toUpperCase())}</span>
+                        )}
+                      </div>
+                      <div className="user-details">
+                        <h6>{user.name}</h6>
+                        <p>{user.email}</p>
+                      </div>
+                    </div>
                     <NavDropdown.Divider />
-                    <NavDropdown.Item href="#action/3.1">Owner Account</NavDropdown.Item>
+                    <NavDropdown.Item href="/update-customer">
+                      <i className="fas fa-cog me-2"></i>
+                      Cài đặt tài khoản
+                    </NavDropdown.Item>
+                    <NavDropdown.Item href="#action/3.1">
+                      <i className="fas fa-home me-2"></i>
+                      Tài khoản chủ nhà
+                    </NavDropdown.Item>
                     <NavDropdown.Divider />
-                    <NavDropdown.Item onClick={handleLogout}>Logout</NavDropdown.Item>
-                  </NavDropdown>
-                </>
-              ) : (
-                <Nav.Link className="custom-nav-link" href="/">Login</Nav.Link>
-              )}
-            </Container>
+                    <NavDropdown.Item onClick={handleLogout} className="logout-item">
+                      <i className="fas fa-sign-out-alt me-2"></i>
+                      Đăng xuất
+                    </NavDropdown.Item>
+                  </div>
+                </NavDropdown>
+              </div>
+            ) : (
+              <Nav.Link className="login-btn" href="/">Đăng nhập</Nav.Link>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>

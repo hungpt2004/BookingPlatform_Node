@@ -2,6 +2,7 @@ const Room = require("../models/room.js");
 const Hotel = require("../models/hotel.js");
 const RoomFacility = require("../models/roomFacility.js");
 const RoomAvailability = require('../models/roomAvailability.js')
+const Reservation = require("../models/reservation.js");
 const asyncHandler = require("../middlewares/asyncHandler.js");
 
 exports.createRoom = asyncHandler(async (req, res, next) => {
@@ -39,6 +40,77 @@ exports.getAllRoom = asyncHandler(async (req, res, next) => {
     rooms,
     message: "Get all rooms success",
   });
+});
+
+exports.getRoomByHotelIdOwner = asyncHandler(async (req, res) => {
+  try {
+    const { hotelId } = req.params;
+
+    if (!hotelId) {
+      return res.status(400).json({ error: true, message: "Hotel ID is required" });
+    }
+    const hotel = await Hotel.findById(hotelId);
+    if (!hotel) {
+      return res.status(404).json({ error: true, message: "Hotel not found" });
+    }
+    const rooms = await Room.find({ hotel: hotelId });
+
+    return res.status(200).json({
+      error: false,
+      rooms,
+      message: "Rooms fetched successfully",
+    });
+  } catch (error) {
+    console.error("Error in getRoomByHotelId:", error);
+    return res.status(500).json({
+      error: true,
+      message: "Internal server error",
+    });
+  }
+});
+
+exports.getRoomAvailability = asyncHandler(async (req, res) => {
+  const { hotelId } = req.params;
+  const { checkInDate, checkOutDate } = req.query;
+
+  if (!hotelId || !checkInDate || !checkOutDate) {
+    return res.status(400).json({
+      error: true,
+      message: "Missing required fields (hotelId, checkInDate, or checkOutDate).",
+    });
+  }
+
+  try {
+    const selectedCheckIn = new Date(checkInDate);
+    const selectedCheckOut = new Date(checkOutDate);
+    const overlappingReservations = await Reservation.find({
+      hotel: hotelId,
+      status: { $nin: ["CANCELLED", "COMPLETED"] },
+      $and: [
+        { checkInDate: { $lt: selectedCheckOut } },
+        { checkOutDate: { $gt: selectedCheckIn } },
+      ],
+    }).populate("rooms");
+    const allRooms = await Room.find({ hotel: hotelId });
+    const bookedRoomIds = overlappingReservations
+      .flatMap(res => res.rooms)
+      .map(room => room._id.toString());
+    const availableRooms = allRooms.filter(
+      room => !bookedRoomIds.includes(room._id.toString())
+    );
+
+    return res.status(200).json({
+      error: false,
+      message: "Rooms fetched successfully",
+      rooms: availableRooms,
+    });
+  } catch (error) {
+    console.error("Error fetching room availability:", error);
+    return res.status(500).json({
+      error: true,
+      message: "Internal Server Error",
+    });
+  }
 });
 
 exports.getRoomByHotelId = asyncHandler(async (req, res, next) => {

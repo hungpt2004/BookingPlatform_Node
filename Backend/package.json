@@ -11,7 +11,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.24.0",
     "@payos/node": "^1.0.10",
+    "axios": "^1.8.3",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "bookingplatform_node": "file:",
@@ -32,6 +34,7 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.10.0",
     "nodemon": "^3.1.9",
+    "pdfkit": "^0.16.0",
     "pdfkit-table": "^0.1.99",
     "prettier": "^3.4.2",
     "validator": "^13.12.0"

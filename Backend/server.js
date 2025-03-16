@@ -23,6 +23,7 @@ const fs = require("fs");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const MonthlyRouter = require("./src/routes/monthlypayment.route");
+const PDFRouter = require("./src/routes/pdf.route");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Hỗ trợ dữ liệu form-urlencoded
@@ -72,9 +73,9 @@ app.use("/reservation", ReservationRouter);
 //Payment
 app.use("/payment", PaymentRouter);
 
-
 //Booking
 app.use("/booking", BookingRouter);
+
 //Favorite
 app.use("/favorite", FavoriteRouter);
 
@@ -92,6 +93,9 @@ app.use("/hotel-service", HotelServiceRouter);
 
 //Monthly Payment
 app.use("/monthly-payment", MonthlyRouter)
+
+//PDF
+app.use("/pdf", PDFRouter)
 
 //facility
 app.use("/facility", hotelFacilityRouter);

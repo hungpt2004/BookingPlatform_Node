@@ -6,182 +6,169 @@ import {
   FaChevronRight,
   FaBuilding,
   FaCog,
+  FaTachometerAlt,
+  FaChartBar,
+  FaUserCog,
+  FaSignOutAlt,
+  FaBars,
+  FaTimes
 } from "react-icons/fa";
-import axiosInstance from "../utils/AxiosInstance";
+import { NavLink } from "react-router-dom";
+import './sidebar.css'
 
-export const Sidebar = ({ width, setWidth }) => {
-  const [expandedHotels, setExpandedHotels] = useState(false);
-  const [selectedHotel, setSelectedHotel] = useState(null);
-  const [userHotels, setUserHotels] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
+const Sidebar = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const [activeMenu, setActiveMenu] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchOwnedHotels = async () => {
-      try {
-        setLoading(true);
-        console.log("Token:", sessionStorage.getItem("token"));
-        const response = await axiosInstance.get("/hotel/get-owned-hotel");
-        console.log("API Response:", response.data);
-        if (!response.data.error) {
-          setUserHotels(response.data.hotels);
-        } else {
-          setError(response.data.message);
-        }
-      } catch (err) {
-        setError("Failed to fetch hotels. Please try again.");
-        console.error("Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Submenus
+  const menus = [
+    {
+      title: "Dashboard",
+      icon: <FaTachometerAlt />,
+      path: "/dashboard",
+    },
+    {
+      title: "Quản lý khách sạn",
+      icon: <FaHotel />,
+      submenus: [
+        { title: "Danh sách khách sạn", path: "/hotels" },
+        { title: "Thêm khách sạn", path: "/hotels/add" },
+      ],
+    },
+    {
+      title: "Quản lý phòng",
+      icon: <FaBuilding />,
+      submenus: [
+        { title: "Danh sách phòng", path: "/rooms" },
+        { title: "Thêm phòng", path: "/rooms/add" },
+      ],
+    },
+    {
+      title: "Quản lý doanh thu",
+      icon: <FaChartBar />,
+      path: "/monthly-owner",
+    },
+    {
+      title: "Cài đặt",
+      icon: <FaCog />,
+      path: "/settings",
+    },
+  ];
 
-    fetchOwnedHotels();
-  }, []);
-
-  const handleHotelClick = (hotelId) => {
-    if (selectedHotel === hotelId) {
-      setSelectedHotel(null);
+  const toggleSubmenu = (menu) => {
+    if (activeMenu === menu) {
+      setActiveMenu("");
     } else {
-      setSelectedHotel(hotelId);
-      navigate(`/dashboard/hotels/${hotelId}`);
+      setActiveMenu(menu);
     }
   };
 
-  const handleServiceClick = (hotelId, service) => {
-    navigate(`/dashboard/hotels/${hotelId}/services/${service}`);
+  const toggleSidebar = () => {
+    setCollapsed(!collapsed);
   };
 
+  // Kiểm tra đường dẫn hiện tại để xác định menu active
+  useEffect(() => {
+    menus.forEach((menu) => {
+      if (menu.path === location.pathname) {
+        setActiveMenu("");
+      } else if (menu.submenus) {
+        const hasActiveSubmenu = menu.submenus.some(
+          (submenu) => submenu.path === location.pathname
+        );
+        if (hasActiveSubmenu) {
+          setActiveMenu(menu.title);
+        }
+      }
+    });
+  }, [location.pathname]);
+
   return (
-    <div
-      className="sidebar text-white"
-      style={{
-        width: `${width}px`,
-        height: "100vh",
-        position: "fixed",
-        overflowY: "auto",
-        transition: "width 0.3s",
-        backgroundColor: "#6499E9",
-      }}
-    >
-      <div className="p-3">
-        <h5 className="text-center font-weight-bold">
-          Hotel Managing Dashboard
-        </h5>
-        <hr />
+    <div className={`sidebar-container ${collapsed ? "collapsed" : ""}`}>
+      <div className="sidebar-header">
+        <div className="logo-container">
+          {!collapsed && <img src='/logo.png' alt="Logo" className="logo" />}
+          {!collapsed && <span className="logo-text">Admin Panel</span>}
+        </div>
+        <button className="toggle-button" onClick={toggleSidebar}>
+          {collapsed ? <FaBars /> : <FaTimes />}
+        </button>
+      </div>
 
-        <div className="menu-items">
-          <Link to="/dashboard" className="text-decoration-none">
-            <div
-              className="menu-item p-2 rounded mb-2 text-white"
-              style={{
-                backgroundColor:
-                  location.pathname === "/dashboard"
-                    ? "rgba(0, 0, 0, 0.2)"
-                    : "transparent",
-                fontWeight:
-                  location.pathname === "/dashboard" ? "bold" : "normal",
-              }}
-            >
-              Dashboard Overview
-            </div>
-          </Link>
-
-          <div
-            className="menu-item p-2 rounded mb-2 text-white"
-            onClick={() => setExpandedHotels(!expandedHotels)}
-            style={{
-              cursor: "pointer",
-              backgroundColor: expandedHotels
-                ? "rgba(0, 0, 0, 0.2)"
-                : "transparent",
-              fontWeight: expandedHotels ? "bold" : "normal",
-            }}
-          >
-            <div className="d-flex justify-content-between align-items-center">
-              <div>
-                <FaHotel className="me-2" />
-                Hotel Management
-              </div>
-              {expandedHotels ? <FaChevronDown /> : <FaChevronRight />}
-            </div>
-          </div>
-
-          {expandedHotels && (
-            <div className="ms-3 mb-2">
-              {loading ? (
-                <div className="text-white">Loading hotels...</div>
-              ) : error ? (
-                <div className="text-white">{error}</div>
-              ) : userHotels.length === 0 ? (
-                <div className="text-white">No hotels found</div>
-              ) : (
-                userHotels.map((hotel) => (
-                  <div key={hotel._id}>
-                    <div
-                      className="p-2 rounded hotel-item"
-                      onClick={() => handleHotelClick(hotel._id)}
-                      style={{
-                        cursor: "pointer",
-                        backgroundColor:
-                          selectedHotel === hotel._id
-                            ? "rgba(0, 0, 0, 0.15)"
-                            : "transparent",
-                        fontWeight:
-                          selectedHotel === hotel._id ? "bold" : "normal",
-                      }}
-                    >
-                      <div className="d-flex justify-content-between align-items-center">
-                        <div>
-                          <FaBuilding className="me-2" />
-                          {hotel.hotelName || "Unnamed Hotel"}{" "}
-                          {/* Updated to hotelName */}
-                        </div>
-                        {selectedHotel === hotel._id ? (
+      <div className="sidebar-menu">
+        {menus.map((menu, index) => (
+          <div key={index} className="menu-item">
+            {menu.submenus ? (
+              <>
+                <div
+                  className={`menu-title ${
+                    activeMenu === menu.title ? "active" : ""
+                  }`}
+                  onClick={() => toggleSubmenu(menu.title)}
+                >
+                  <div className="menu-icon">{menu.icon}</div>
+                  {!collapsed && (
+                    <>
+                      <span className="menu-text">{menu.title}</span>
+                      <div className="menu-arrow">
+                        {activeMenu === menu.title ? (
                           <FaChevronDown />
                         ) : (
                           <FaChevronRight />
                         )}
                       </div>
-                    </div>
-                    {selectedHotel === hotel._id && (
-                      <div className="ms-3">
-                        {["rooms", "amenities", "offers"].map((service) => (
-                          <div
-                            key={service}
-                            className="p-2 rounded service-item"
-                            onClick={() =>
-                              handleServiceClick(hotel._id, service)
-                            }
-                            style={{
-                              cursor: "pointer",
-                              backgroundColor: location.pathname.includes(
-                                `/hotels/${hotel._id}/services/${service}`
-                              )
-                                ? "rgba(0, 0, 0, 0.1)"
-                                : "transparent",
-                              fontWeight: location.pathname.includes(
-                                `/hotels/${hotel._id}/services/${service}`
-                              )
-                                ? "bold"
-                                : "normal",
-                            }}
-                          >
-                            <FaCog className="me-2" />
-                            {service.charAt(0).toUpperCase() + service.slice(1)}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    </>
+                  )}
+                </div>
+                {activeMenu === menu.title && !collapsed && (
+                  <div className="submenu">
+                    {menu.submenus.map((submenu, subIndex) => (
+                      <NavLink
+                        key={subIndex}
+                        to={submenu.path}
+                        className={({ isActive }) =>
+                          isActive ? "submenu-item active" : "submenu-item"
+                        }
+                      >
+                        {submenu.title}
+                      </NavLink>
+                    ))}
                   </div>
-                ))
-              )}
-            </div>
-          )}
-        </div>
+                )}
+              </>
+            ) : (
+              <NavLink
+                to={menu.path}
+                className={({ isActive }) =>
+                  isActive ? "menu-title active" : "menu-title"
+                }
+              >
+                <div className="menu-icon">{menu.icon}</div>
+                {!collapsed && <span className="menu-text">{menu.title}</span>}
+              </NavLink>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="sidebar-footer">
+        <NavLink to="/profile" className="profile-link">
+          <div className="menu-icon">
+            <FaUserCog />
+          </div>
+          {!collapsed && <span className="menu-text">Hồ sơ</span>}
+        </NavLink>
+        <button className="logout-button" onClick={() => navigate("/logout")}>
+          <div className="menu-icon">
+            <FaSignOutAlt />
+          </div>
+          {!collapsed && <span className="menu-text">Đăng xuất</span>}
+        </button>
       </div>
     </div>
   );
 };
+
+export default Sidebar;

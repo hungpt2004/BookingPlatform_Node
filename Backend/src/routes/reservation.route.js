@@ -22,6 +22,11 @@ ReservationRouter.get(
   ReservationController.getReservationByStatus
 );
 ReservationRouter.get(
+  '/detail/:reservationId',
+  protect,
+  ReservationController.getReservationDetailById
+)
+ReservationRouter.get(
   "/room/:reservationId",
   protect,
   ReservationController.getRoomByReservationId
@@ -30,6 +35,11 @@ ReservationRouter.get(
   "/hotel/:reservationId",
   protect,
   ReservationController.getHotelByReservationId
+);
+ReservationRouter.get(
+  "/hotel-reservations/:hotelId",
+  protect,
+  ReservationController.getHotelReservations
 );
 ReservationRouter.post(
   "/cancel/:reservationId",

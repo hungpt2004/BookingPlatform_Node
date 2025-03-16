@@ -160,7 +160,15 @@ const Step15 = ({ prevStep }) => {
     const areAllDocumentsSelected = () => {
         return documentTypes.every(doc => documents[doc.type]);
     };
-
+    //xóa tất cả sessionStorage ngoại trừ token
+    const clearSessionStorageExceptToken = () => {
+        Object.keys(sessionStorage).forEach((key) => {
+            if (key !== 'token') {
+                sessionStorage.removeItem(key);
+            }
+        });
+    };
+   
     const createHotelFromSessionStorage = async () => {
         try {
             // Get all data from sessionStorage
@@ -190,15 +198,9 @@ const Step15 = ({ prevStep }) => {
             });
             console.log('services:', hotelServiceData);
             if (response.data.success) {
-
                 CustomSuccessToast('Khách sạn đã được tạo thành công! Vui lòng chờ đợi xét duyệt đăng ký của bạn.');
-                // sessionStorage.removeItem('hotelStep');
-                // sessionStorage.removeItem('hotelFacility');
-                // sessionStorage.removeItem('hotelDes');
-                // sessionStorage.removeItem('hotelLocation');
-                // sessionStorage.removeItem('hotelName&Star');
-                // sessionStorage.removeItem('step15FormData');
-                // navigate('/home');
+                clearSessionStorageExceptToken();
+                 navigate('/home');
             } else {
                 CustomFailedToast(`Lỗi: ${response.data.message}`);
             }
