@@ -15,8 +15,8 @@ import { FaBed } from "react-icons/fa6";
 const initialBedTypes = [
     { label: "Giường đơn", count: 0, lengthDetail: "Rộng 90 - 130 cm" },
     { label: "Giường đôi", count: 0, lengthDetail: "Rộng 131 - 150 cm" },
-    { label: "Giường lớn (cỡ King)", count: 0, lengthDetail: "Rộng 151 - 180 cm" },
-    { label: "Giường cực lớn (cỡ Super-king)", count: 0, lengthDetail: "Rộng 181 - 210 cm" },
+    { label: "Giường 4 người", count: 0, lengthDetail: "Rộng 151 - 180 cm" },
+    { label: "2 giường đơn", count: 0, lengthDetail: "Rộng 181 - 210 cm" },
 ];
 
 export const Step1 = ({ nextStep, prevStep }) => {
@@ -135,8 +135,8 @@ export const Step1 = ({ nextStep, prevStep }) => {
                                 >
                                     <option value="Phòng giường đôi">Phòng giường đôi</option>
                                     <option value="Phòng giường đơn">Phòng giường đơn</option>
-                                    <option value="Phòng giường King">Phòng giường King</option>
-                                    <option value="Phòng giường tầng">Phòng giường tầng</option>
+                                    <option value="Phòng giường 4 người">Phòng giường 4 người</option>
+                                    <option value="Phòng 2 giường đơn">Phòng 2 giường đơn</option>
                                 </Form.Select>
                             </Form.Group>
 

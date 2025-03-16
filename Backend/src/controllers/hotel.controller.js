@@ -1,5 +1,6 @@
 const asyncHandler = require("../middlewares/asyncHandler");
 const Hotel = require("../models/hotel");
+const HotelService = require("../models/hotelService");
 const Room = require("../models/room");
 require("../models/hotelFacility"); 
 const Reservation = require("../models/reservation");
@@ -109,7 +110,8 @@ exports.getTotalReservationByHotelId = asyncHandler(async (req, res) => {
 
 
 exports.createHotel = asyncHandler(async (req, res) => {
-
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
     console.log(req.body);
     const ownerID = req.user?.id || req.body.id;
@@ -123,6 +125,12 @@ exports.createHotel = asyncHandler(async (req, res) => {
       pricePerNight = 0,
       facilities,
       businessDocuments
+
+      /* Merged code from SON */
+      // facilities = [],
+      // services = {},
+      // rooms = []
+
     } = req.body;
 
     // Kiểm tra các trường bắt buộc
@@ -199,8 +207,9 @@ exports.createHotel = asyncHandler(async (req, res) => {
         });
       }
     }
+
     // Tạo khách sạn mới
-    const newHotel = await Hotel.create({
+    const newHotel = new Hotel({
       hotelName,
       description,
       address,
@@ -213,20 +222,71 @@ exports.createHotel = asyncHandler(async (req, res) => {
       owner: ownerID,
       businessDocuments: parsedBusinessDocuments
     });
+    await newHotel.save({ session });
+
+    // Create Hotel Services
+    const hotelServices = [];
+    if (services.serveBreakfast === "Có" && services.includedInPrice === "Không" && services.breakfastPrice) {
+      const breakfastService = new HotelService({
+        hotel: newHotel._id,
+        name: "Breakfast",
+        price: parseFloat(services.breakfastPrice)
+      });
+      await breakfastService.save({ session });
+      hotelServices.push(breakfastService);
+    }
+    if (services.hasParking === "Có, tính phí" && services.parkingFee) {
+      const parkingService = new HotelService({
+        hotel: newHotel._id,
+        name: "Parking",
+        price: parseFloat(services.parkingFee)
+      });
+      await parkingService.save({ session });
+      hotelServices.push(parkingService);
+    }
+
+    // Create Rooms
+    const createdRooms = [];
+    for (const roomData of rooms) {
+      const { roomDetails, facilities: roomFacilities, ...rest } = roomData;
+      const newRoom = new Room({
+        ...rest,
+        type: roomDetails.roomType,
+        price: parseFloat(rest.price),
+        capacity: roomDetails.capacity,
+        description: roomDetails.description,
+        quantity: roomDetails.roomQuantity,
+        hotel: newHotel._id,
+        facilities: roomFacilities,
+        bed: roomDetails.bedTypes.map(bed => ({
+          bed: bed.bedId,
+          quantity: bed.count
+        }))
+      });
+      await newRoom.save({ session });
+      createdRooms.push(newRoom);
+    }
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
 
     // Trả về phản hồi thành công
     res.status(201).json({
       success: true,
-      message: "Tạo khách sạn mới thành công",
+      message: "Hotel created with services and rooms",
       hotel: newHotel,
-
+      services: hotelServices,
+      rooms: createdRooms
     });
-    console.log(newHotel);
+
   } catch (error) {
-    console.error("Lỗi khi tạo khách sạn:", error);
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Error creating hotel:", error);
     res.status(500).json({
       success: false,
-      message: "Lỗi máy chủ khi tạo khách sạn",
+      message: "Server error creating hotel",
       error: error.message
     });
   }

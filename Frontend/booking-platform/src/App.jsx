@@ -36,6 +36,8 @@ import ReviewPage from './views/owner/ReviewPage'
 import HotelReservations from './views/owner/BookingSchedule'
 import HotelDetailOwnerPage from './views/owner/HotelDetailOwner'
 import BookingSchedule from "./views/owner/BookingSchedule";
+import OwnerHomePage from './views/owner/HomePage'
+import FinancePage from './views/owner/FinancePage'
 
 function App() {
   const { user, isAuthenticated } = useAuthStore();
@@ -139,11 +141,12 @@ function App() {
         <Route path='/edit-non-refundable' element={<PriceNoRefund />} />
         <Route path='/edit-weekly-price' element={<PricePerWeek />} />
         <Route path='/create-photo' element={<HotelPhotos />} />
-
-        <Route path='/booking-management' element={<BookingManagePage />} />
+        
+        <Route path='booking-management' element={<BookingManagePage />} />
         <Route path='/reviews' element={<ReviewPage />} />
-        <Route path='/booking-schedule/:hotelId' element={<HotelReservations/>}/>
-        <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage/>}/>
+        <Route path='/owner-homepage' element={<OwnerHomePage />} />
+        <Route path='/owner-finance' element={<FinancePage />} />
+
       </Routes>
     </Router>
   );

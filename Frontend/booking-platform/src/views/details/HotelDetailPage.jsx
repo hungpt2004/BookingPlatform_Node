@@ -56,11 +56,94 @@ export const HotelDetailPage = () => {
    const [showGalleryModal, setShowGalleryModal] = useState(false);
    const [listFacility, setListFacility] = useState([]);
    const [listService, setListService] = useState([]);
+   const [validDate, setValidDate] = useState(true); // State to store date validity
+   const [checkInTime, setCheckInTime] = useState('12:00');
+   const [checkOutTime, setCheckOutTime] = useState('13:00');
+   const [timeErrors, setTimeErrors] = useState({
+      checkIn: '',
+      checkOut: ''
+   });
+
+   const validateTimes = (checkInTime, checkOutTime) => {
+      const errors = { checkIn: '', checkOut: '' };
+
+      const [checkInHours, checkInMinutes] = checkInTime.split(':').map(Number);
+      const [checkOutHours, checkOutMinutes] = checkOutTime.split(':').map(Number);
+
+      const checkInTotal = checkInHours * 60 + checkInMinutes;
+      const checkOutTotal = checkOutHours * 60 + checkOutMinutes;
+
+      if (checkOutTotal <= checkInTotal) {
+         errors.checkOut = 'Check-out time must be after check-in time when dates are the same';
+      }
+
+      return errors;
+   };
+
+   // Add this useEffect for time validation
+   useEffect(() => {
+      const errors = validateTimes(checkInTime, checkOutTime);
+      setTimeErrors(errors);
+   }, [checkInTime, checkOutTime]);
+
 
    //Show all image in modal
    const handleShowGalleryModal = () => setShowGalleryModal(true);
    const handleCloseGalleryModal = () => setShowGalleryModal(false);
 
+
+   const handleSearch = async () => {
+      setCapacityError('');
+      setAvailabilityError('');
+      if (!checkInDate || !checkOutDate) {
+         setAvailabilityError('Please select both check-in and check-out dates');
+         return;
+      }
+      // Validate capacity
+      if (numberOfPeople > currentHotel?.capacity) {
+         setCapacityError(`This hotel only accommodates up to ${currentHotel?.capacity} guests`);
+         return;
+      }
+
+      // Validate dates are logical
+      if (new Date(checkOutDate) <= new Date(checkInDate)) {
+         setAvailabilityError('Check-out date must be after check-in date');
+         return;
+      }
+   };
+
+
+   // Add this useEffect to handle date parameters
+   useEffect(() => {
+      const today = new Date().toISOString().split('T')[0];
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowString = tomorrow.toISOString().split('T')[0];
+
+      const initialCheckIn = searchParams.get('checkin') || today;
+      let initialCheckOut = searchParams.get('checkout') || tomorrowString;
+
+      // Handle date dependencies
+      if (!searchParams.get('checkin') && searchParams.get('checkout')) {
+         initialCheckOut = searchParams.get('checkout');
+         if (new Date(initialCheckOut) < new Date(today)) {
+            initialCheckOut = tomorrowString;
+         }
+      }
+
+      if (new Date(initialCheckOut) <= new Date(initialCheckIn)) {
+         initialCheckOut = new Date(initialCheckIn);
+         initialCheckOut.setDate(initialCheckOut.getDate() + 1);
+         initialCheckOut = initialCheckOut.toISOString().split('T')[0];
+      }
+
+      setCheckInDate(initialCheckIn);
+      setCheckOutDate(initialCheckOut);
+      setNumberOfPeople(parseInt(searchParams.get('guests')) || 1);
+
+   }, [searchParams]);
+
+   // Add the search bar components
    const handleDateChange = (type, value) => {
 
       const today = new Date().toISOString().split('T')[0];
@@ -475,24 +558,45 @@ export const HotelDetailPage = () => {
                </Container>
                <div className="container mt-4">
                   <div className="row g-3 justify-content-center">
+                     {/* Check-in Date & Time */}
                      <div className="col-md-3">
                         <CustomDateValidator
                            type="date"
+                           label="CHECK-IN DATE"
                            value={checkInDate}
                            min={new Date().toISOString().split('T')[0]}
                            onChange={(e) => handleDateChange('checkin', e.target.value)}
                            error={dateErrors.checkIn}
                         />
+                        <input
+                           type="time"
+                           value={checkInTime}
+                           onChange={(e) => setCheckInTime(e.target.value)}
+                           className={`form-control mt-2 ${timeErrors.checkIn ? 'is-invalid' : ''}`}
+                        />
+                        {timeErrors.checkIn && <div className="invalid-feedback">{timeErrors.checkIn}</div>}
                      </div>
+
+                     {/* Check-out Date & Time */}
                      <div className="col-md-3">
                         <CustomDateValidator
                            type="date"
+                           label="CHECK-OUT DATE"
                            value={checkOutDate}
                            min={checkInDate || new Date().toISOString().split('T')[0]}
                            onChange={(e) => handleDateChange('checkout', e.target.value)}
                            error={dateErrors.checkOut}
                         />
+                        <input
+                           type="time"
+                           value={checkOutTime}
+                           onChange={(e) => setCheckOutTime(e.target.value)}
+                           className={`form-control mt-2 ${timeErrors.checkOut ? 'is-invalid' : ''}`}
+                        />
+                        {timeErrors.checkOut && <div className="invalid-feedback">{timeErrors.checkOut}</div>}
                      </div>
+
+                     {/* Guests Input (existing) */}
                      <div className="col-md-2">
                         <CustomInput
                            type="number"
@@ -506,15 +610,15 @@ export const HotelDetailPage = () => {
                            }}
                         />
                      </div>
-                     <div className="row justify-content-center mt-2">
-                        <div className="col-md-8">
-                           {capacityError && <div className="alert alert-danger">{capacityError}</div>}
-                           {availabilityError && <div className="alert alert-danger">{availabilityError}</div>}
-                        </div>
-                     </div>
-
                   </div>
 
+                  {/* Error messages (existing) */}
+                  <div className="row justify-content-center mt-2">
+                     <div className="col-md-8">
+                        {capacityError && <div className="alert alert-danger">{capacityError}</div>}
+                        {availabilityError && <div className="alert alert-danger">{availabilityError}</div>}
+                     </div>
+                  </div>
                </div>
 
 
@@ -528,6 +632,8 @@ export const HotelDetailPage = () => {
                   key={`${checkInDate}-${checkOutDate}-${numberOfPeople}`} // Add key to force re-render
                   currentHotel={currentHotel}
                   listFeedback={listFeedback}
+                  checkInTime={checkInTime}
+                  checkOutTime={checkOutTime}
                />
 
 
