@@ -2,20 +2,21 @@ const asyncWrapper = require('../middlewares/asyncHandler')
 const hotel = require('../models/hotel')
 const reservation = require('../models/reservation')
 const monthlyPayment = require('../models/monthlyPayment')
+const mongoose = require('mongoose')
 const dayjs = require('dayjs')
 const cron = require('node-cron')
 
 
-exports.getMonthlyPaymentOfAllHotels = asyncWrapper(async (req, res) => {
+exports.getMonthlyPaymentByMonthYear = asyncWrapper(async (req, res) => {
   try {
-    let { month, year } = req.query;
+    let { month, year, hotelId, name } = req.query;
 
     const currentDate = dayjs();
-    year = parseInt(year) || currentDate.year(); // Mặc định lấy năm hiện tại
+    month = month ? parseInt(month) : currentDate.month() + 1; // Thêm +1 để đúng format
+    year = year ? parseInt(year) : currentDate.year();
 
-    let filter = { year };
+    let filter = { year, month };
 
-    // Nếu nhập month thì thêm vào filter, nếu không thì lấy cả 12 tháng
     if (month) {
       month = parseInt(month);
       if (month < 1 || month > 12) {
@@ -27,21 +28,39 @@ exports.getMonthlyPaymentOfAllHotels = asyncWrapper(async (req, res) => {
       filter.month = month;
     }
 
-    // Truy vấn dữ liệu
-    const payments = await MonthlyPayment.find(filter).populate("hotel", "name owner");
+    if (hotelId) {
+      hotelId = new mongoose.Types.ObjectId(hotelId);
+      filter.hotel = hotelId;
+    }
+
+    if (name) {
+      filter.name = { $regex: name, $options: "i" }; // Case-insensitive search
+    }
+
+    const monthlyPayments = await monthlyPayment.find(filter);
+
+    console.log(hotelId)
+    console.log(month)
+    console.log(year)
+    console.log(monthlyPayments)
+
+    const reservations = (await reservation.find({hotel: hotelId})).length;
+
 
     return res.status(200).json({
       success: true,
-      data: payments,
+      data: monthlyPayments,
+      reservations
     });
+
   } catch (err) {
     return res.status(500).json({
       success: false,
-      message: err.message,
+      message: "Internal Server Error",
+      error: err.message,
     });
   }
 });
-
 
 exports.getDashBoardData = asyncWrapper(async (req, res) => {
   const currentUser = req.user;
@@ -109,7 +128,17 @@ exports.getDashBoardData = asyncWrapper(async (req, res) => {
   }
 });
 
+exports.createMonthlyPayment = asyncWrapper(async(req, res) => {
 
+  const newMonthlyPayment = new monthlyPayment(req.body)
+
+  await newMonthlyPayment.save();
+
+  console.log("Đã insert thành công")
+
+  return res.status(200).send("Create monthly payment successfully");
+
+});
 
 const calculateMonthlyPayments = async () => {
   try {
@@ -121,7 +150,7 @@ const calculateMonthlyPayments = async () => {
     // 1️⃣ Lấy danh sách tất cả khách sạn
     const hotels = await hotel.find();
     if (!hotels.length) {
-      console.log("❌ No hotels found.");
+      console.log("No hotels found");
       return;
     }
 

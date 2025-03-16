@@ -16,6 +16,7 @@ import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar";
 import axiosInstance from "../../utils/AxiosInstance";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 import Sidebar from "../../components/navbar/CustomeSidebar";
+import AdminSideBar from "../../components/navbar/AdminSidebarSecond";
 
 // Dashboard Overview Component
 const AdminDashboard = () => {
@@ -175,7 +176,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="d-flex">
-      <Sidebar />
+      <AdminSideBar />
       <div className="content w-100">
         <AdminCustomNavbar />
         <div className="container-fluid px-4 py-3">

@@ -6,8 +6,8 @@ import "chart.js/auto";
 import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar";
 import axiosInstance from "../../utils/AxiosInstance";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
-import Sidebar from "../../components/navbar/CustomeSidebar";
 import axios from "axios";
+import Sidebar from "../../components/navbar/AdminSidebar";
 
 // Dashboard Overview Component
 const DashboardOverview = () => {
@@ -22,7 +22,6 @@ const DashboardOverview = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState("yearly");
-  const [listHotel, setListHotel] = useState([]);
 
   //Get data of hotel ownner
   useEffect(() => {

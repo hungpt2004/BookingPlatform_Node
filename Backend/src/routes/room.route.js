@@ -10,6 +10,6 @@ RoomRouter.post("/create-facility/:roomId", RoomController.createRoomFacility);
 RoomRouter.get("/get-facility/:roomId", RoomController.getRoomFacilitiesByRoomId);
 RoomRouter.get("/get-room-owner/:hotelId", RoomController.getRoomByHotelIdOwner);
 RoomRouter.get("/get-room-availability/:hotelId", RoomController.getRoomAvailability);
-//RoomRouter.get("/get-room-by-id/:roomId", RoomController.getRoomById);
+RoomRouter.get("/get-room-by-id/:roomId", RoomController.getRoomById);
 
 module.exports = RoomRouter;

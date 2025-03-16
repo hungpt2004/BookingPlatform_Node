@@ -1,14 +1,14 @@
 import { useState } from "react"
 import { Navbar, Nav, Container, Row, Col, Form, Button, Dropdown, Card } from "react-bootstrap"
 import { Printer, Download, Filter, FileIcon as FileEarmark } from "lucide-react"
-import { OwnerNavbar } from "../../components/navbar/OwnerNavbar"
+import Sidebar from "../../components/navbar/AdminSidebar"
 
 export default function ReviewPage() {
 
     return (
         <div className="booking-app">
             {/* Navigation Bar */}
-            <OwnerNavbar />
+            <Sidebar />
             <Container className="py-4">
                 <label className="mb-2 text-dark fw-bold fs-3">Đánh giá
                 </label>

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Spinner, Alert, Button, Badge, Form } from 'react-bootstrap';
 import axios from 'axios';
 import { BASE_URL } from '../../utils/Constant';
-import { OwnerNavbar } from '../../components/navbar/OwnerNavbar';
+import Sidebar from '../../components/navbar/AdminSidebar';
 
 const HotelDetailOwnerPage = () => {
     const { hotelId } = useParams();
@@ -99,7 +99,7 @@ const HotelDetailOwnerPage = () => {
 
     return (
         <>
-            <OwnerNavbar />
+            <Sidebar />
             <Container className="py-4">
                 <Button
                     variant="outline-secondary"

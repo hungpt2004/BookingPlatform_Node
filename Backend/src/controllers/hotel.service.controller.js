@@ -15,7 +15,7 @@ exports.getAllHotelServicesByHotelId = catchAsync(async (req, res) => {
     });
   }
 
-  const hotelServices = await HotelService.find({ hotel: hotelId });
+  const hotelServices = await Hotel.findOne({_id: hotelId}).populate('services');
 
   if (hotelServices.length === 0) {
     return res.status(404).json({

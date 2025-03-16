@@ -27,6 +27,18 @@ MonthlyRouter.get(
   MonthlyController.getDashBoardData
 );
 
+MonthlyRouter.post(
+  "/create",
+  authController.restrictTo("OWNER"),
+  MonthlyController.createMonthlyPayment
+);
+
+MonthlyRouter.get(
+  '/monthly-data',
+  authController.restrictTo("OWNER"),
+  MonthlyController.getMonthlyPaymentByMonthYear
+)
+
 // Nếu cần thêm route cho các role khác thì làm như này:
 // MonthlyRouter.get('/admin-stats', authController.restrictTo("ADMIN"), MonthlyController.getAdminStats);
 // MonthlyRouter.get('/customer-view', authController.restrictTo("CUSTOMER"), MonthlyController.getCustomerView);

@@ -3,13 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Spinner, Alert, Container, Badge, Button, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios';
 import { BASE_URL } from '../../utils/Constant';
-import { OwnerNavbar } from '../../components/navbar/OwnerNavbar';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import '../owner/BookingSchedule.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import Sidebar from '../../components/navbar/AdminSidebar';
 
 const localizer = momentLocalizer(moment);
 
@@ -271,7 +271,7 @@ const BookingSchedule = () => {
     if (loading) {
         return (
             <div>
-                <OwnerNavbar />
+                <Sidebar />
                 <Container className="mt-5 text-center">
                     <Spinner animation="border" role="status" />
                     <p className="mt-2">Loading reservations...</p>

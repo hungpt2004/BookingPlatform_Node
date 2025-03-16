@@ -16,7 +16,7 @@ import {
 import { NavLink } from "react-router-dom";
 import "./sidebar.css";
 
-const Sidebar = () => {
+const AdminSideBar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [activeMenu, setActiveMenu] = useState("");
   const location = useLocation();
@@ -30,28 +30,17 @@ const Sidebar = () => {
       path: "/dashboard",
     },
     {
-      title: "Quản lý khách sạn",
+      title: "Quản Lý Khách Hàng",
       icon: <FaHotel />,
       submenus: [
-        { title: "Thông tin Khách Sạn", path: "/hotel-management" },
-        { title: "Lịch Booking", path: "/booking-management" },
-        { title: "Quản lý Booking", path: "/hotels/add" },
+        { title: "Danh Sách Khách Hàng", path: "/customer-partner" },
       ],
     },
     {
-      title: "Quản lý đánh giá",
+      title: "Quản Lý Khách Sạn",
       icon: <FaBuilding />,
       submenus: [
-        { title: "Danh sách đánh giá", path: "/feedback-management" },
-        { title: "Thêm phòng", path: "/rooms/add" },
-      ],
-    },
-    {
-      title: "Quản lý dịch vụ",
-      icon: <FaBuilding />,
-      submenus: [
-        { title: "Danh sách dịch vụ", path: "/service-management" },
-        { title: "Danh sách tiện ích", path: "/rooms/add" },
+        { title: "Danh Sách KS Liên Kết", path: "/hotel-partner" },
       ],
     },
     {
@@ -90,11 +79,11 @@ const Sidebar = () => {
   }, [location.pathname]);
 
   return (
-    <div className={`sidebar-container ${collapsed ? "collapsed" : ""} h-100vh`} style={{height: '100vh'}}>
+    <div className={`sidebar-container ${collapsed ? "collapsed" : ""}`}>
       <div className="sidebar-header">
         <div className="logo-container">
           {!collapsed && <img src="/logo.png" alt="Logo" className="logo" />}
-          {!collapsed && <span className="logo-text">Owner Panel</span>}
+          {!collapsed && <span className="logo-text">Admin Panel</span>}
         </div>
         <button className="toggle-button" onClick={toggleSidebar}>
           {collapsed ? <FaBars /> : <FaTimes />}
@@ -175,4 +164,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default AdminSideBar;

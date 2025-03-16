@@ -224,8 +224,7 @@ const Booking = ({
         console.log("Booking Data", bookingData);
 
         try {
-            await axiosInstance.post('/payment/create-booking', bookingData);
-            console.log("Booking created successfully");
+            //LANH CHANH T GÕ M
             navigate('/booking-step2', { state: bookingData });
         } catch (error) {
             console.error("Error creating booking:", error);

@@ -59,7 +59,9 @@ const defaultCenter = {
 const stepContainer = {
     width: "100%",          // Dấu % phải để trong chuỗi
     maxWidth: "3500px",    // Không có khoảng trắng giữa maxWidth
-    margin: "auto"         // Phải đặt trong chuỗi
+    margin: "auto",        // Phải đặt trong chuỗi
+    marginTop: '100px',
+    height: 'auto'
 };
 
 // Component to handle map events

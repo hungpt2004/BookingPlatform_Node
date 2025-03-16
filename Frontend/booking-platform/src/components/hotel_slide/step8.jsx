@@ -52,6 +52,8 @@ export const Step8 = ({ nextStep, prevStep }) => {
 
     return (
         <Container className="float-start" style={{ width: "35%", marginLeft: "5%" }} >
+            <br></br>
+            <br></br>
             <h2 className="fw-bold mt-5">Dịch vụ tại chỗ nghỉ</h2>
 
             <Form className="mb-4">
