@@ -430,7 +430,8 @@ cron.schedule(
   "*/5 * * * *",
   () => {
     // autoUpdateReservationStatus();
-    // autoDeleteNotPaidReservation();
+    autoDeleteNotPaidReservation();
+    console.log(`Đã xóa not paid reservation sau 5 phút`)
   },
   {
     timezone: "Asia/Ho_Chi_Minh",

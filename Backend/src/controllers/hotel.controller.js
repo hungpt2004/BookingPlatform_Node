@@ -9,6 +9,8 @@ const { AUTH, GENERAL, HOTEL } = require("../utils/constantMessage");
 const { uploadMultipleImages, deleteImages, getPublicIdFromUrl } = require("../utils/uploadToCloudinary");
 const hotelFacility = require("../models/hotelFacility");
 const mongoose = require("mongoose");
+
+
 exports.getAllHotels = asyncHandler(async (req, res) => {
   const hotels = await Hotel.find();
 

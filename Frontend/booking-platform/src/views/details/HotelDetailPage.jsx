@@ -286,9 +286,7 @@ export const HotelDetailPage = () => {
       <>
          <CustomNavbar />
          {loading ? (
-            <div className="text-center mt-5">
-               <Spinner animation="border" variant="primary" />
-            </div>
+            null
          ) : error ? (
             <p className="text-danger">{error}</p>
          ) : (
@@ -443,7 +441,7 @@ export const HotelDetailPage = () => {
                               </div>
                               <p className="hotel-location text-secondary mb-0">
                                  <FaMapMarkerAlt className="me-1" />
-                                 {currentHotel.location}
+                                 {currentHotel.address}
                               </p>
                            </Card.Header>
 

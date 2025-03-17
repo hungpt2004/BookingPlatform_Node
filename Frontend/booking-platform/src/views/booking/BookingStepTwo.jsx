@@ -23,6 +23,7 @@ import {
   FaPercent,
   FaLock,
 } from "react-icons/fa"
+import { CustomFailedToast, CustomToast } from "../../components/toast/CustomToast"
 
 const BookingStepTwo = () => {
   const { state: bookingData } = useLocation()
@@ -178,10 +179,17 @@ const BookingStepTwo = () => {
           reservationId: reservationId,
         })
 
-        sessionStorage.setItem("payment_link", responsePayment.data.checkoutUrl)
+        localStorage.setItem("payment_link", responsePayment.data.checkoutUrl)
 
         window.location.href = responsePayment.data.checkoutUrl
       }
+
+      if(responseBooking.data && responseBooking.data.redirect && responseBooking.data.message) {
+        window.location.href = responseBooking.data.redirect
+        CustomFailedToast(responseBooking.data.message)
+      }
+
+
     } catch (error) {
       console.error("Payment error:", error)
     }
@@ -189,6 +197,7 @@ const BookingStepTwo = () => {
 
   return (
     <>
+      <CustomToast/>
       <CustomNavbar />
       <div className="py-4" style={{ backgroundColor: "#f5f5f5" }}>
         <Container className="py-3" style={{ maxWidth: "85%" }}>

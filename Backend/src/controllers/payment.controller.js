@@ -41,6 +41,22 @@ exports.createBooking = asyncHandler(async (req, res) => {
     const checkOut = new Date(checkOutDate);
 
     //Check not paid reservation
+    const unpaidReservation = await Reservation.findOne({
+      user: user._id,
+      status: 'NOT PAID'
+    })
+
+    if(unpaidReservation) {
+
+      console.log(`Đã phát hiện đơn not paid`)
+
+      const urlReturnBack = 'http://localhost:5173/transaction'
+
+      return res.json({ 
+        redirect: urlReturnBack,
+        message: "You must payment the not paid reservation before or wait 5 minutes to delete" 
+      });
+    }
 
     const session = await mongoose.startSession();
     session.startTransaction();

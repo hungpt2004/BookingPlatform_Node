@@ -32,7 +32,8 @@ function CustomNavbar() {
     };
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    localStorage.removeItem('payment_link');
     logout();
     setUser(null);
     navigate('/');

@@ -110,9 +110,11 @@ function App() {
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/redirect" element={<RoleRedirect />} />
 
+        {/* Note sửa lỗi home */}
+        <Route path="/home" element={<HomePage />} />
+
         {/* Customer routes */}
         <Route element={<ProtectedRoute allowedRoles={["CUSTOMER"]} />}>
-          <Route path="/home" element={<HomePage />} />
           <Route path="/transaction" element={<HistoryTransaction />} />
           <Route path="/booking-step2" element={<BookingStepTwo />} />
           <Route path="/hotel-detail/:id" element={<HotelDetailPage />} />

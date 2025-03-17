@@ -92,7 +92,7 @@ export const HistoryTransaction = () => {
             console.log(response.data)
             setReservations(response.data.reservations);
             setTotalPages(response.data.totalPages || 1);
-            setPaymentLink(sessionStorage.getItem('payment_link'))
+            setPaymentLink(localStorage.getItem('payment_link'))
             setErr("");
          }
       } catch (error) {
@@ -369,14 +369,14 @@ export const HistoryTransaction = () => {
                                     }`
                                  }>
                                     <Card className="card-search-hotel m-3 rounded-4">
-                                       <Card.Header style={{backgroundColor: '#003b95'}} className="text-center text-light fs-4 rounded-top-4">{item.hotel.hotelName || "Unknown Hotel"}</Card.Header>
+                                       <Card.Header style={{backgroundColor: '#003b95'}} className="text-center text-light fs-4 rounded-top-4">{item.hotel?.hotelName || "Unknown Hotel"}</Card.Header>
                                        <Card.Body className="p-4">
                                           <p style={{
                                              display: '-webkit-box',
                                              WebkitBoxOrient: 'vertical',
                                              WebkitLineClamp: 1,
                                              overflow: 'hidden',
-                                          }}>Address: {item.hotel.address || "N/A"}</p>
+                                          }}>Address: {item.hotel?.address || "N/A"}</p>
                                           <p>Check In: {formatDate(item.checkInDate, "DD/MM/YYYY")}</p>
                                           <p>Check Out: {formatDate(item.checkOutDate, "DD/MM/YYYY")}</p>
                                           <p>Price: {formatCurrencyVND(item.totalPrice)}</p>
@@ -399,6 +399,7 @@ export const HistoryTransaction = () => {
                                           )}
                                           {paymentLink ? (
                                              (item.status === "NOT PAID" && (
+                                                <>
                                                 <Button
                                                    onClick={() => {
                                                       if (paymentLink) {
@@ -412,6 +413,7 @@ export const HistoryTransaction = () => {
                                                 >
                                                    Continue payment
                                                 </Button>
+                                                </>
                                              ))
                                           ) : null}
                                           {item.status === "BOOKED" && (

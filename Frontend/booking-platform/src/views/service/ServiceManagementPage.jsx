@@ -172,10 +172,13 @@ const ServiceTable = () => {
          render: (_, record) => (
             <Space size="small">
                <Button type="primary" icon={<EyeOutlined />} size="small">
-                  View
+                  Add
                </Button>
                <Button type="default" icon={<MessageOutlined />} size="small">
-                  Reply
+                  Update
+               </Button>
+               <Button type="default" icon={<MessageOutlined />} size="small">
+                  Delete
                </Button>
             </Space>
          ),
