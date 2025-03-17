@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react"
 import { Navbar, Nav, Container, Row, Col, Form, Button, Dropdown, Card } from "react-bootstrap"
 import { Printer, Download, Filter, FileIcon as FileEarmark, Hotel, Building, User } from "lucide-react"
-import { OwnerNavbar } from "../../components/navbar/OwnerNavbar"
 import { BASE_URL } from '../../utils/Constant';
 import AdminSidebar from '../../components/navbar/AdminSidebar';
 import axios from "axios"
+import Sidebar from "../../components/navbar/AdminSidebar";
+import axiosInstance from "../../utils/AxiosInstance";
+import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar";
 
 export default function BookingManagePage() {
     const [dateRange, setDateRange] = useState("")
@@ -24,15 +26,12 @@ export default function BookingManagePage() {
                     setLoading(false)
                     return
                 }
-                const userResponse = await axios.get(`${BASE_URL}/customer/current-user`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                const userResponse = await axiosInstance.get(`/customer/current-user`);
                 if (userResponse.data.error === false) {
                     setCurrentUser(userResponse.data.user)
 
-                    const hotelResponse = await axios.get(
-                        `${BASE_URL}/hotel/get-owned-hotel`,
-                        { headers: { Authorization: `Bearer ${token}` } }
+                    const hotelResponse = await axiosInstance.get(
+                        `/hotel/get-owned-hotel`,
                     );
 
                     if (hotelResponse.data.error === false) {

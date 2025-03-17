@@ -30,6 +30,9 @@ export const Step6 = ({ nextStep, prevStep }) => {
         saveNameStarHotel()
     }, [hotelName, selectedStar]);
     return (
+       <>
+       <br></br>
+       <br></br>
         <Container>
             <h4 className="fw-bold mt-4">Cho chúng tôi biết thêm về hotel của Quý vị</h4>
 
@@ -134,6 +137,7 @@ export const Step6 = ({ nextStep, prevStep }) => {
                 </Form>
             </Card>
         </Container>
+       </>
     );
 };
 

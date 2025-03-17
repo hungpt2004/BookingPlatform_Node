@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Spinner, Alert, Container, Badge, Button, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios';
 import { BASE_URL } from '../../utils/Constant';
-import { OwnerNavbar } from '../../components/navbar/OwnerNavbar';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import '../owner/BookingSchedule.css'
@@ -272,7 +271,7 @@ const BookingSchedule = () => {
     if (loading) {
         return (
             <div>
-                <OwnerNavbar />
+                <Sidebar />
                 <Container className="mt-5 text-center">
                     <Spinner animation="border" role="status" />
                     <p className="mt-2">Loading reservations...</p>
@@ -284,7 +283,6 @@ const BookingSchedule = () => {
     if (error) {
         return (
             <div>
-                <OwnerNavbar />
                 <Container className="mt-5">
                     <Alert variant="danger">{error}</Alert>
                     <Button variant="outline-secondary" onClick={handleBackClick} className="mt-3">

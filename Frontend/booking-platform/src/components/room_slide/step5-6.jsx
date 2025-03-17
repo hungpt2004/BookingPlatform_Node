@@ -11,10 +11,11 @@ export const Step5 = ({ nextStep, prevStep }) => {
     const [price, setPrice] = useState("");
     const [open, setOpen] = useState(true);
     const commissionRate = 0.15;
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (price) {
-            sessionStorage.setItem("price", price);
+            sessionStorage.setItem("price", Number(price) * (1 - commissionRate));
         }
     }, [price])
 
@@ -38,6 +39,56 @@ export const Step5 = ({ nextStep, prevStep }) => {
         setOpen(false);
     };
 
+    const toCreateHotel = () => {
+        const roomDetails = JSON.parse(sessionStorage.getItem('roomDetails'));
+        const facilities = JSON.parse(sessionStorage.getItem('facilities'));
+        const price = sessionStorage.getItem('price');
+        const bathroomData = JSON.parse(sessionStorage.getItem('bathroomData'));
+        const roomName = sessionStorage.getItem('roomName') || "Phòng Giường Đôi";
+        const nonRefundableSettings = JSON.parse(sessionStorage.getItem('nonRefundableSettings')) || DEFAULT_NON_REFUNDABLE_SETTINGS;
+        const weeklyPricingSettings = JSON.parse(sessionStorage.getItem('weeklyPricingSettings')) || DEFAULT_WEEKLY_PRICING_SETTINGS;
+        const cancelPolicy = JSON.parse(sessionStorage.getItem('cancelPolicy')) || DEFAULT_CANCEL_POLICY;
+        const id = sessionStorage.getItem('id');
+
+        let rooms = JSON.parse(sessionStorage.getItem('rooms')) || [];
+        const roomCount = rooms.length + 1;
+
+        const newRoom = {
+            id: id ? parseInt(id) : roomCount,
+            roomDetails,
+            facilities,
+            price,
+            // bathroomData,
+            roomName,
+            // groupDiscounts,
+            // nonRefundableSettings,
+            // weeklyPricingSettings,
+            // cancelPolicy,
+            createdAt: new Date().toISOString()
+        };
+        if (!id) {
+            rooms.push(newRoom);
+        } else {
+            rooms = rooms.map((room) => room.id === parseInt(id) ? newRoom : room)
+        }
+
+        sessionStorage.setItem('rooms', JSON.stringify(rooms));
+
+        sessionStorage.removeItem('id');
+
+        sessionStorage.setItem('roomStep', 1);
+        sessionStorage.removeItem('roomDetails');
+        sessionStorage.removeItem('comfortOptions');
+        sessionStorage.removeItem('price');
+        sessionStorage.removeItem('bathroomData');
+        sessionStorage.removeItem('roomName');
+        sessionStorage.removeItem('groupDiscounts');
+        sessionStorage.removeItem('nonRefundableSettings');
+        sessionStorage.removeItem('weeklyPricingSettings');
+        sessionStorage.removeItem('cancelPolicy');
+
+        navigate('/create-hotel');
+    };
 
     return (
         <Container className="mt-4 w-50">
@@ -69,7 +120,7 @@ export const Step5 = ({ nextStep, prevStep }) => {
                         {price > 0 && (
                             <div className="mb-4 ps-3">
                                 <h6 >
-                                    15,00% Hoa hồng cho Booking.com
+                                    15,00% Hoa hồng cho Travelofy.com
                                 </h6>
                                 <div className="ps-5" style={{ fontSize: "0.8rem" }}>
                                     <div className="d-flex align-items-center mb-2" >
@@ -107,7 +158,7 @@ export const Step5 = ({ nextStep, prevStep }) => {
                         <Col className="text-end">
                             <Button
                                 variant="primary"
-                                onClick={nextStep}
+                                onClick={toCreateHotel}
                                 disabled={!price}
                             >
                                 Tiếp tục &gt;

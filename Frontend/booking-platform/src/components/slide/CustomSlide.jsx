@@ -1,14 +1,14 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Button, Card, Container, Spinner } from 'react-bootstrap';
+import { Button, Card, Container, Spinner, Badge } from 'react-bootstrap';
 import 'swiper/css';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../utils/Constant';
 import { RatingConsider } from '../../utils/RatingConsider';
 import { formatCurrencyVND } from '../../utils/FormatPricePrint';
-import { delay, disableInstantTransitions } from 'framer-motion';
-import { useNavigate, useNavigation } from 'react-router-dom';
-import { FaMapMarkerAlt, FaBed, FaHeart, FaThumbsUp } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
+import { FaMapMarkerAlt, FaHeart, FaRegCalendarAlt } from "react-icons/fa";
+import './CustomSlide.css';
 
 const CustomSlide = () => {
    const [hotels, setHotels] = useState([]);
@@ -16,7 +16,6 @@ const CustomSlide = () => {
    const [error, setError] = useState('');
    const [bookingData, setBookingData] = useState([]);
    const navigate = useNavigate();
-
 
    const goToDetail = (hotelId) => {
       navigate(`/hotel-detail/${hotelId}`);
@@ -42,10 +41,9 @@ const CustomSlide = () => {
    const getTotalReservationOfHotel = async (hotelId) => {
       try {
          const response = await axios.get(`${BASE_URL}/hotel/total/${hotelId}`);
-         console.log(response.data?.totalReservations)
          return response.data?.totalReservations || 0;
       } catch (err) {
-         return err.response.data.message;
+         return 0;
       }
    };
 
@@ -58,7 +56,6 @@ const CustomSlide = () => {
          const bookings = await Promise.all(
             hotels.map(async (hotel) => await getTotalReservationOfHotel(hotel._id))
          );
-         console.log(bookingData[0])
          setBookingData(bookings);
       };
 
@@ -68,86 +65,79 @@ const CustomSlide = () => {
    }, [hotels]);
 
    return (
-      <Container fluid>
-         <h1 className='text-center fw-bold mt-5'>Top Ranking Hotels In Travelofy</h1>
+      <Container fluid className="top-hotels-container">
+         <h1 className='text-center fw-bold mt-5 mb-4'>Top Ranking Hotels In Travelofy</h1>
+         
          {error && <p className="text-danger text-center">{error}</p>}
+         
          {loading ? (
-            <div className="d-flex flex-column justify-content-center align-items-center">
-               <Spinner size="30" style={{ color: '#003b95' }} />
+            <div className="d-flex justify-content-center align-items-center py-5">
+               <Spinner animation="border" style={{ color: '#003b95' }} />
             </div>
          ) : (
             <Swiper
-               className='p-5 mt-5'
-               slidesPerView={5}
-               spaceBetween={10}
-               onAutoplay={{ delay: 3000, disableInstantTransitions: false }}
+               className='hotel-swiper py-4 px-3'
+               slidesPerView={1}
+               spaceBetween={20}
                autoplay={{ delay: 3000, disableOnInteraction: false }}
                navigation={true}
-               allowSlideNext={true}
-               pagination={true}
+               pagination={{ clickable: true }}
+               breakpoints={{
+                  640: { slidesPerView: 2 },
+                  768: { slidesPerView: 3 },
+                  1024: { slidesPerView: 4 },
+                  1280: { slidesPerView: 5 }
+               }}
             >
                {hotels.map((item, index) => (
                   <SwiperSlide key={index}>
-                     <Card className='shadow-lg mb-2 bg-body-tertiary rounded-4'>
-                        <div className="card-img-container" style={{
-                           height: "240px",
-                           overflow: "hidden",
-                           position: "relative",
-                           margin: "16px"
-                        }}>
+                     <Card className='hotel-card shadow'>
+                        <div className="hotel-image-container">
                            <Card.Img
-                              src={item.images[0] || "default_image_url"}
-                              className="img-fluid rounded-3"
-                              style={{
-                                 objectFit: "cover",
-                                 width: "100%",
-                                 height: "100%",
-                                 position: "absolute",
-                                 top: "0",
-                                 left: "0"
-                              }}
+                              src={item.images[0] || "/placeholder.svg?height=240&width=320"}
+                              className="hotel-image"
+                              alt={item.hotelName}
                            />
-                           <div className="position-absolute top-0 end-0 m-3"
-                              style={{
-                                 backdropFilter: 'blur(4px)',
-                                 backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                                 padding: '8px',
-                                 borderRadius: '50%'
-                              }}
-                           >
-                              <FaHeart
-                                 color={"white"}
-                                 size={24}
-                              />
+                           <div className="favorite-icon-wrapper">
+                              <FaHeart className="favorite-icon" />
                            </div>
+                           <Badge bg="danger" className="position-absolute top-0 start-0 m-3">Top Rated</Badge>
                         </div>
-                        <Card.Body>
-                           <Card.Title className='fs-4 title text-start fw-bold' style={{
-                              display: '-webkit-box',
-                              WebkitBoxOrient: 'vertical',
-                              WebkitLineClamp: 1,
-                              overflow: 'hidden',
-                           }}>{item.hotelName}</Card.Title>
-                           <Card.Subtitle className='text-start fs-6 mb-2' style={{
-                              display: '-webkit-box',
-                              WebkitBoxOrient: 'vertical',
-                              WebkitLineClamp: 1,
-                              overflow: 'hidden',
-                           }}>{item.address}</Card.Subtitle>
-                           <div className='d-flex justify-content-start align-items-center'>
-                              <Card.Text className='mb-1 fs-6 text-danger text-decoration-line-through'>{formatCurrencyVND(item.pricePerNight + 100)} </Card.Text>
-                              <Card.Text className='mb-1 fs-5 fw-bold'>  {formatCurrencyVND(item.pricePerNight)}</Card.Text>
+                        
+                        <Card.Body className="d-flex flex-column">
+                           <div className="hotel-title-container">
+                              <Card.Title className="hotel-title">{item.hotelName}</Card.Title>
+                              <div className="d-flex align-items-center mb-2">
+                                 <FaMapMarkerAlt className="location-icon" />
+                                 <Card.Subtitle className="hotel-location">{item.address}</Card.Subtitle>
+                              </div>
                            </div>
-                           <div className="d-flex align-items-center mt-0 mb-1">
-                              <Card style={{ backgroundColor: '#003b95' }}>
-                                 <Card.Text className="px-3 py-1 text-light text-center fs-6">{item.rating}</Card.Text>
-                              </Card>
-                              <span className="fw-bold px-3 fs-6">{RatingConsider(item.rating)}</span>
+                           
+                           <div className="d-flex justify-content-between align-items-center mb-2">
+                              <div className="price-container">
+                                 <Card.Text className="old-price">{formatCurrencyVND(item.pricePerNight + 100)}</Card.Text>
+                                 <Card.Text className="current-price">{formatCurrencyVND(item.pricePerNight)}</Card.Text>
+                              </div>
+                              <div className="rating-badge" style={{ backgroundColor: '#003b95' }}>
+                                 <span>{item.rating}</span>
+                              </div>
                            </div>
-                           <Card.Text className='text-start fs-6'>Total Booking: {bookingData[index] ?? 0} reservations</Card.Text> {/* ✅ Fix lỗi undefined */}
-                           <div className='d-flex justify-content-end align-items-center rounded-0'>
-                              <Button style={{ backgroundColor: '#003b95', borderColor: '#003b95' }} onClick={() => goToDetail(item._id)} className='px-2 py-1'>Booking Now</Button>
+                           
+                           <Card.Text className="rating-text">{RatingConsider(item.rating)}</Card.Text>
+                           
+                           <div className="d-flex align-items-center mt-auto mb-2">
+                              <FaRegCalendarAlt className="booking-icon" />
+                              <Card.Text className="booking-text">
+                                 {bookingData[index] ?? 0} reservations
+                              </Card.Text>
                            </div>
+                           
+                           <Button 
+                              className="booking-button w-100"
+                              onClick={() => goToDetail(item._id)}
+                           >
+                              Book Now
+                           </Button>
                         </Card.Body>
                      </Card>
                   </SwiperSlide>

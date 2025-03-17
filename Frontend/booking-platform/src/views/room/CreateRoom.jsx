@@ -14,11 +14,11 @@ export const CreateRoom = () => {
     // Define your steps array (currently just Step1, but you can add more)
     const steps = [
         <CreateRoomStep1 key={1} nextStep={() => setStep(step + 1)} />,
-        <CreateRoomStep2 key={2} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
-        <CreateRoomStep3 key={3} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
-        <CreateRoomStep4 key={4} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
-        <CreateRoomStep5 key={5} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
-        <CreateRoomStep6 key={6} prevStep={() => setStep(step - 1)} />
+        // <CreateRoomStep2 key={2} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
+        <CreateRoomStep3 key={2} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
+        <CreateRoomStep4 key={3} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
+        <CreateRoomStep5 key={4} nextStep={() => setStep(step + 1)} prevStep={() => setStep(step - 1)} />,
+        // <CreateRoomStep6 key={5} prevStep={() => setStep(step - 1)} />
     ];
 
     return (

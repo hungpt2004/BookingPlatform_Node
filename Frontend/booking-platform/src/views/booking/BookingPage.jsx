@@ -18,7 +18,9 @@ const Booking = ({
     numberOfPeople,
     userId,
     currentHotel,
-    listFeedback
+    listFeedback,
+    checkInTime,
+    checkOutTime,
 }) => {
     const [selectedRooms, setSelectedRooms] = useState({});
     const [loading, setLoading] = useState(false);
@@ -33,6 +35,8 @@ const Booking = ({
 
     const navigate = useNavigate();
 
+    console.log(`Check In Time: ${checkInTime}`)
+    console.log(`Check Out Time: ${checkOutTime}`)
 
     // console.log("Data bed 2:", JSON.stringify(beds, null, 2));
     // console.log("Data bed detail 3:", JSON.stringify(bed, null, 2));
@@ -48,7 +52,9 @@ const Booking = ({
                 params: {
                     checkInDate,
                     checkOutDate,
-                    numberOfPeople
+                    numberOfPeople,
+                    checkInTime,
+                    checkOutTime
                 }
             });
             // console.log("numberOfPeople:", numberOfPeople);
@@ -214,14 +220,15 @@ const Booking = ({
             currentHotel,
             distanceNight: distanceDay,
             listFeedback,
+            checkInTime,
+            checkOutTime,
             numberOfPeople: numberOfPeople,
         };
 
         console.log("Booking Data", bookingData);
 
         try {
-            await axiosInstance.post('/payment/create-booking', bookingData);
-            console.log("Booking created successfully");
+            //LANH CHANH T GÕ M
             navigate('/booking-step2', { state: bookingData });
         } catch (error) {
             console.error("Error creating booking:", error);
@@ -245,9 +252,6 @@ const Booking = ({
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h5>Select Rooms - <span className="alert alert-warning">You want to have {distanceDay} nights</span></h5>
                 <p>Price per night: {formatCurrencyVND(currentHotel.pricePerNight)}</p>
-                {/* <Button variant="secondary" onClick={() => setOpen(false)}>
-                    Close
-                </Button> */}
             </div>
 
             {loading && (

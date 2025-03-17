@@ -1,14 +1,13 @@
 require("dotenv").config();
 const PayOs = require("@payos/node");
 const asyncHandler = require("../middlewares/asyncHandler");
-const User = require('../models/user')
+const User = require("../models/user");
 const Room = require("../models/room");
 const Reservation = require("../models/reservation");
-const cron = require('node-cron')
-const RoomAvailability = require('../models/roomAvailability')
+const cron = require("node-cron");
+const RoomAvailability = require("../models/roomAvailability");
 const { PAYMENT, RESERVATION } = require("../utils/constantMessage");
 const mongoose = require("mongoose");
-
 
 //Create object pay os
 const payOs = new PayOs(
@@ -20,19 +19,29 @@ const payOs = new PayOs(
 //Create booking with not paid reservation
 exports.createBooking = asyncHandler(async (req, res) => {
   const user = req.user;
-  const { hotelId, roomIds, checkInDate, checkOutDate, roomDetails, totalPrice } = req.body;
+  const {
+    hotelId,
+    roomIds,
+    checkInDate,
+    checkOutDate,
+    roomDetails,
+    totalPrice,
+  } = req.body;
+
+  console.log(req.body)
 
   try {
     if (!user.id || !hotelId || !roomIds || !checkInDate || !checkOutDate) {
-      return res.status(400).json({ error: true, message: "Missing required fields" });
+      return res
+        .status(400)
+        .json({ error: true, message: "Missing required fields" });
     }
 
     const checkIn = new Date(checkInDate);
     const checkOut = new Date(checkOutDate);
 
     //Check not paid reservation
-    
-    
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -51,7 +60,9 @@ exports.createBooking = asyncHandler(async (req, res) => {
             date,
           }).session(session);
 
-          const totalBooked = existingRecord ? existingRecord.bookedQuantity : 0;
+          const totalBooked = existingRecord
+            ? existingRecord.bookedQuantity
+            : 0;
           const room = await Room.findById(item.roomId).session(session);
 
           if (!room || totalBooked + item.quantity > room.quantity) {
@@ -61,7 +72,9 @@ exports.createBooking = asyncHandler(async (req, res) => {
         }
 
         if (!available) {
-          throw new Error(`Not enough rooms available for room ID ${item.roomId}`);
+          throw new Error(
+            `Not enough rooms available for room ID ${item.roomId}`
+          );
         }
       }
 
@@ -95,7 +108,10 @@ exports.createBooking = asyncHandler(async (req, res) => {
       const reservation = new Reservation({
         user: user.id,
         hotel: hotelId,
-        rooms: roomDetails.map((item) => ({ room: item.roomId, quantity: item.quantity })),
+        rooms: roomDetails.map((item) => ({
+          room: item.roomId,
+          quantity: item.quantity,
+        })),
         checkInDate,
         checkOutDate,
         totalPrice,
@@ -108,30 +124,33 @@ exports.createBooking = asyncHandler(async (req, res) => {
       //push is not check
 
       await User.findByIdAndUpdate(user._id, {
-        $addToSet: { reservations: reservation._id }
+        $addToSet: { reservations: reservation._id },
       });
 
       await session.commitTransaction();
       session.endSession();
 
-      console.log(`Transaction create booking success`)
+      console.log(`Đã tạo reservation với trạng thái  NOT PAID`);
 
       return res.status(201).json({
         error: false,
         message: "Reservation created successfully",
         reservation,
       });
-
     } catch (err) {
       await session.abortTransaction();
       session.endSession();
+      
       return res.status(400).json({
         error: true,
         message: err.message || "Failed to create reservation",
       });
     }
   } catch (err) {
-    return res.status(500).json({ error: true, message: "Failed to create reservation" });
+    console.log(err.message);
+    return res
+      .status(500)
+      .json({ error: true, message: "Failed to create reservation" });
   }
 });
 
@@ -163,12 +182,12 @@ exports.createPaymentLink = asyncHandler(async (req, res) => {
   const paymentLink = await payOs.createPaymentLink(newOrder);
 
   return res.json({ checkoutUrl: paymentLink.checkoutUrl });
+
 });
 
 //Logic CancelPayment
 exports.cancelPayment = asyncHandler(async (req, res) => {
   const currentUser = req.user;
-
   const { id } = req.params;
 
   if (!id) {
@@ -178,10 +197,7 @@ exports.cancelPayment = asyncHandler(async (req, res) => {
     });
   }
 
-  const reservation = await Reservation.findOne({
-    _id: id,
-    user: currentUser.id,
-  });
+  const reservation = await Reservation.findOne({ _id: id, user: currentUser.id });
 
   if (!reservation) {
     return res.status(404).json({
@@ -190,22 +206,31 @@ exports.cancelPayment = asyncHandler(async (req, res) => {
     });
   }
 
+  if (!reservation.rooms || reservation.rooms.length === 0) {
+    return res.status(400).json({
+      error: true,
+      message: "No rooms found in this reservation.",
+    });
+  }
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
     for (const roomItem of reservation.rooms) {
-      const room = await Room.findOne(roomItem.room).session(session);
+      if (!roomItem.room) continue; // Tránh lỗi khi roomItem không hợp lệ
+
+      const room = await Room.findOne({ _id: roomItem.room }).session(session);
       if (room) {
         room.quantity += roomItem.quantity;
         await room.save({ session });
       }
     }
 
-    await Reservation.findOneAndDelete({
-      _id: id,
-      user: currentUser.id,
-    });
+    const deleted = await Reservation.findOneAndDelete({ _id: id, user: currentUser.id }).session(session);
+    if (!deleted) {
+      throw new Error("Failed to delete reservation");
+    }
 
     await session.commitTransaction();
     session.endSession();
@@ -214,18 +239,22 @@ exports.cancelPayment = asyncHandler(async (req, res) => {
       error: false,
       message: "Cancel Payment Successfully",
     });
+
   } catch (err) {
-    if(session.inTransaction()){
+    if (session && session.inTransaction()) {
       await session.abortTransaction();
     }
+
     session.endSession();
 
     return res.status(400).json({
       error: true,
       message: PAYMENT.CANCEL_FAIL,
+      details: err.message,
     });
   }
 });
+
 
 //Logic SuccessPayment
 exports.successPayment = asyncHandler(async (req, res) => {
@@ -260,7 +289,6 @@ exports.successPayment = asyncHandler(async (req, res) => {
   // const rooms = reservation.rooms;
 
   try {
-
     //Trừ số phòng đã đặt
     // for (var roomItem of rooms) {
     //   const room = await Room.findById(roomItem.room).session(session); //Session ở đây thông báo rằng hành động này cùng thuộc 1 transactions
@@ -287,7 +315,7 @@ exports.successPayment = asyncHandler(async (req, res) => {
     });
   } catch (err) {
     //roll back
-    if(session.inTransaction()){
+    if (session.inTransaction()) {
       await session.abortTransaction(); //Không thành công thì rollback dữ liệu
     }
     session.endSession();
@@ -296,7 +324,6 @@ exports.successPayment = asyncHandler(async (req, res) => {
       error: false,
       message: PAYMENT.FAIL,
     });
-
   }
 });
 
@@ -319,16 +346,21 @@ async function restoreRooms() {
         await room.save();
       }
     }
-
   }
 
-  console.log(`Đã khôi phục số phòng cho ${expiredReservations.length} đơn đặt phòng.`);
+  console.log(
+    `Đã khôi phục số phòng cho ${expiredReservations.length} đơn đặt phòng.`
+  );
 }
 
 // Lên lịch chạy cron job mỗi ngày lúc 00:00 (nửa đêm)
-cron.schedule("0 0 * * *", async () => {
-  console.log("🔄 Đang chạy cron job khôi phục số phòng...");
-  await restoreRooms();
-},{
-  timezone: "Asia/Ho_Chi_Minh"
-});
+cron.schedule(
+  "0 0 * * *",
+  async () => {
+    console.log("🔄 Đang chạy cron job khôi phục số phòng...");
+    await restoreRooms();
+  },
+  {
+    timezone: "Asia/Ho_Chi_Minh",
+  }
+);

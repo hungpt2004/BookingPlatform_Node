@@ -23,6 +23,7 @@
     "axios": "^1.7.9",
     "booking-platform": "file:",
     "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
     "chart.js": "^4.4.8",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",

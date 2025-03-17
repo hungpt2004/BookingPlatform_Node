@@ -7,28 +7,19 @@ export const OwnerNavbar = () => {
         <Navbar bg="primary" variant="dark" expand="lg">
             <Container>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
+                <Navbar.Collapse id="basic-navbar-nav ">
                     <Nav className="me-auto">
-                        <Nav.Link href="#" className="text-white">
+                        <Nav.Link href="/owner-homepage" className="text-white">
                             Trang chủ Nhóm chỗ nghỉ
                         </Nav.Link>
-                        <Nav.Link href="#" className="text-white">
+                        <Nav.Link href="booking-management" className="text-white">
                             Đặt phòng
                         </Nav.Link>
-                        <Nav.Link href="#" className="text-white">
+                        <Nav.Link href="/reviews" className="text-white">
                             Đánh giá
                         </Nav.Link>
-                        <Nav.Link href="#" className="text-white">
+                        <Nav.Link href="/owner-finance" className="text-white">
                             Tài chính
-                        </Nav.Link>
-                        <Nav.Link href="#" className="text-white">
-                            Chỉnh sửa dòng loạt
-                        </Nav.Link>
-                        <Nav.Link href="#" className="text-white">
-                            Trung tâm Cơ hội dành cho Nhóm chỗ nghỉ
-                        </Nav.Link>
-                        <Nav.Link href="#" className="text-white">
-                            Phân tích
                         </Nav.Link>
                     </Nav>
                 </Navbar.Collapse>

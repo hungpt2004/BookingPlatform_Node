@@ -3,6 +3,7 @@ const Hotel = require("../models/hotel");
 const asyncHandler = require("../middlewares/asyncHandler");
 
 exports.addFavoriteHotel = asyncHandler(async (req, res) => {
+  
   const userId = req.user._id;
 
   const { hotelId } = req.body;

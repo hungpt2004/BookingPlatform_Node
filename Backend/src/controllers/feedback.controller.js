@@ -27,10 +27,11 @@ async function checkProfanityWithGemini(content) {
 }
 
 exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
+  
   const { hotelId } = req.params;
 
   const [listFeedback, userFeeback] = await Promise.all([
-    Feedback.find({ hotel: hotelId }).populate("user"),
+    Feedback.find({ hotel: hotelId }).populate("user").populate('hotel'),
     Feedback.find(
       { hotel: hotelId },
       {
@@ -41,6 +42,10 @@ exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
       }
     ).populate("user"),
   ]);
+
+  if(!hotelId) {
+    listFeedback = await Feedback.find();
+  }
 
   if (listFeedback.length === 0) {
     return res.send("No have any feedback")
