@@ -100,7 +100,9 @@ const HotelDetailOwnerPage = () => {
 
     return (
         <>
-            <AdminCustomNavbar />
+            <div className="d-flex">
+                <AdminSidebar />
+                <div className="booking-app flex-grow-1" style={{ paddingLeft: "20px" }}>
             <Container className="py-4">
                 <Button
                     variant="outline-secondary"
@@ -205,6 +207,8 @@ const HotelDetailOwnerPage = () => {
                     ))}
                 </Row>
             </Container>
+            </div>
+            </div>
         </>
     );
 };

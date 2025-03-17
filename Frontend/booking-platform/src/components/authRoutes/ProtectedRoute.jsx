@@ -47,7 +47,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
       case "CUSTOMER":
         return <Navigate to="/home" replace />;
       default:
-        return <Navigate to="/home" replace />;
+        return <Navigate to="/admin-dashboard" replace />;
     }
   }
 

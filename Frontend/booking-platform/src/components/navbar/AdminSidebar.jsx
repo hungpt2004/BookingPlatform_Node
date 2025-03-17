@@ -34,14 +34,14 @@ const Sidebar = () => {
       icon: <FaHotel />,
       submenus: [
         { title: "Lịch Booking", path: "/booking-management" },
-        { title: "Booking Management", path: "/hotels/add" },
+        { title: "Hotel Management", path: "/hotels/add" },
       ],
     },
     {
       title: "Quản lý phòng",
       icon: <FaBuilding />,
       submenus: [
-        { title: "Danh sách phòng", path: "/rooms" },
+        { title: "Danh sách phòng", path: "/room-management" },
         { title: "Thêm phòng", path: "/rooms/add" },
       ],
     },
@@ -84,6 +84,12 @@ const Sidebar = () => {
       }
     });
   }, [location.pathname]);
+
+  const handleLogout = () => {
+    logout();
+    setUser(null);
+    navigate('/');
+  };
 
   return (
     <div className={`sidebar-container ${collapsed ? "collapsed" : ""}`}>
@@ -160,7 +166,7 @@ const Sidebar = () => {
           </div>
           {!collapsed && <span className="menu-text">Hồ sơ</span>}
         </NavLink>
-        <button className="logout-button" onClick={() => navigate("/logout")}>
+        <button className="logout-button" onClick={handleLogout}>
           <div className="menu-icon">
             <FaSignOutAlt />
           </div>

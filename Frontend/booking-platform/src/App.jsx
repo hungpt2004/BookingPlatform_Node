@@ -36,6 +36,7 @@ import ReviewPage from './views/owner/ReviewPage'
 import HotelReservations from './views/owner/BookingSchedule'
 import HotelDetailOwnerPage from './views/owner/HotelDetailOwner'
 import BookingSchedule from "./views/owner/BookingSchedule";
+import RoomManagePage from "./views/owner/RoomManagement";
 
 function App() {
   const { user, isAuthenticated } = useAuthStore();
@@ -121,6 +122,10 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["OWNER"]} />}>
           <Route path="/dashboard" element={<DashboardOverview />} />
           <Route path="/monthly-owner" element={<MonthlyPayment />} />
+          <Route path='/booking-management' element={<BookingManagePage />} />
+          <Route path='/room-management' element={<RoomManagePage />} />
+          <Route path='/booking-schedule/:hotelId' element={<HotelReservations/>}/>
+          <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage/>}/>
         </Route>
 
         {/* Admin routes */}
@@ -140,10 +145,10 @@ function App() {
         <Route path='/edit-weekly-price' element={<PricePerWeek />} />
         <Route path='/create-photo' element={<HotelPhotos />} />
 
-        <Route path='/booking-management' element={<BookingManagePage />} />
+        
         <Route path='/reviews' element={<ReviewPage />} />
-        <Route path='/booking-schedule/:hotelId' element={<HotelReservations/>}/>
-        <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage/>}/>
+        
+        
       </Routes>
     </Router>
   );

@@ -6,7 +6,7 @@ import { BASE_URL } from '../../utils/Constant';
 import AdminSidebar from '../../components/navbar/AdminSidebar';
 import axios from "axios"
 
-export default function BookingManagePage() {
+export default function RoomManagePage() {
     const [dateRange, setDateRange] = useState("")
     const [hotels, setHotels] = useState([])
     const [loading, setLoading] = useState(true)
@@ -56,8 +56,8 @@ export default function BookingManagePage() {
 
     return (
         <><div className="d-flex">
-            <AdminSidebar />
-            <div className="booking-app flex-grow-1" style={{ paddingLeft: "20px" }}>
+        <AdminSidebar />
+        <div className="booking-app flex-grow-1" style={{ paddingLeft: "20px" }}>
 
                 <Container className="py-4">
                     <div className="d-flex justify-content-between align-items-center mb-4">
@@ -159,29 +159,13 @@ export default function BookingManagePage() {
                                             <Card.Text className="text-muted small mb-2">
                                                 {hotel.address}
                                             </Card.Text>
-                                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                                <div>
-                                                    <span className="me-2">{hotel.star} ★</span>
-                                                    <span className="text-warning">{hotel.rating.toFixed(1)}</span>
-                                                </div>
-                                                <div>
-                                                    <span className="fw-bold">₫{hotel.pricePerNight.toLocaleString()}</span>
-                                                    <span className="text-muted">/đêm</span>
-                                                </div>
-                                            </div>
                                             <div className="d-flex gap-2">
                                                 <Button
                                                     variant="outline-primary"
                                                     className="w-100"
-                                                    href={`/booking-schedule/${hotel._id || ''}`}
-                                                    onClick={(e) => {
-                                                        if (!hotel._id) {
-                                                            e.preventDefault();
-                                                            alert("Cannot manage this hotel: Missing hotel ID");
-                                                        }
-                                                    }}
+                                                    href={`/detail/${hotel._id}`}
                                                 >
-                                                    Quản lý
+                                                    Xem chi tiết
                                                 </Button>
                                             </div>
                                         </Card.Body>
@@ -194,5 +178,5 @@ export default function BookingManagePage() {
             </div>
             </div>
         </>
-            )
+    )
 }
