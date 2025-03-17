@@ -4,6 +4,8 @@ import { Printer, Download, Filter, FileIcon as FileEarmark, Hotel, Building, Us
 import { BASE_URL } from '../../utils/Constant';
 import axios from "axios"
 import Sidebar from "../../components/navbar/AdminSidebar";
+import axiosInstance from "../../utils/AxiosInstance";
+import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar";
 
 export default function BookingManagePage() {
     const [dateRange, setDateRange] = useState("")
@@ -23,15 +25,12 @@ export default function BookingManagePage() {
                     setLoading(false)
                     return
                 }
-                const userResponse = await axios.get(`${BASE_URL}/customer/current-user`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                const userResponse = await axiosInstance.get(`/customer/current-user`);
                 if (userResponse.data.error === false) {
                     setCurrentUser(userResponse.data.user)
 
-                    const hotelResponse = await axios.get(
-                        `${BASE_URL}/hotel/get-owned-hotel`,
-                        { headers: { Authorization: `Bearer ${token}` } }
+                    const hotelResponse = await axiosInstance.get(
+                        `/hotel/get-owned-hotel`,
                     );
 
                     if (hotelResponse.data.error === false) {
@@ -57,6 +56,7 @@ export default function BookingManagePage() {
         <div className="booking-app">
             <Sidebar />
             <Container className="py-4">
+                <AdminCustomNavbar/>
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <label className="text-dark fw-bold fs-3">Khách sạn của tôi</label>
 

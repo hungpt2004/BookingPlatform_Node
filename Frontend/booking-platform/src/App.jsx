@@ -35,17 +35,14 @@ import BookingManagePage from './views/owner/BookingManagePage'
 import ReviewPage from './views/owner/ReviewPage'
 import HotelReservations from './views/owner/BookingSchedule'
 import HotelDetailOwnerPage from './views/owner/HotelDetailOwner'
-<<<<<<< Updated upstream
 import BookingSchedule from "./views/owner/BookingSchedule";
 import OwnerHomePage from './views/owner/HomePage'
 import FinancePage from './views/owner/FinancePage'
-=======
 import CustomPartnerPage from "./views/customer/CustomerPartnerPage";
 import HotelManagementPage from "./views/hotel/HotelManagementPage";
 import FeedbackTable from "./views/feedback/FeedbackOwnerPage";
 import ServiceTable from "./views/service/ServiceManagementPage";
 import FavoriteListPage from "./views/favorite/FavoriteListPage";
->>>>>>> Stashed changes
 
 function App() {
   const { user, isAuthenticated } = useAuthStore();
@@ -134,6 +131,8 @@ function App() {
           <Route path="/hotel-management" element={<HotelManagementPage />} />
           <Route path="/feedback-management" element={<FeedbackTable />} />
           <Route path="/service-management" element={<ServiceTable />} />
+          <Route path="/booking-management" element={<BookingManagePage />} />
+          <Route path="/booking-schedule" element={<BookingSchedule />} />
         </Route>
 
         {/* Admin routes */}

@@ -28,6 +28,13 @@ const dataFacility = [
    "Trung tâm thể hình"
 ]
 
+const amenities = [
+   { icon: "🚭", text: "Phòng không hút thuốc" },
+   { icon: "📶", text: "WiFi nhanh miễn phí (414 Mbps)" },
+   { icon: "🅿️", text: "Chỗ đỗ xe miễn phí" },
+   { icon: "🔥", text: "Hệ thống sưởi" },
+   { icon: "❄️", text: "Điều hòa nhiệt độ" },
+];
 
 export const HotelDetailPage = () => {
    const [currentHotel, setCurrentHotel] = useState(null);
@@ -47,7 +54,6 @@ export const HotelDetailPage = () => {
    const [availabilityError, setAvailabilityError] = useState('');
    const [userId, setUserId] = useState(null); // State to store userId
    const [showGalleryModal, setShowGalleryModal] = useState(false);
-<<<<<<< Updated upstream
    const [listFacility, setListFacility] = useState([]);
    const [listService, setListService] = useState([]);
    const [validDate, setValidDate] = useState(true); // State to store date validity
@@ -57,10 +63,6 @@ export const HotelDetailPage = () => {
       checkIn: '',
       checkOut: ''
    });
-=======
-   const [services, setServices] = useState([]);
-   const [facility, setFacilities] = useState([]);
->>>>>>> Stashed changes
 
    const validateTimes = (checkInTime, checkOutTime) => {
       const errors = { checkIn: '', checkOut: '' };
@@ -103,35 +105,10 @@ export const HotelDetailPage = () => {
          return;
       }
 
-<<<<<<< Updated upstream
       // Validate dates are logical
       if (new Date(checkOutDate) <= new Date(checkInDate)) {
          setAvailabilityError('Check-out date must be after check-in date');
          return;
-=======
-};
-
-const CustomDateValidator = ({ label, error, ...props }) => (
-   <div className="mb-0">
-      {label && <label className="form-label">{label}</label>}
-      <input
-         {...props}
-         className={`form-control ${error ? 'is-invalid' : ''} rounded-0 p-3`}
-      />
-      {error && <div className="error-message">{error}</div>}
-   </div>
-);
-
-const getCurrentHotelDetail = async () => {
-   setLoading(true)
-   try {
-      const response = await axios.get(`${BASE_URL}/hotel/get-hotel-detail/${id}`);
-      if (response.data && response.data.hotel) {
-         setCurrentHotel(response.data.hotel);
-         setServices(response.data.hotel?.services);
-         setFacilities(response.data.hotel?.facilities);
-         setError("");
->>>>>>> Stashed changes
       }
    };
 
@@ -273,7 +250,6 @@ const getCurrentHotelDetail = async () => {
       const initialCheckIn = searchParams.get('checkin') || today;
       let initialCheckOut = searchParams.get('checkout') || tomorrowString;
 
-<<<<<<< Updated upstream
       // Handle date dependencies
       if (!searchParams.get('checkin') && searchParams.get('checkout')) {
          initialCheckOut = searchParams.get('checkout');
@@ -281,32 +257,6 @@ const getCurrentHotelDetail = async () => {
             initialCheckOut = tomorrowString;
          }
       }
-=======
-                           <Modal show={showGalleryModal} onHide={handleCloseGalleryModal} size="lg" centered>
-                              <Modal.Header closeButton>
-                                 <Modal.Title>All Photos</Modal.Title>
-                              </Modal.Header>
-                              <Modal.Body>
-                                 <Row className="g-2">
-                                    {currentHotel.images.map((img, index) => (
-                                       <Col key={index} xs={6} md={4} lg={3}>
-                                          <Image
-                                             src={img}
-                                             style={{
-                                                width: "100%",
-                                                height: "150px",
-                                                objectFit: "cover",
-                                                borderRadius: "8px",
-                                                cursor: "pointer",
-                                             }}
-                                             onClick={() => window.open(img, "_blank")}
-                                          />
-                                       </Col>
-                                    ))}
-                                 </Row>
-                              </Modal.Body>
-                           </Modal>
->>>>>>> Stashed changes
 
       if (new Date(initialCheckOut) <= new Date(initialCheckIn)) {
          initialCheckOut = new Date(initialCheckIn);
@@ -318,30 +268,7 @@ const getCurrentHotelDetail = async () => {
       setCheckOutDate(initialCheckOut);
       setNumberOfPeople(parseInt(searchParams.get('guests')) || 1);
 
-<<<<<<< Updated upstream
    }, [searchParams]);
-=======
-                  {/* Phần thông tin chi tiết - chiếm 40% */}
-                  <Col lg={6} md={12}>
-                     <Card className="hotel-details-card h-100 border-0 shadow-sm">
-                        <Card.Header className="bg-white border-bottom-0 pt-3">
-                           <div className="d-flex justify-content-between align-items-center mb-3">
-                              <h3 className="hotel-name mb-0">{currentHotel.hotelName}</h3>
-                              <div className="d-flex align-items-center">
-                                 <div className="rating-label me-2">
-                                    {RatingConsider(currentHotel.rating)}
-                                 </div>
-                                 <div className="rating-badge" style={{ backgroundColor: '#003b95' }}>
-                                    <span className="rating-score">{currentHotel.rating}</span>
-                                 </div>
-                              </div>
-                           </div>
-                           <p className="hotel-location text-secondary mb-0">
-                              <FaMapMarkerAlt className="me-1" />
-                              {currentHotel.address}
-                           </p>
-                        </Card.Header>
->>>>>>> Stashed changes
 
    //Render hotel detail
    useEffect(() => {
@@ -355,7 +282,6 @@ const getCurrentHotelDetail = async () => {
       }
    }, [currentHotel]);
 
-<<<<<<< Updated upstream
    return (
       <>
          <CustomNavbar />
@@ -447,19 +373,6 @@ const getCurrentHotelDetail = async () => {
                                              />
                                           )}
                                        </motion.div>
-=======
-                           <div className="mb-4">
-                              <h5 className="section-title">
-                                 <FaStar className="me-2" />
-                                 Popular Amenities
-                              </h5>
-                              <Row className="g-2 amenities-container">
-                                 {facility.slice(0, 6).map((item, index) => (
-                                    <Col key={index} xs={6} md={4}>
-                                       <div className="amenity-badge p-2 mb-2">
-                                          <span className="amenity-text">{item.name}</span>
-                                       </div>
->>>>>>> Stashed changes
                                     </Col>
                                  ))}
                               </Row>
@@ -478,7 +391,6 @@ const getCurrentHotelDetail = async () => {
                                  </div>
                               )}
 
-<<<<<<< Updated upstream
                               <Modal show={showGalleryModal} onHide={handleCloseGalleryModal} size="lg" centered>
                                  <Modal.Header closeButton>
                                     <Modal.Title>All Photos</Modal.Title>
@@ -655,39 +567,6 @@ const getCurrentHotelDetail = async () => {
                            min={new Date().toISOString().split('T')[0]}
                            onChange={(e) => handleDateChange('checkin', e.target.value)}
                            error={dateErrors.checkIn}
-=======
-               {/* Row thứ hai chứa các tiện nghi nổi bật */}
-               <Row className="mt-4">
-                  <Col>
-                     <Card className="border-0 shadow-sm p-3">
-                        <Card.Title className="mb-3">
-                           <FaConciergeBell className="me-2" />
-                           Featured Amenities
-                        </Card.Title>
-                        <Row className="g-3">
-                           {services.map((item, index) => (
-                              <Col xs={6} md={3} lg={2} key={index}>
-                                 <div className="featured-amenity p-2 text-center">
-                                    <div className="amenity-name">
-                                       {item.name}
-                                    </div>
-                                 </div>
-                              </Col>
-                           ))}
-                        </Row>
-                     </Card>
-                  </Col>
-               </Row>
-               
-               <Row className="m-0 p-0 mt-4">
-                  <Modal show={showModal} onHide={handleCloseModal} centered size="lg">
-                     <Modal.Body>
-                        <Image
-                           src={selectedImage}
-                           alt="Selected Image"
-                           className="img-fluid"
-                           style={{ objectFit: 'cover', width: '100%', borderRadius: '10px' }}
->>>>>>> Stashed changes
                         />
                         <input
                            type="time"
@@ -731,6 +610,13 @@ const getCurrentHotelDetail = async () => {
                            }}
                         />
                      </div>
+                     <div className="row justify-content-center mt-2">
+                        <div className="col-md-8">
+                           {capacityError && <div className="alert alert-danger">{capacityError}</div>}
+                           {availabilityError && <div className="alert alert-danger">{availabilityError}</div>}
+                        </div>
+                     </div>
+
                   </div>
 
                   {/* Error messages (existing) */}

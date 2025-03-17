@@ -1,12 +1,57 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navbar, Nav, Container, Dropdown, Image } from "react-bootstrap";
 import { FaBell, FaCog, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
 import './sidebar.css';
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../store/authStore";
+import axiosInstance from "../../utils/AxiosInstance";
 
 export const AdminCustomNavbar = () => {
+
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const { logout } = useAuthStore();
+  const [scrolled, setScrolled] = useState(false);
+
+  // Xử lý sự kiện scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    setUser(null);
+    navigate('/');
+  };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axiosInstance.get('/customer/current-user');
+        setUser(response.data.user);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+
   return (
-    <Navbar 
-      bg="white" 
+    <Navbar
+      bg="white"
       className="mb-3 shadow-sm py-3 border-bottom"
       expand="lg"
     >
@@ -14,7 +59,7 @@ export const AdminCustomNavbar = () => {
         <Navbar.Brand href="#" className="fw-bold fs-2 auto-typing text-primary">
           <span className="gradient-text">TRAVELOFY</span>
         </Navbar.Brand>
-        
+
         <Nav className="ms-auto d-flex align-items-center">
           {/* Notification icon */}
           <Nav.Link className="position-relative me-3">
@@ -24,12 +69,12 @@ export const AdminCustomNavbar = () => {
               <span className="visually-hidden">unread messages</span>
             </span>
           </Nav.Link>
-          
+
           {/* User dropdown */}
           <Dropdown align="end">
             <Dropdown.Toggle variant="white" id="dropdown-basic" className="d-flex align-items-center border-0">
               <div className="d-none d-sm-flex flex-column align-items-end me-2">
-                <span className="fw-bold text-dark">HungPT</span>
+                {/* <span className="fw-bold text-dark">{user?.name}</span> */}
                 <small className="text-muted">Administrator</small>
               </div>
               <Image
@@ -41,11 +86,17 @@ export const AdminCustomNavbar = () => {
               />
             </Dropdown.Toggle>
             <Dropdown.Menu className="shadow border-0 py-2">
+              <Dropdown.Item>
+              <div className="user-details">
+                {/* <h6>{user.name}</h6> */}
+                {/* <p>{user.email}</p> */}
+              </div>
+              </Dropdown.Item>
               <Dropdown.Item href="#" className="py-2">
                 <FaUserCircle className="me-2 text-secondary" /> Thông tin tài khoản
               </Dropdown.Item>
               <Dropdown.Item href="#" className="py-2">
-                <FaCog className="me-2 text-secondary" /> Cài đặt 
+                <FaCog className="me-2 text-secondary" /> Cài đặt
               </Dropdown.Item>
               <Dropdown.Divider />
               <Dropdown.Item href="#" className="py-2 text-danger">

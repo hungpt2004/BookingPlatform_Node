@@ -15,6 +15,7 @@ import {
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import "./sidebar.css";
+import { useAuthStore } from "../../store/authStore";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -34,8 +35,8 @@ const Sidebar = () => {
       icon: <FaHotel />,
       submenus: [
         { title: "Thông tin Khách Sạn", path: "/hotel-management" },
-        { title: "Lịch Booking", path: "/booking-management" },
-        { title: "Quản lý Booking", path: "/hotels/add" },
+        { title: "Lịch Booking", path: "/booking-schedule" },
+        { title: "Quản lý Booking", path: "/booking-management" },
       ],
     },
     {

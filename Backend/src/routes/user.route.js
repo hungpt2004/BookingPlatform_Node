@@ -10,7 +10,6 @@ router.use(authController.protect);
 
 UserRouter.get("/get-all-user", UserController.getAllUser);
 UserRouter.get("/search", SearchController.searchAndFilterHotels);
-UserRouter.get("/current-user", protect, UserController.getCurrentUser)
 
 UserRouter.route("/update-profile")
   .patch(protect, UserController.updateUser)

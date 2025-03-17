@@ -35,6 +35,8 @@ const Booking = ({
 
     const navigate = useNavigate();
 
+    console.log(`Check In Time: ${checkInTime}`)
+    console.log(`Check Out Time: ${checkOutTime}`)
 
     // console.log("Data bed 2:", JSON.stringify(beds, null, 2));
     // console.log("Data bed detail 3:", JSON.stringify(bed, null, 2));
@@ -218,6 +220,8 @@ const Booking = ({
             currentHotel,
             distanceNight: distanceDay,
             listFeedback,
+            checkInTime,
+            checkOutTime,
             numberOfPeople: numberOfPeople,
         };
 

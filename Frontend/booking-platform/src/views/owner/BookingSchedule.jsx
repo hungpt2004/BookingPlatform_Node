@@ -283,7 +283,6 @@ const BookingSchedule = () => {
     if (error) {
         return (
             <div>
-                <OwnerNavbar />
                 <Container className="mt-5">
                     <Alert variant="danger">{error}</Alert>
                     <Button variant="outline-secondary" onClick={handleBackClick} className="mt-3">
@@ -296,7 +295,7 @@ const BookingSchedule = () => {
 
     return (
         <div>
-            <OwnerNavbar />
+            <Sidebar />
             <Container className="py-4">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h3 className="mb-0">Booking Schedule</h3>
