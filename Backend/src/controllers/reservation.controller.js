@@ -351,7 +351,6 @@ Thông tin của hóa đơn thanh toán gồm
 - Tên khách sạn, địa chỉ, số điện thoại
 - Tên người dùng, email, điện thoại
 - thông tin reservation
-
 */
 
 exports.getReservationDetailById = asyncHandler(async (req, res) => {

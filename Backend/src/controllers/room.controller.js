@@ -21,6 +21,12 @@ exports.createRoom = asyncHandler(async (req, res, next) => {
 
   const savedRoom = await newRoom.save();
 
+  await hotel.rooms.push(newRoom._id);
+
+  console.log("Đã thêm vào rooms [] trong DB");
+
+  await hotel.save();
+
   res.status(200).json({
     error: false,
     message: "Room created successfully",

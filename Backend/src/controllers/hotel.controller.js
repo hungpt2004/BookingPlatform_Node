@@ -110,7 +110,6 @@ exports.getTotalReservationByHotelId = asyncHandler(async (req, res) => {
 
 });
 
-
 exports.createHotel = asyncHandler(async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
