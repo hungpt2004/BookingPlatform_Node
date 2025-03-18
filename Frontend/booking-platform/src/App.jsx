@@ -36,6 +36,7 @@ import ReviewPage from './views/owner/ReviewPage'
 import HotelReservations from './views/owner/BookingSchedule'
 import HotelDetailOwnerPage from './views/owner/HotelDetailOwner'
 import BookingSchedule from "./views/owner/BookingSchedule";
+import RoomManagePage from "./views/owner/RoomManagement";
 import OwnerHomePage from './views/owner/HomePage'
 import FinancePage from './views/owner/FinancePage'
 import CustomPartnerPage from "./views/customer/CustomerPartnerPage";
@@ -130,6 +131,10 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["OWNER"]} />}>
           <Route path="/dashboard" element={<DashboardOverview />} />
           <Route path="/monthly-owner" element={<MonthlyPayment />} />
+          <Route path='/booking-management' element={<BookingManagePage />} />
+          <Route path='/room-management' element={<RoomManagePage />} />
+          <Route path='/booking-schedule/:hotelId' element={<HotelReservations/>}/>
+          <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage/>}/>
           <Route path="/hotel-management" element={<HotelManagementPage />} />
           <Route path="/feedback-management" element={<FeedbackTable />} />
           <Route path="/service-management" element={<ServiceTable />} />

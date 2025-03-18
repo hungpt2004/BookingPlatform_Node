@@ -43,7 +43,7 @@ const Sidebar = () => {
       title: "Quản lý đánh giá",
       icon: <FaBuilding />,
       submenus: [
-        { title: "Danh sách đánh giá", path: "/feedback-management" },
+        { title: "Danh sách phòng", path: "/room-management" },
         { title: "Thêm phòng", path: "/rooms/add" },
       ],
     },
@@ -89,6 +89,12 @@ const Sidebar = () => {
       }
     });
   }, [location.pathname]);
+
+  const handleLogout = () => {
+    logout();
+    setUser(null);
+    navigate('/');
+  };
 
   return (
     <div className={`sidebar-container ${collapsed ? "collapsed" : ""} h-100vh`} style={{height: '100vh'}}>
@@ -165,7 +171,7 @@ const Sidebar = () => {
           </div>
           {!collapsed && <span className="menu-text">Hồ sơ</span>}
         </NavLink>
-        <button className="logout-button" onClick={() => navigate("/logout")}>
+        <button className="logout-button" onClick={handleLogout}>
           <div className="menu-icon">
             <FaSignOutAlt />
           </div>

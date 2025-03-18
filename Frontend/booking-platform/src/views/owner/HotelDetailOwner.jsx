@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Spinner, Alert, Button, Badge, Form } from 'react-bootstrap';
 import axios from 'axios';
 import { BASE_URL } from '../../utils/Constant';
-import Sidebar from '../../components/navbar/AdminSidebar';
+import { OwnerNavbar } from '../../components/navbar/OwnerNavbar';
+import { AdminCustomNavbar } from '../../components/navbar/AdminCustomNavbar';
 
 const HotelDetailOwnerPage = () => {
     const { hotelId } = useParams();
@@ -99,7 +100,9 @@ const HotelDetailOwnerPage = () => {
 
     return (
         <>
-            <Sidebar />
+            <div className="d-flex">
+                <AdminSidebar />
+                <div className="booking-app flex-grow-1" style={{ paddingLeft: "20px" }}>
             <Container className="py-4">
                 <Button
                     variant="outline-secondary"
@@ -204,6 +207,8 @@ const HotelDetailOwnerPage = () => {
                     ))}
                 </Row>
             </Container>
+            </div>
+            </div>
         </>
     );
 };

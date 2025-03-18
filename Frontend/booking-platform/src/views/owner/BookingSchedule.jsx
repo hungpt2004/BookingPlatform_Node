@@ -9,7 +9,7 @@ import '../owner/BookingSchedule.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import Sidebar from '../../components/navbar/AdminSidebar';
+import AdminSidebar from '../../components/navbar/AdminSidebar'
 
 const localizer = momentLocalizer(moment);
 
@@ -294,8 +294,9 @@ const BookingSchedule = () => {
     }
 
     return (
-        <div>
-            <Sidebar />
+        <div className="d-flex">
+                <AdminSidebar />
+                <div className="booking-app flex-grow-1" style={{ paddingLeft: "20px" }}>
             <Container className="py-4">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h3 className="mb-0">Booking Schedule</h3>
@@ -529,6 +530,7 @@ const BookingSchedule = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
+        </div>
         </div>
     );
 };

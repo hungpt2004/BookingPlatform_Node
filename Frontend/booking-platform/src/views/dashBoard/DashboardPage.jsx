@@ -6,6 +6,8 @@ import "chart.js/auto";
 import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar";
 import axiosInstance from "../../utils/AxiosInstance";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
+import Sidebar from "../../components/navbar/CustomeSidebar";
+import AdminSidebar from "../../components/navbar/AdminSidebar"
 import axios from "axios";
 import Sidebar from "../../components/navbar/AdminSidebar";
 
@@ -27,13 +29,13 @@ const DashboardOverview = () => {
   useEffect(() => {
     const fetchOwnerHotel = async () => {
       try {
-        
-        const response = await axiosInstance.get('/hotel/get-owned-hotel')
-          if(response.data && response.data.hotels) {
 
-          }
+        const response = await axiosInstance.get('/hotel/get-owned-hotel')
+        if (response.data && response.data.hotels) {
+
+        }
       } catch (error) {
-        
+
       }
     }
   })
@@ -108,7 +110,7 @@ const DashboardOverview = () => {
         padding: 12,
         displayColors: false,
         callbacks: {
-          label: function(context) {
+          label: function (context) {
             return `Revenue: ${formatCurrencyVND(context.raw)}`;
           }
         }
@@ -121,7 +123,7 @@ const DashboardOverview = () => {
           color: 'rgba(0, 0, 0, 0.05)'
         },
         ticks: {
-          callback: function(value) {
+          callback: function (value) {
             if (value >= 1000000) {
               return (value / 1000000).toFixed(1) + 'M';
             }
@@ -138,8 +140,8 @@ const DashboardOverview = () => {
   };
 
   // Calculate success rate
-  const successRate = dashboardData.totalReservations > 0 
-    ? Math.round((dashboardData.successBooking / dashboardData.totalReservations) * 100) 
+  const successRate = dashboardData.totalReservations > 0
+    ? Math.round((dashboardData.successBooking / dashboardData.totalReservations) * 100)
     : 0;
 
   if (loading) return (
@@ -150,14 +152,13 @@ const DashboardOverview = () => {
       </div>
     </div>
   );
-  
+
   if (error) return <Alert variant="danger" className="m-4">{error}</Alert>;
 
   return (
     <div className="d-flex">
-      <Sidebar />
+      <AdminSidebar />
       <div className="content w-100">
-        <AdminCustomNavbar />
         <div className="container-fluid px-4 py-3">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -165,8 +166,8 @@ const DashboardOverview = () => {
               <p className="text-muted">Nơi này sẽ giúp quản lý doanh thu của bạn</p>
             </div>
             <div className="d-flex gap-2">
-              <select 
-                className="form-select form-select-sm" 
+              <select
+                className="form-select form-select-sm"
                 value={timeRange}
                 onChange={(e) => setTimeRange(e.target.value)}
                 style={{ width: "120px" }}
@@ -187,7 +188,7 @@ const DashboardOverview = () => {
                 <Card.Body className="p-4">
                   <div className="d-flex justify-content-between align-items-center mb-3">
                     <div className="text-muted">Tổng Hóa Đơn</div>
-                    <div className="rounded-circle d-flex align-items-center justify-content-center" 
+                    <div className="rounded-circle d-flex align-items-center justify-content-center"
                       style={{ width: "40px", height: "40px", backgroundColor: "rgba(0, 113, 194, 0.1)" }}>
                       <i className="bi bi-calendar-check fs-5 text-primary"></i>
                     </div>
@@ -200,13 +201,13 @@ const DashboardOverview = () => {
                 </Card.Body>
               </Card>
             </Col>
-            
+
             <Col lg={3} md={6}>
               <Card className="h-100 border-0 shadow-sm">
                 <Card.Body className="p-4">
                   <div className="d-flex justify-content-between align-items-center mb-3">
                     <div className="text-muted">Tổng doanh thu</div>
-                    <div className="rounded-circle d-flex align-items-center justify-content-center" 
+                    <div className="rounded-circle d-flex align-items-center justify-content-center"
                       style={{ width: "40px", height: "40px", backgroundColor: "rgba(25, 135, 84, 0.1)" }}>
                       <i className="bi bi-currency-dollar fs-5 text-success"></i>
                     </div>
@@ -219,13 +220,13 @@ const DashboardOverview = () => {
                 </Card.Body>
               </Card>
             </Col>
-            
+
             <Col lg={3} md={6}>
               <Card className="h-100 border-0 shadow-sm">
                 <Card.Body className="p-4">
                   <div className="d-flex justify-content-between align-items-center mb-3">
                     <div className="text-muted">Success Bookings</div>
-                    <div className="rounded-circle d-flex align-items-center justify-content-center" 
+                    <div className="rounded-circle d-flex align-items-center justify-content-center"
                       style={{ width: "40px", height: "40px", backgroundColor: "rgba(13, 110, 253, 0.1)" }}>
                       <i className="bi bi-check-circle fs-5 text-primary"></i>
                     </div>
@@ -238,13 +239,13 @@ const DashboardOverview = () => {
                 </Card.Body>
               </Card>
             </Col>
-            
+
             <Col lg={3} md={6}>
               <Card className="h-100 border-0 shadow-sm">
                 <Card.Body className="p-4">
                   <div className="d-flex justify-content-between align-items-center mb-3">
                     <div className="text-muted">Pending Bookings</div>
-                    <div className="rounded-circle d-flex align-items-center justify-content-center" 
+                    <div className="rounded-circle d-flex align-items-center justify-content-center"
                       style={{ width: "40px", height: "40px", backgroundColor: "rgba(255, 193, 7, 0.1)" }}>
                       <i className="bi bi-hourglass-split fs-5 text-warning"></i>
                     </div>
@@ -326,7 +327,7 @@ const DashboardOverview = () => {
                 </Card.Body>
               </Card>
             </Col>
-            
+
             <Col lg={6}>
               <Card className="border-0 shadow-sm h-100">
                 <Card.Body className="p-4">
