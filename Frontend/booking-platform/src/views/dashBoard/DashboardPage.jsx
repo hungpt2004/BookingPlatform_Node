@@ -9,7 +9,6 @@ import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 import Sidebar from "../../components/navbar/CustomeSidebar";
 import AdminSidebar from "../../components/navbar/AdminSidebar"
 import axios from "axios";
-import Sidebar from "../../components/navbar/AdminSidebar";
 
 // Dashboard Overview Component
 const DashboardOverview = () => {
