@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import { Button, Card, Container, Form, Row, Col } from "react-bootstrap";
+import { useState , useEffect} from "react";
+import { Button, Card, Container, Form} from "react-bootstrap";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-
+import axiosInstance from "../../utils/AxiosInstance";
 export const Step11 = ({ nextStep, prevStep }) => {
     const navigate = useNavigate();
-    const ownerName = "son thai"; // Hardcoded for now
+    
+    const [user, setUser] = useState(null);
     const hotelNameAndStar = JSON.parse(sessionStorage.getItem("hotelName&Star")) || "";
     const [invoiceInfo, setInvoiceInfo] = useState(
         JSON.parse(sessionStorage.getItem("hotelBillInfo")) || {
@@ -29,7 +30,20 @@ export const Step11 = ({ nextStep, prevStep }) => {
         }
         return invoiceInfo.invoiceType !== "";
     };
-
+    useEffect(() => {
+            //user
+            const fetchUser = async () => {
+                try {
+                    const response = await axiosInstance.get('/customer/current-user');
+                    setUser(response.data.user);
+                } catch (error) {
+                    console.error('Error fetching user:', error);
+                }
+            };
+            
+            // Call fetchUser
+            fetchUser();
+        }, []);
     return (
         <Container style={{ maxWidth: "50%" }}>
             <h2 className="mt-5 mb-4 fw-bold">Hóa đơn</h2>
@@ -41,7 +55,7 @@ export const Step11 = ({ nextStep, prevStep }) => {
                     <Form.Group className="mb-4">
                         <Form.Check
                             type="radio"
-                            label={ownerName}
+                            label={user ? user.name : ""}
                             name="invoiceType"
                             checked={invoiceInfo.invoiceType === 'owner'}
                             onChange={() => handleInputChange("invoiceType", 'owner')}

@@ -131,10 +131,10 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["OWNER"]} />}>
           <Route path="/dashboard" element={<DashboardOverview />} />
           <Route path="/monthly-owner" element={<MonthlyPayment />} />
-          <Route path='/booking-management' element={<BookingManagePage />} />
+
           <Route path='/room-management' element={<RoomManagePage />} />
-          <Route path='/booking-schedule/:hotelId' element={<HotelReservations/>}/>
-          <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage/>}/>
+          <Route path='/booking-schedule/:hotelId' element={<HotelReservations />} />
+          <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage />} />
           <Route path="/hotel-management" element={<HotelManagementPage />} />
           <Route path="/feedback-management" element={<FeedbackTable />} />
           <Route path="/service-management" element={<ServiceTable />} />
@@ -159,9 +159,8 @@ function App() {
         <Route path='/edit-non-refundable' element={<PriceNoRefund />} />
         <Route path='/edit-weekly-price' element={<PricePerWeek />} />
         <Route path='/create-photo' element={<HotelPhotos />} />
-        
+
         <Route path='booking-management' element={<BookingManagePage />} />
-        <Route path='/reviews' element={<ReviewPage />} />
         <Route path='/owner-homepage' element={<OwnerHomePage />} />
         <Route path='/owner-finance' element={<FinancePage />} />
 

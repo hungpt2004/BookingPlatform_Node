@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import CustomNavbar from "../../components/navbar/CustomNavbar";
-import { CreateRoomStep1, CreateRoomStep2, CreateRoomStep3, CreateRoomStep4, CreateRoomStep5, CreateRoomStep6 } from "../../components/room_slide";
+import { CreateRoomStep1, CreateRoomStep3, CreateRoomStep4, CreateRoomStep5 } from "../../components/room_slide";
 export const CreateRoom = () => {
     // Keep track of the current step for the room flow
     const [step, setStep] = useState(() => Number(sessionStorage.getItem("roomStep")) || 1);
