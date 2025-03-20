@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { data, useParams, useSearchParams } from "react-router-dom";
 import CustomNavbar from "../../components/navbar/CustomNavbar";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -469,7 +469,7 @@ export const HotelDetailPage = () => {
                                                 <Carousel.Item key={feedback.id}>
                                                    <div className="review-item p-3">
                                                       <div className="review-content">
-                                                         <p className="review-text mb-2">"{feedback.content}"</p>
+                                                         <p className="review-text mb-2">`{feedback.content}`</p>
                                                          <Rating rating={feedback.rating} />
                                                       </div>
                                                       <div className="reviewer d-flex align-items-center mt-3">
