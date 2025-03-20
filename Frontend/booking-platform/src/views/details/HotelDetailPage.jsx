@@ -5,7 +5,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import axios from "axios";
 import { BASE_URL } from "../../utils/Constant";
-import { Button, Card, Col, Container, Image, ListGroup, ListGroupItem, Row, Spinner, Carousel, Modal, Placeholder, ProgressBar, Alert } from "react-bootstrap";
+import { Button, Card, Col, Container, Image, ListGroup, ListGroupItem, Row, Spinner, Carousel, Modal, Placeholder, ProgressBar, Alert, Form } from "react-bootstrap";
 import { MdLocationPin } from "react-icons/md";
 import "swiper/css/navigation";
 import Rating from "../../components/animation/HotelRating";
@@ -18,6 +18,8 @@ import './HotelDetailPage.css'
 import { FaConciergeBell } from "react-icons/fa";
 import { FaImages } from "react-icons/fa";
 import { FaMapMarkerAlt, FaCommentAlt, FaStar, FaInfoCircle, FaCalendarCheck, FaImage } from "react-icons/fa";
+import axiosInstance from "../../utils/AxiosInstance";
+import FavoriteToggle from "./FavoriteToggle";
 
 const dataFacility = [
    "Wi-Fi miễn phí",
@@ -28,13 +30,6 @@ const dataFacility = [
    "Trung tâm thể hình"
 ]
 
-const amenities = [
-   { icon: "🚭", text: "Phòng không hút thuốc" },
-   { icon: "📶", text: "WiFi nhanh miễn phí (414 Mbps)" },
-   { icon: "🅿️", text: "Chỗ đỗ xe miễn phí" },
-   { icon: "🔥", text: "Hệ thống sưởi" },
-   { icon: "❄️", text: "Điều hòa nhiệt độ" },
-];
 
 export const HotelDetailPage = () => {
    const [currentHotel, setCurrentHotel] = useState(null);
@@ -64,6 +59,7 @@ export const HotelDetailPage = () => {
       checkOut: ''
    });
 
+
    const validateTimes = (checkInTime, checkOutTime) => {
       const errors = { checkIn: '', checkOut: '' };
 
@@ -86,11 +82,9 @@ export const HotelDetailPage = () => {
       setTimeErrors(errors);
    }, [checkInTime, checkOutTime]);
 
-
    //Show all image in modal
    const handleShowGalleryModal = () => setShowGalleryModal(true);
    const handleCloseGalleryModal = () => setShowGalleryModal(false);
-
 
    const handleSearch = async () => {
       setCapacityError('');
@@ -112,6 +106,24 @@ export const HotelDetailPage = () => {
       }
    };
 
+     // Toggle favorite function
+  const toggleFavorite = async (hotelId) => {
+   try {
+     if (favorites.includes(hotelId)) {
+       // Remove from favorites
+       await axiosInstance.delete('/favorite/remove-favorite', {
+         data: { hotelId }
+       });
+       setFavorites(favorites.filter(id => id !== hotelId));
+     } else {
+       // Add to favorites
+       await axiosInstance.post('/favorite/add-favorite', { hotelId });
+       setFavorites([...favorites, hotelId]);
+     }
+   } catch (error) {
+     console.error('Error toggling favorite:', error);
+   }
+ };
 
    // Add this useEffect to handle date parameters
    useEffect(() => {
@@ -222,7 +234,6 @@ export const HotelDetailPage = () => {
          }
       }
    };
-
 
    const handleShowModalImage = (image) => {
       setSelectedImage(image);
@@ -505,13 +516,7 @@ export const HotelDetailPage = () => {
                                     {`Với ${dataFacility[0]} và ${dataFacility[1]}, ${currentHotel.hotelName} tọa lạc ở 
                      ${currentHotel.description.substring(0, 150)}...`}
                                  </p>
-                                 <Button
-                                    variant="link"
-                                    className="read-more p-0 text-decoration-none"
-                                    onClick={() => handleShowDescriptionModal()}
-                                 >
-                                    Read more
-                                 </Button>
+                                 <FavoriteToggle hotelId={currentHotel._id} />
                               </div>
                            </Card.Body>
                         </Card>

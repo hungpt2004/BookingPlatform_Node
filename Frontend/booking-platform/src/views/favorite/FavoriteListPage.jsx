@@ -1,140 +1,49 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Container, Row, Col, Card, Button, Modal, Badge } from "react-bootstrap"
 import { Heart, Star, MapPin, Phone, Globe, Calendar } from "lucide-react"
 import "bootstrap/dist/css/bootstrap.min.css"
 import "./FavoriteListPage.css"
-import axios from "axios"
-import { BASE_URL } from "../../utils/Constant"
+import { formatCurrencyVND } from "../../utils/FormatPricePrint"
+import CustomNavbar from "../../components/navbar/CustomNavbar"
+import axiosInstance from "../../utils/AxiosInstance"
+import { useNavigate } from "react-router-dom"
 
-// Mock data for hotels
-const hotels = [
-  {
-    id: 1,
-    name: "Grand Plaza Hotel",
-    location: "New York City, USA",
-    rating: 4.8,
-    price: "$250",
-    image: "/placeholder.svg?height=200&width=300",
-    description:
-      "Luxury hotel in the heart of Manhattan with stunning views of Central Park. Features include a rooftop pool, spa, and 3 restaurants.",
-    amenities: ["Free WiFi", "Pool", "Spa", "Gym", "Restaurant", "Room Service"],
-    contact: {
-      phone: "+1 212-555-1234",
-      email: "info@grandplaza.com",
-      website: "www.grandplazahotel.com",
-    },
-  },
-  {
-    id: 2,
-    name: "Seaside Resort & Spa",
-    location: "Miami Beach, USA",
-    rating: 4.6,
-    price: "$320",
-    image: "/placeholder.svg?height=200&width=300",
-    description:
-      "Beachfront resort with private access to Miami Beach. Enjoy our world-class spa, infinity pool, and oceanview rooms.",
-    amenities: ["Beachfront", "Spa", "Pool", "Free WiFi", "Restaurant", "Bar"],
-    contact: {
-      phone: "+1 305-555-6789",
-      email: "reservations@seasideresort.com",
-      website: "www.seasideresort.com",
-    },
-  },
-  {
-    id: 3,
-    name: "Mountain View Lodge",
-    location: "Aspen, Colorado, USA",
-    rating: 4.9,
-    price: "$400",
-    image: "/placeholder.svg?height=200&width=300",
-    description:
-      "Cozy mountain retreat with ski-in/ski-out access. Featuring fireplaces in every room and panoramic mountain views.",
-    amenities: ["Ski Access", "Fireplace", "Hot Tub", "Restaurant", "Bar", "Free WiFi"],
-    contact: {
-      phone: "+1 970-555-4321",
-      email: "stay@mountainviewlodge.com",
-      website: "www.mountainviewlodge.com",
-    },
-  },
-  {
-    id: 4,
-    name: "Desert Oasis Resort",
-    location: "Phoenix, Arizona, USA",
-    rating: 4.5,
-    price: "$180",
-    image: "/placeholder.svg?height=200&width=300",
-    description:
-      "Tranquil desert retreat with stunning red rock views. Features include a golf course, spa treatments, and desert excursions.",
-    amenities: ["Golf Course", "Spa", "Pool", "Restaurant", "Free WiFi", "Hiking Trails"],
-    contact: {
-      phone: "+1 480-555-7890",
-      email: "info@desertoasis.com",
-      website: "www.desertoasisresort.com",
-    },
-  },
-  {
-    id: 5,
-    name: "City Lights Boutique Hotel",
-    location: "Chicago, USA",
-    rating: 4.7,
-    price: "$220",
-    image: "/placeholder.svg?height=200&width=300",
-    description:
-      "Stylish boutique hotel in downtown Chicago. Walking distance to major attractions, shopping, and dining.",
-    amenities: ["Free WiFi", "Restaurant", "Bar", "Fitness Center", "Business Center"],
-    contact: {
-      phone: "+1 312-555-2345",
-      email: "hello@citylightshotel.com",
-      website: "www.citylightshotel.com",
-    },
-  },
-  {
-    id: 6,
-    name: "Tropical Paradise Resort",
-    location: "Honolulu, Hawaii, USA",
-    rating: 4.9,
-    price: "$450",
-    image: "/placeholder.svg?height=200&width=300",
-    description:
-      "Luxurious beachfront resort on Waikiki Beach with traditional Hawaiian hospitality and stunning ocean views.",
-    amenities: ["Beachfront", "Pool", "Spa", "Restaurant", "Water Sports", "Cultural Activities"],
-    contact: {
-      phone: "+1 808-555-8765",
-      email: "aloha@tropicalparadise.com",
-      website: "www.tropicalparadiseresort.com",
-    },
-  },
-]
 
 function HotelCard({ hotel, onClick }) {
   return (
     <Card className="hotel-card mb-4 h-100">
-      <Card.Img variant="top" src={hotel.image} alt={hotel.name} />
+      <Card.Img variant="top" src={hotel.images[0]} 
+      className="position-relative"
+      style={{
+        width: '100%',
+        height: '550px'
+      }} alt={hotel.hotelName} />
+      <Button className="position-absolute right-0 top-1">Delete</Button>
       <Card.Body>
         <div className="d-flex justify-content-between align-items-start">
-          <Card.Title>{hotel.name}</Card.Title>
+          <Card.Title>{hotel.hotelName}</Card.Title>
           <Heart className="favorite-icon" size={20} fill="#ff6b6b" />
         </div>
         <div className="d-flex align-items-center mb-2">
           <MapPin size={16} className="me-1 text-secondary" />
-          <small className="text-muted">{hotel.location}</small>
+          <small className="text-muted">{hotel.address}</small>
         </div>
         <div className="d-flex align-items-center mb-3">
           <Star size={16} className="me-1 text-warning" fill="#ffc107" />
           <span className="me-2">{hotel.rating}</span>
-          <span className="price-tag ms-auto">{hotel.price}/night</span>
+          <span className="price-tag ms-auto">{formatCurrencyVND(hotel.pricePerNight)}/đêm</span>
         </div>
         <Button variant="primary" className="w-100" onClick={() => onClick(hotel)}>
-          View Details
+          Xem chi tiết
         </Button>
       </Card.Body>
     </Card>
   )
 }
 
-function HotelDetailModal({ show, hotel, onHide }) {
+function HotelDetailModal({ show, hotel, onHide, onNavigate }) {
 
   if (!hotel) return null
 
@@ -146,53 +55,53 @@ function HotelDetailModal({ show, hotel, onHide }) {
       <Modal.Body>
         <Row>
           <Col md={6}>
-            <img src={hotel.image || "/placeholder.svg"} alt={hotel.name} className="img-fluid rounded mb-3" />
+            <img style={{
+              width: '100%',
+              height: '500px'
+            }} src={hotel.images[0] || "/placeholder.svg"} alt={hotel.hotelName} className="img-fluid rounded mb-3" />
             <div className="d-flex align-items-center mb-2">
               <MapPin size={18} className="me-2 text-primary" />
-              <span>{hotel.location}</span>
+              <span>{hotel.address}</span>
             </div>
             <div className="d-flex align-items-center mb-3">
               <Star size={18} className="me-1 text-warning" fill="#ffc107" />
               <span className="me-2">{hotel.rating}</span>
               <Badge bg="primary" className="ms-auto">
-                {hotel.price}/night
+                {formatCurrencyVND(hotel.pricePerNight)}/đêm
               </Badge>
             </div>
           </Col>
           <Col md={6}>
-            <h5>About</h5>
+            <h5>Về khách sạn</h5>
             <p>{hotel.description}</p>
 
-            <h5 className="mt-3">Amenities</h5>
+            <h5 className="mt-3">Các dịch vụ của khách sạn</h5>
             <div className="amenities-container">
-              {hotel.amenities.map((amenity, index) => (
+              {hotel.services.map((amenity, index) => (
                 <Badge bg="light" text="dark" key={index} className="me-2 mb-2 p-2">
-                  {amenity}
+                  {amenity.name}
                 </Badge>
               ))}
             </div>
 
-            <h5 className="mt-3">Contact</h5>
+            <h5 className="mt-3">Liên hệ</h5>
             <div className="d-flex align-items-center mb-2">
               <Phone size={16} className="me-2 text-primary" />
-              <span>{hotel.contact.phone}</span>
+              <span>{hotel.phoneNumber}</span>
             </div>
             <div className="d-flex align-items-center mb-2">
               <Globe size={16} className="me-2 text-primary" />
-              <a href={`https://${hotel.contact.website}`} target="_blank" rel="noopener noreferrer">
-                {hotel.contact.website}
-              </a>
             </div>
           </Col>
         </Row>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="outline-secondary" onClick={onHide}>
-          Close
+          Đóng
         </Button>
-        <Button variant="primary">
+        <Button variant="primary" onClick={() => onNavigate(hotel._id)}>
           <Calendar size={16} className="me-2" />
-          Book Now
+          Đặt ngay
         </Button>
       </Modal.Footer>
     </Modal>
@@ -203,18 +112,36 @@ function FavoriteListPage() {
   const [selectedHotel, setSelectedHotel] = useState(null)
   const [showModal, setShowModal] = useState(false)
   const [listHotels, setListHotels] = useState([]);
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate();
+
 
   const getDataFavoriteHotel = async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get(`/favorite/get-all-favorite`);
 
-   try {
-      
-      const response = await axios.get(`${BASE_URL}`)
+      console.log(response.data)
 
-   } catch (error) {
-      
-   }
+      if (response.data && response.data.favorites) {
+        setListHotels(response.data.favorites);
+      }
+
+    } catch (error) {
+      if (error.response.data.message) {
+        console.log(error.reponse.data.message);
+      }
+    } finally {
+      setTimeout(() => {
+        setLoading(false)
+      }, 500)
+    }
 
   }
+
+  useEffect(() => {
+    getDataFavoriteHotel();
+  }, [])
 
   const handleHotelClick = (hotel) => {
     setSelectedHotel(hotel)
@@ -225,21 +152,29 @@ function FavoriteListPage() {
     setShowModal(false)
   }
 
+  const handleNavigate = (hotelId) => {
+    navigate(`/hotel-detail/${hotelId}`);
+  }
+
+
   return (
-    <Container className="py-5">
-      <h1 className="mb-4 text-center">My Favorite Hotels</h1>
-      <p className="text-center text-muted mb-5">Click on a hotel to view more details</p>
+    <>
+      <CustomNavbar/>
+      <Container className="py-5 mt-5">
+      <h1 className="mb-4 text-center">Danh sách khách sạn yêu thích của tôi</h1>
+      <p className="text-center text-muted mb-5">Bấm vào để xem thông tin khách sạn</p>
 
       <Row>
-        {hotels.map((hotel) => (
+        {listHotels.map((hotel) => (
           <Col key={hotel.id} xs={12} sm={6} lg={4}>
             <HotelCard hotel={hotel} onClick={handleHotelClick} />
           </Col>
         ))}
       </Row>
 
-      <HotelDetailModal show={showModal} hotel={selectedHotel} onHide={handleCloseModal} />
+      <HotelDetailModal show={showModal} hotel={selectedHotel} onHide={handleCloseModal} onNavigate={handleNavigate}/>
     </Container>
+    </>
   )
 }
 

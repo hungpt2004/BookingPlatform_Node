@@ -37,6 +37,8 @@ const FeedbackTable = () => {
 
    feedbacks.forEach((item) => console.log(item.content))
 
+   console.log(selectedHotel)
+
    const fetchFeedbacks = async () => {
       setLoading(true);
       try {
@@ -220,10 +222,10 @@ const FeedbackTable = () => {
          render: (_, record) => (
             <Space size="small">
                <Button type="primary" icon={<EyeOutlined />} size="small">
-                  View
+                  Xem 
                </Button>
                <Button type="default" icon={<MessageOutlined />} size="small">
-                  Reply
+                  Trả lời
                </Button>
             </Space>
          ),
@@ -259,7 +261,7 @@ const FeedbackTable = () => {
                         </span>
                      </div>
                      <Card.Title className="mb-0" style={{ fontSize: "16px", color: "#666" }}>
-                        Total Feedbacks
+                        Tổng số Feedback
                      </Card.Title>
                   </Card.Body>
                </Card>
@@ -277,7 +279,7 @@ const FeedbackTable = () => {
                         <small style={{ fontSize: "18px", color: "#666" }}> / 5</small>
                      </div>
                      <Card.Title className="mb-2" style={{ fontSize: "16px", color: "#666" }}>
-                        Average Rating
+                        Đánh giá trung bình
                      </Card.Title>
                      <div className="d-flex justify-content-center">
                         <Rate disabled allowHalf defaultValue={Number.parseFloat(averageRating)} style={{ fontSize: "16px" }} />
@@ -289,7 +291,7 @@ const FeedbackTable = () => {
                <Card className="h-100 shadow-sm border-0">
                   <Card.Body>
                      <Card.Title className="text-center mb-3" style={{ fontSize: "16px", color: "#666" }}>
-                        Rating Distribution
+                        Rating
                      </Card.Title>
                      <div>
                         {[5, 4, 3, 2, 1].map((star) => {

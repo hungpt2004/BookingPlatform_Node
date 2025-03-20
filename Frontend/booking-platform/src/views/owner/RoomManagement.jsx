@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { Navbar, Nav, Container, Row, Col, Form, Button, Dropdown, Card } from "react-bootstrap"
 import { Printer, Download, Filter, FileIcon as FileEarmark, Hotel, Building, User } from "lucide-react"
-import { OwnerNavbar } from "../../components/navbar/OwnerNavbar"
 import { BASE_URL } from '../../utils/Constant';
 import AdminSidebar from '../../components/navbar/AdminSidebar';
 import axios from "axios"

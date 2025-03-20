@@ -40,7 +40,7 @@ const Sidebar = () => {
       ],
     },
     {
-      title: "Quản lý đánh giá",
+      title: "Quản lý phòng",
       icon: <FaBuilding />,
       submenus: [
         { title: "Danh sách phòng", path: "/room-management" },
@@ -52,6 +52,7 @@ const Sidebar = () => {
       icon: <FaBuilding />,
       submenus: [
         { title: "Danh sách dịch vụ", path: "/service-management" },
+        { title: "Danh sách đánh giá", path: "/feedback-management" },
         { title: "Danh sách tiện ích", path: "/rooms/add" },
       ],
     },

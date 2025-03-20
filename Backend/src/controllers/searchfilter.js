@@ -35,7 +35,7 @@ exports.searchAndFilterHotels = async (req, res) => {
       // query.star = { $gte: minRating, $lte: maxRating };
     }
 
-    const allHotels = await Hotel.find(query);
+    const allHotels = await Hotel.find({...query, adminStatus: "APPROVED", ownerStatus: "ACTIVE"});
 
     const filteredByCapacity = await Promise.all(
       allHotels.map(async (hotel) => {

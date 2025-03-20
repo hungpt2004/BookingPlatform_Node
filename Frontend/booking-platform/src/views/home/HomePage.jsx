@@ -63,25 +63,6 @@ export const HomePage = () => {
     }
   }, [showHotels]);
 
-  // Toggle favorite function
-  const toggleFavorite = async (hotelId) => {
-    try {
-      if (favorites.includes(hotelId)) {
-        // Remove from favorites
-        await axiosInstance.delete('/favorite/remove-favorite', {
-          data: { hotelId }
-        });
-        setFavorites(favorites.filter(id => id !== hotelId));
-      } else {
-        // Add to favorites
-        await axiosInstance.post('/favorite/add-favorite', { hotelId });
-        setFavorites([...favorites, hotelId]);
-      }
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-    }
-  };
-
 
   useEffect(() => {
     const fetchCities = async () => {

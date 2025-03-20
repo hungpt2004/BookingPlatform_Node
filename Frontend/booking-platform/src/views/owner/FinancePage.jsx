@@ -1,11 +1,11 @@
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa6";
-import { OwnerNavbar } from "../../components/navbar/OwnerNavbar";
 import { FaCalendarCheck } from "react-icons/fa";
+import AdminSideBar from "../../components/navbar/AdminSidebarSecond";
 
 export default function FinancePage() {
     return (
         <>
-            <OwnerNavbar />
+            <AdminSideBar/>
             <div className="container py-4">
                 {/* Header */}
                 <div className="d-flex justify-content-between align-items-center mb-4">

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   Card,
-  Container,
   Alert,
   Row,
   Col,
@@ -10,12 +9,10 @@ import {
   ProgressBar,
 } from "react-bootstrap";
 import { Line } from "react-chartjs-2";
-import { Routes, Route, useParams, useNavigate } from "react-router-dom";
 import "chart.js/auto";
 import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar";
 import axiosInstance from "../../utils/AxiosInstance";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
-import Sidebar from "../../components/navbar/CustomeSidebar";
 import AdminSideBar from "../../components/navbar/AdminSidebarSecond";
 
 // Dashboard Overview Component

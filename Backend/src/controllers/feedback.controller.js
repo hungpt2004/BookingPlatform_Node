@@ -24,7 +24,7 @@ async function checkProfanityWithGemini(content) {
     console.error("Lỗi kiểm tra nội dung bằng Gemini:", error);
     return false; // Nếu lỗi xảy ra, mặc định không chặn nội dung
   }
-}
+};
 
 exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
   
@@ -206,7 +206,6 @@ exports.deleteFeedback = asyncHandler(async (req, res) => {
   });
 });
 
-
 //get feedback by user_id
 exports.getFeedbackByUserAndReservation = asyncHandler(async (req, res) => {
   const userId = req.user.id;
@@ -237,7 +236,6 @@ exports.getFeedbackByUserAndReservation = asyncHandler(async (req, res) => {
     });
   }
 });
-
 
 const calculateAvgRatingHotel = async (hotelId) => {
   // Sử dụng aggregate để tính trung bình rating
