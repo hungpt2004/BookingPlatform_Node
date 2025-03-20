@@ -1,6 +1,6 @@
 const Room = require("../models/room.js");
 const Hotel = require("../models/hotel.js");
-const RoomFacility = require("../models/roomFacility");
+const RoomFacility = require("../models/roomFacility.js");
 const RoomAvailability = require('../models/roomAvailability.js')
 const Reservation = require("../models/reservation.js");
 const asyncHandler = require("../middlewares/asyncHandler.js");

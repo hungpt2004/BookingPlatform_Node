@@ -36,7 +36,7 @@ export const Step10 = ({ nextStep, prevStep }) => {
                             type="radio"
                             name="paymentMethod"
                             id="onlinePayment"
-                            label="Thanh toán online khi đặt phòng. Booking.com sẽ hỗ trợ xử lý các khoản thanh toán của khách với dịch vụ Thanh toán bởi Booking.com."
+                            label="Thanh toán online khi đặt phòng. Travelofy.com sẽ hỗ trợ xử lý các khoản thanh toán của khách với dịch vụ Thanh toán bởi Travelofy.com."
                             checked={selectedMethod === "online"}
                             onChange={() => handlePaymentChange("online")}
                             className="mb-3"
@@ -65,10 +65,10 @@ export const Step10 = ({ nextStep, prevStep }) => {
             <Card className="p-4 mt-3">
 
                 <div className="mb-1">
-                    <h5 className="fw-bold">Cách hoạt động của Thanh toán bởi Booking.com</h5>
+                    <h5 className="fw-bold">Cách hoạt động của Thanh toán bởi Travelofy.com</h5>
                     <ol className="mt-3">
                         <li className="mb-3">
-                            <strong>Khách sẽ thanh toán</strong> thông qua Booking.com với các tùy chọn như PayPal,
+                            <strong>Khách sẽ thanh toán</strong> thông qua Travelofy.com với các tùy chọn như PayPal,
                             WeChat Pay và AllPay.
                         </li>
                         <li className="mb-3">
@@ -76,7 +76,7 @@ export const Step10 = ({ nextStep, prevStep }) => {
                             về bồi hoàn, gian lận hay thẻ không hợp lệ.
                         </li>
                         <li>
-                            <strong>Booking.com gửi thanh toán cho Quý vị.</strong> Quý vị sẽ nhận được chuyển khoản
+                            <strong>Travelofy.com gửi thanh toán cho Quý vị.</strong> Quý vị sẽ nhận được chuyển khoản
                             ngân hàng trễ nhất là ngày 15 hằng tháng, bao gồm tất cả mọi đặt phòng có ngày trả phòng
                             trong tháng trước đó.
                         </li>

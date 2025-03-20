@@ -44,15 +44,15 @@ const hotelSchema = new Schema(
       type: Number,
       required: true,
     },
+    rooms: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Room",
+    }],
     pricePerNight: {
       type: Number,
       required: true,
     },
     images: [
-      // {
-      //   // public_ID: { type: String, required: true },
-      //   url: { type: String, required: true }
-      // },
       { type: String, required: true },
     ],
     //Thêm mảng lưu trữ hình ảnh
@@ -81,7 +81,11 @@ const hotelSchema = new Schema(
 
     decisionDate: {
       type: Date
-    } // Ngày quyết định (nếu có)
+    },// Ngày quyết định (nếu có)
+
+    hotelParent: {
+      type: String
+    }// cty cha (neu co)
 
   },
   { versionKey: false }

@@ -45,6 +45,7 @@ import FeedbackTable from "./views/feedback/FeedbackOwnerPage";
 import ServiceTable from "./views/service/ServiceManagementPage";
 import FavoriteListPage from "./views/favorite/FavoriteListPage";
 
+
 function App() {
   const { user, isAuthenticated } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
@@ -159,12 +160,13 @@ function App() {
         <Route path='/edit-non-refundable' element={<PriceNoRefund />} />
         <Route path='/edit-weekly-price' element={<PricePerWeek />} />
         <Route path='/create-photo' element={<HotelPhotos />} />
-        
-        <Route path='booking-management' element={<BookingManagePage />} />
-        <Route path='/reviews' element={<ReviewPage />} />
         <Route path='/owner-homepage' element={<OwnerHomePage />} />
         <Route path='/owner-finance' element={<FinancePage />} />
-
+        <Route path='/booking-management' element={<BookingManagePage />} />
+        <Route path='/reviews' element={<ReviewPage />} />
+        <Route path='/booking-schedule/:hotelId' element={<HotelReservations/>}/>     
+        <Route path="/dashboard/*" element={<DashboardPage />} />
+        <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage/>}/>
       </Routes>
     </Router>
   );

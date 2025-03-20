@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { Container, Form, Button, Card, Row, Col, Table } from "react-bootstrap";
-import { FaTimes, FaCheck, FaInfo, FaChevronDown } from "react-icons/fa";
+import { FaTimes, FaCheck} from "react-icons/fa";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import { FaChevronLeft, FaCircleCheck, FaCircleInfo, FaPeopleGroup, FaPerson } from "react-icons/fa6";
+import { FaChevronLeft, FaCircleCheck, FaCircleInfo } from "react-icons/fa6";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 import { DEFAULT_CANCEL_POLICY, DEFAULT_WEEKLY_PRICING_SETTINGS, DEFAULT_NON_REFUNDABLE_SETTINGS } from "./Constant";
 
-export const Step5 = ({ nextStep, prevStep }) => {
+export const Step5 = ({ prevStep }) => {
     const [price, setPrice] = useState("");
     const [open, setOpen] = useState(true);
     const commissionRate = 0.15;

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button, Card, Container, Table } from "react-bootstrap";
-import { FaCheckCircle, FaImage, FaBook, FaChevronUp } from "react-icons/fa";
+import { FaCheckCircle, FaImage, FaBook} from "react-icons/fa";
 import BedSvg from "../../../public/bed.svg";
 import BedImg from "../../../public/bedroom.jpg";
 import PropTypes from "prop-types"
