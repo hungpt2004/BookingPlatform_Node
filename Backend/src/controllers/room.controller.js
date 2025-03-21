@@ -83,7 +83,7 @@ exports.updateRoom = asyncHandler(async (req, res) => {
           }
         },
         { new: true, session }
-      ).populate('bed.bed', 'name description');
+      )
 
       if (!updatedRoom) {
         await session.abortTransaction();

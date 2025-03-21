@@ -220,10 +220,13 @@ const RoomManagePage = () => {
                         type="link"
                         onClick={() => {
                             // Transform bed data to match bedTypes structure
-                            const transformedBedTypes = bedOptions.map(bed => ({
-                                _id: bed._id,
-                                name: bed.name,
-                                count: room.bed?.find(b => b.bed === bed._id)?.quantity,
+                            const transformedBedTypes = bedOptions.map(bedOption => ({
+                                _id: bedOption._id,
+                                name: bedOption.name,
+                                // Check if bed.bed is a string ID or a populated object
+                                count: room.bed?.find(b =>
+                                    (b.bed._id || b.bed) === bedOption._id // Handle both cases
+                                )?.quantity || 0 // Default to 0 if not found
                             }));
 
                             setFormData({
@@ -240,6 +243,7 @@ const RoomManagePage = () => {
                             count: room.bed?.find(b => b.bed === bed._id)?.quantity,
                         })))}
                         {console.log("formData.bedTypes::", formData.bedTypes)}
+                        {console.log("room::", room)}
                         <EditOutlined />
                     </Button>
                     <Button
@@ -256,6 +260,7 @@ const RoomManagePage = () => {
             )
         }
     ];
+
     const renderBedConfiguration = () => (
         <Form.Item label="Bed Configuration">
             {console.log("bedOptions::", bedOptions)}
