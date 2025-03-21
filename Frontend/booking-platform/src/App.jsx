@@ -45,7 +45,6 @@ import FeedbackTable from "./views/feedback/FeedbackOwnerPage";
 import ServiceTable from "./views/service/ServiceManagementPage";
 import FavoriteListPage from "./views/favorite/FavoriteListPage";
 
-
 function App() {
   const { user, isAuthenticated } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
@@ -132,10 +131,10 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["OWNER"]} />}>
           <Route path="/dashboard" element={<DashboardOverview />} />
           <Route path="/monthly-owner" element={<MonthlyPayment />} />
-          <Route path='/booking-management' element={<BookingManagePage />} />
-          <Route path='/room-management' element={<RoomManagePage />} />
-          <Route path='/booking-schedule/:hotelId' element={<HotelReservations/>}/>
-          <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage/>}/>
+
+          <Route path='/room-management/' element={<RoomManagePage />} />
+          <Route path='/booking-schedule/:hotelId' element={<HotelReservations />} />
+          <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage />} />
           <Route path="/hotel-management" element={<HotelManagementPage />} />
           <Route path="/feedback-management" element={<FeedbackTable />} />
           <Route path="/service-management" element={<ServiceTable />} />
@@ -155,6 +154,7 @@ function App() {
 
         <Route path="/create-hotel" element={<Createhotel />} />
         <Route path='/create-room' element={<CreateRoom />} />
+        <Route path='/create-room/:hotelId' element={<CreateRoom />} />
         <Route path='/cancel-policy' element={<CancelPolicy />} />
         <Route path='/edit-capacity-price' element={<PricePerPerson />} />
         <Route path='/edit-non-refundable' element={<PriceNoRefund />} />

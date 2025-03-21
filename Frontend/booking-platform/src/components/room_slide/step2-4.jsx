@@ -131,57 +131,46 @@ export const Step3 = ({ nextStep, prevStep }) => {
         return savedSelections ? JSON.parse(savedSelections) : [];
     });
 
-    // Fetch facilities from API
     useEffect(() => {
         const fetchFacilities = async () => {
             try {
-                const response = await axiosInstance.get('/roomFacility/roomFacility-by-name');
-                const facilities = response.data.facilities.map(f => f._id);
-                setGeneralOptions(facilities);
+                const response = await axiosInstance.get('/roomFacility/get-hotelfacilities');
+                setGeneralOptions(response.data.facilities);
             } catch (error) {
                 console.error('Error fetching facilities:', error);
                 // Optionally set default facilities here
                 setGeneralOptions([
-                    "Giá treo quần áo",
-                    "TV màn hình phẳng",
-                    "Điều hòa không khí",
-                    "Ra trải giường",
-                    "Bàn làm việc",
-                    "Dịch vụ báo thức",
-                    "Khăn tắm",
-                    "Tủ hoặc phòng để quần áo",
-                    "Hệ thống sưởi",
-                    "Quạt máy",
-                    "Két an toàn",
-                    "Khăn tắm/Bộ khăn trải giường (có thu phí)",
-                    "Hoàn toàn nằm ở tầng trệt"
-                ]);
+                    { _id: "1", name: "Giá treo quần áo" },
+                    { _id: "2", name: "TV màn hình phẳng" },
+                    { _id: "3", name: "Wifi" },
+                    { _id: "4", name: "Tivi" },
+                ]); // Default facilities
             }
         };
         fetchFacilities();
     }, []);
 
-    const handleCheckboxChange = (option) => {
-        const updatedSelections = selectedOptions.includes(option)
-            ? selectedOptions.filter((item) => item !== option)
-            : [...selectedOptions, option];
+    const handleCheckboxChange = (facilityId) => {
+        const updatedSelections = selectedOptions.includes(facilityId)
+            ? selectedOptions.filter(id => id !== facilityId)
+            : [...selectedOptions, facilityId];
 
         setSelectedOptions(updatedSelections);
         sessionStorage.setItem(storageKey, JSON.stringify(updatedSelections));
     };
 
     return (
-        <Container className="mt-4 w-50">
+        <Container className="mt-5 pt-2 w-50">
             <h3 className="mb-3 fs-3 fw-bold">Khách có thể sử dụng gì trong phòng này?</h3>
             <Card className="p-3 mb-3">
                 <div className="mb-3">
                     <h5 className="fw-bold">Tiện nghi chung</h5>
-                    {generalOptions.map((item) => (
+                    {generalOptions.map((facility) => (
                         <Form.Check
-                            key={item}
-                            label={item}
-                            checked={selectedOptions.includes(item)}
-                            onChange={() => handleCheckboxChange(item)}
+                            key={facility._id}
+                            label={facility.name}
+                            checked={selectedOptions.includes(facility._id)}
+                            onChange={() => handleCheckboxChange(facility._id)}
                         />
                     ))}
                 </div>
@@ -249,7 +238,7 @@ export const Step4 = ({ nextStep, prevStep }) => {
     };
 
     return (
-        <Container className="mt-4 w-50">
+        <Container className="mt-5 pt-2 w-50">
             <h3 className="mb-3 fw-bold">Tên của phòng này là gì?</h3>
             <Row>
                 <Col md={8}>

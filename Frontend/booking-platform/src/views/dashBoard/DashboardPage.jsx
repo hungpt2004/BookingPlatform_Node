@@ -59,7 +59,7 @@ const DashboardOverview = () => {
           setLoading(false);
         }, 800);
       } catch (err) {
-        setError("Failed to load dashboard data");
+        setError("Failed to load dashboard data", err);
         setLoading(false);
       }
     };

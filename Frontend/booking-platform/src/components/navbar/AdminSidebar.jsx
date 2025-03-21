@@ -98,7 +98,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className={`sidebar-container ${collapsed ? "collapsed" : ""} h-100vh`} style={{height: '100vh'}}>
+    <div className={`sidebar-container ${collapsed ? "collapsed" : ""} h-100vh`} style={{ height: '100vh', position: 'sticky', top: 0, overflowY: "hidden" }}>
       <div className="sidebar-header">
         <div className="logo-container">
           {!collapsed && <img src="/logo.png" alt="Logo" className="logo" />}
@@ -115,9 +115,8 @@ const Sidebar = () => {
             {menu.submenus ? (
               <>
                 <div
-                  className={`menu-title ${
-                    activeMenu === menu.title ? "active" : ""
-                  }`}
+                  className={`menu-title ${activeMenu === menu.title ? "active" : ""
+                    }`}
                   onClick={() => toggleSubmenu(menu.title)}
                 >
                   <div className="menu-icon">{menu.icon}</div>

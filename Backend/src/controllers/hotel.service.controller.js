@@ -4,8 +4,27 @@ const Hotel = require("../models/hotel");
 const HotelService = require("../models/hotelService.js");
 require("dotenv").config();
 
+
+// Get all hotel services - Son
+exports.getAllHotelServices = catchAsync(async (req, res) => {
+  const hotelServices = await HotelService.find();
+
+  if (hotelServices.length === 0) {
+    return res.status(404).json({
+      message: "No hotel services found",
+      error: true,
+    });
+  }
+
+  return res.status(200).json({
+    message: "Get all hotel services success",
+    error: false,
+    hotelServices,
+  });
+});
+
 exports.getAllHotelServicesByHotelId = catchAsync(async (req, res) => {
-  
+
   const { hotelId } = req.params;
 
   if (!hotelId) {
@@ -15,7 +34,7 @@ exports.getAllHotelServicesByHotelId = catchAsync(async (req, res) => {
     });
   }
 
-  const hotelServices = await Hotel.findOne({_id: hotelId}).populate('services');
+  const hotelServices = await Hotel.findOne({ _id: hotelId }).populate('services');
 
   if (hotelServices.length === 0) {
     return res.status(404).json({
