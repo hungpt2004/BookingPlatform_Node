@@ -4,48 +4,168 @@ const RoomFacility = require("../models/roomFacility.js");
 const RoomAvailability = require('../models/roomAvailability.js')
 const Reservation = require("../models/reservation.js");
 const asyncHandler = require("../middlewares/asyncHandler.js");
+const mongoose = require("mongoose");
+const Bed = require("../models/bed.js");
 
-exports.createRoom = asyncHandler(async (req, res, next) => {
-  const hotelId = req.params.hotelId;
+exports.createRoom = asyncHandler(async (req, res) => {
+  try {
+    const { facilities, bed, ...rest } = req.body;
+    console.log(req.body);
 
-  // Validate if hotel exists
-  const hotel = await Hotel.findById(hotelId);
-  if (!hotel) {
-    return next(createError(404, "Hotel not found"));
+    // Validate facilities and bed types exist
+    const validFacilities = await RoomFacility.find({ _id: { $in: facilities } });
+    const validBeds = await Bed.find({ _id: { $in: bed.map(b => b.bed) } });
+
+    if (validFacilities.length !== facilities.length) {
+      return res.status(400).json({ error: true, message: "Invalid facilities provided" });
+    }
+
+    if (validBeds.length !== bed.length) {
+      return res.status(400).json({ error: true, message: "Invalid bed types provided" });
+    }
+
+    const newRoom = new Room({
+      ...rest,
+      facilities,
+      bed,
+      hotel: req.params.hotelId
+    });
+
+    const savedRoom = await newRoom.save();
+
+    // Update hotel's rooms array
+    await Hotel.findByIdAndUpdate(
+      req.params.hotelId,
+      { $push: { rooms: savedRoom._id } },
+      { new: true }
+    );
+
+    return res.status(201).json({
+      error: false,
+      message: "Room created successfully",
+      room: savedRoom
+    });
+  } catch (error) {
+    console.error("Error in createRoom:", error);
+    return res.status(500).json({
+      error: true,
+      message: error.message
+    });
   }
-  // Create and save the room
-  const newRoom = new Room({
-    ...req.body,
-    hotel: hotelId, // Add the hotel reference explicitly
-  });
-
-  const savedRoom = await newRoom.save();
-
-  await hotel.rooms.push(newRoom._id);
-
-  console.log("Đã thêm vào rooms [] trong DB");
-
-  await hotel.save();
-
-  res.status(200).json({
-    error: false,
-    message: "Room created successfully",
-    room: savedRoom,
-  });
 });
 
-exports.getAllRoom = asyncHandler(async (req, res, next) => {
-  const rooms = await Room.find();
+// Update Room
+exports.updateRoom = asyncHandler(async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const { type, capacity, price, quantity, bed, facilities } = req.body;
 
-  if (rooms.length === 0) {
-    return next(createError(404, "No rooms found"));
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+
+      // Update room
+      console.log(req.body);
+      const updatedRoom = await Room.findByIdAndUpdate(
+        roomId,
+        {
+          $set: {
+            type,
+            capacity,
+            price,
+            quantity,
+            bed: bed.map(b => ({
+              bed: b.bed,
+              quantity: b.quantity
+            })),
+            facilities
+          }
+        },
+        { new: true, session }
+      ).populate('bed.bed', 'name description');
+
+      if (!updatedRoom) {
+        await session.abortTransaction();
+        return res.status(404).json({ error: true, message: "Room not found" });
+      }
+
+      await session.commitTransaction();
+      res.status(200).json({
+        error: false,
+        message: "Room updated successfully",
+        room: updatedRoom
+      });
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+  } catch (error) {
+    console.error("Error updating room:", error);
+    res.status(500).json({ error: true, message: "Failed to update room" });
   }
+});
 
-  res.status(200).json({
-    error: false,
-    rooms,
-    message: "Get all rooms success",
-  });
+// Delete Room
+exports.deleteRoom = asyncHandler(async (req, res) => {
+  const { roomId } = req.params;
+  try {
+    // Delete room
+    const deletedRoom = await Room.findByIdAndDelete(roomId);
+
+    if (!deletedRoom) {
+      return res.status(404).json({ error: true, message: "Room not found" });
+    }
+
+    res.status(200).json({
+      error: false,
+      message: "Room deleted successfully"
+    });
+  } catch (error) {
+    console.error("Error deleting room:", error);
+    res.status(500).json({ error: true, message: "Failed to delete room" });
+  }
+});
+
+
+exports.getRoomById = asyncHandler(async (req, res) => {
+  try {
+    const room = await Room.findById(req.params.roomId)
+      .populate('facilities', 'name description')
+
+    if (!room) {
+      return res.status(404).json({ error: true, message: "Room not found" });
+    }
+
+    return res.status(200).json({
+      error: false,
+      room
+    });
+  } catch (error) {
+    console.error("Error in getRoomById:", error);
+    return res.status(500).json({ error: true, message: "Internal server error" });
+  }
+});
+
+exports.getAllRoom = asyncHandler(async (req, res) => {
+  try {
+    const rooms = await Room.find();
+
+    if (rooms.length === 0) {
+      return res.status(404).json({ error: true, message: "No rooms found" });
+    }
+
+    return res.status(200).json({
+      error: false,
+      rooms,
+      message: "Get all rooms success",
+    });
+  } catch (error) {
+    console.error("Error in getAllRoom:", error);
+    return res.status(500).json({ error: true, message: "Internal server error" });
+  }
 });
 
 exports.getRoomByHotelIdOwner = asyncHandler(async (req, res) => {

@@ -132,7 +132,7 @@ function App() {
           <Route path="/dashboard" element={<DashboardOverview />} />
           <Route path="/monthly-owner" element={<MonthlyPayment />} />
 
-          <Route path='/room-management' element={<RoomManagePage />} />
+          <Route path='/room-management/' element={<RoomManagePage />} />
           <Route path='/booking-schedule/:hotelId' element={<HotelReservations />} />
           <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage />} />
           <Route path="/hotel-management" element={<HotelManagementPage />} />
@@ -154,6 +154,7 @@ function App() {
 
         <Route path="/create-hotel" element={<Createhotel />} />
         <Route path='/create-room' element={<CreateRoom />} />
+        <Route path='/create-room/:hotelId' element={<CreateRoom />} />
         <Route path='/cancel-policy' element={<CancelPolicy />} />
         <Route path='/edit-capacity-price' element={<PricePerPerson />} />
         <Route path='/edit-non-refundable' element={<PriceNoRefund />} />

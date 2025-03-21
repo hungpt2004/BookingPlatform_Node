@@ -9,28 +9,63 @@ import {
     InputGroup
 } from "react-bootstrap";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FaBed } from "react-icons/fa6";
+import axiosInstance from "../../utils/AxiosInstance";
 // Example bed types
-const initialBedTypes = [
-    { label: "Giường đơn", count: 0, lengthDetail: "Rộng 90 - 130 cm" },
-    { label: "Giường đôi", count: 0, lengthDetail: "Rộng 131 - 150 cm" },
-    { label: "Giường 4 người", count: 0, lengthDetail: "Rộng 151 - 180 cm" },
-    { label: "2 giường đơn", count: 0, lengthDetail: "Rộng 181 - 210 cm" },
-];
 
 export const Step1 = ({ nextStep, prevStep }) => {
     const navigate = useNavigate();
-    // State for form data
+    const { hotelId } = useParams();
+
+    const [bedTypes, setBedTypes] = useState([]);
+    const handleBefore = () => {
+        if (hotelId) {
+            navigate(`/room-management?hotelId=${hotelId}`)
+        } else {
+            toCreateHotel()
+        }
+    }
+
+
+    const fetchBedTypes = async () => {
+        try {
+            const res = await axiosInstance.get("/bed/get-all-bed");
+            // Add count property to each bed type
+            const bedsWithCount = res.data.beds.map(bed => ({
+                ...bed,
+                count: 0 // Initialize count to 0
+            }));
+            setBedTypes(bedsWithCount);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchBedTypes();
+    }, []);
+
     const [formData, setFormData] = useState({
-        roomType: "Phòng giường đôi", // default
+        roomType: "Phòng giường đôi",
         roomQuantity: 1,
-        bedTypes: initialBedTypes,
+        bedTypes: [], // Initialize as empty array
         capacity: 2,
         roomArea: 0,
         AreaType: "meter",
         isSmoking: false,
     });
+
+    // Update formData when bedTypes are fetched
+    useEffect(() => {
+        if (bedTypes.length > 0) {
+            setFormData(prev => ({
+                ...prev,
+                bedTypes: bedTypes
+            }));
+        }
+    }, [bedTypes]);
+
 
     // Whenever formData changes, save to sessionStorage
     useEffect(() => {
@@ -74,13 +109,13 @@ export const Step1 = ({ nextStep, prevStep }) => {
     // Render bed type rows
     const renderBedTypes = () =>
         formData.bedTypes.map((bed, index) => (
-            <Row key={bed.label} className="align-items-center mb-2 p-0" >
+            <Row key={bed._id} className="align-items-center mb-2 p-0" >
                 <Col xs={8} className="d-flex align-items-center">
                     <span className="material-symbols-outlined me-2" style={{ fontSize: "2rem", }}>
-                        {bed.label === "Giường đơn" ? "single_bed" : "king_bed"}
+                        {bed.name === "Giường đơn" ? "single_bed" : "king_bed"}
                     </span>
                     <div className="d-flex flex-column">
-                        <Form.Label className="mb-0">{bed.label}</Form.Label>
+                        <Form.Label className="mb-0">{bed.name}</Form.Label>
                         <p className="text-secondary mb-0" style={{ fontSize: "0.8rem" }}>{bed.lengthDetail}</p>
                     </div>
                 </Col>
@@ -225,7 +260,7 @@ export const Step1 = ({ nextStep, prevStep }) => {
                         </Card>
                         {/* ACTION BUTTONS */}
                         <div className="d-flex justify-content-between mt-3">
-                            <Button variant="secondary" onClick={toCreateHotel}>
+                            <Button variant="secondary" onClick={handleBefore}>
                                 Quay lại
                             </Button>
                             <Button variant="primary" onClick={nextStep} disabled={totalBedCount === 0}>

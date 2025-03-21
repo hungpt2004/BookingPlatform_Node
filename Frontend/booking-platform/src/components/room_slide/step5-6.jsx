@@ -1,24 +1,98 @@
 import { useState, useEffect } from "react";
 import { Container, Form, Button, Card, Row, Col, Table } from "react-bootstrap";
-import { FaTimes, FaCheck} from "react-icons/fa";
+import { FaTimes, FaCheck } from "react-icons/fa";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FaChevronLeft, FaCircleCheck, FaCircleInfo } from "react-icons/fa6";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 import { DEFAULT_CANCEL_POLICY, DEFAULT_WEEKLY_PRICING_SETTINGS, DEFAULT_NON_REFUNDABLE_SETTINGS } from "./Constant";
+import axiosInstance from "../../utils/AxiosInstance";
 
 export const Step5 = ({ prevStep }) => {
     const [price, setPrice] = useState("");
     const [open, setOpen] = useState(true);
     const commissionRate = 0.15;
     const navigate = useNavigate();
+    const { hotelId } = useParams();
 
+    // Store original price without commission
     useEffect(() => {
         if (price) {
-            sessionStorage.setItem("price", Number(price) * (1 - commissionRate));
+            sessionStorage.setItem("price", Number(price));
         }
-    }, [price])
+    }, [price]);
 
+    const handleFinalSubmit = () => {
+        if (hotelId) {
+            handleCreateRoom();
+        } else {
+            toCreateHotel();
+        }
+    };
+
+    const handleCreateRoom = async () => {
+        try {
+            const roomData = {
+                name: sessionStorage.getItem('roomName') || "Phòng Giường Đôi",
+                capacity: JSON.parse(sessionStorage.getItem('roomDetails'))?.capacity || 2,
+                price: Number(price) || 0,
+                type: JSON.parse(sessionStorage.getItem('roomDetails'))?.type || "Phòng Giường Đôi",
+                quantity: JSON.parse(sessionStorage.getItem('roomDetails'))?.roomQuantity || 1,
+                description: JSON.parse(sessionStorage.getItem('roomDetails'))?.description || "Default Description",
+                facilities: JSON.parse(sessionStorage.getItem('facilities')) || [],
+                bed: JSON.parse(sessionStorage.getItem('roomDetails'))?.bedTypes?.map(bed => ({
+                    bed: bed._id, // Should be valid ObjectId
+                    quantity: bed.count
+                })) || []
+            };
+
+            const response = await axiosInstance.post(
+                `/room/create-room/${hotelId}`,
+                roomData
+            );
+
+            if (response.data.error === false) {
+                clearSessionStorage();
+                navigate(`/room-management?hotelId=${hotelId}`);
+            }
+        } catch (error) {
+            console.error("Room creation failed:", error);
+            alert(error.response?.data?.message || "Failed to create room");
+        }
+    };
+
+    const toCreateHotel = () => {
+        const roomData = {
+            roomName: sessionStorage.getItem('roomName'),
+            price: Number(price),
+            roomDetails: JSON.parse(sessionStorage.getItem('roomDetails')) || {},
+            facilities: JSON.parse(sessionStorage.getItem('facilities')) || [],
+            bedTypes: JSON.parse(sessionStorage.getItem('roomDetails'))?.bedTypes?.map(bed => ({
+                bedId: bed._id, // Should be valid ObjectId
+                count: bed.count
+            })) || []
+        };
+
+        // Update session storage with complete room data
+        let rooms = JSON.parse(sessionStorage.getItem('rooms')) || [];
+        const id = sessionStorage.getItem('id');
+
+        if (id) {
+            rooms = rooms.map(room =>
+                room.id === parseInt(id) ? { ...room, ...roomData } : room
+            );
+        } else {
+            rooms.push({
+                ...roomData,
+                id: rooms.length + 1,
+                createdAt: new Date().toISOString()
+            });
+        }
+
+        sessionStorage.setItem('rooms', JSON.stringify(rooms));
+        clearSessionStorage();
+        navigate('/create-hotel');
+    };
 
     const handlePriceChange = (e) => {
         const rawValue = e.target.value.replace(/[^0-9]/g, "");
@@ -39,55 +113,13 @@ export const Step5 = ({ prevStep }) => {
         setOpen(false);
     };
 
-    const toCreateHotel = () => {
-        const roomDetails = JSON.parse(sessionStorage.getItem('roomDetails'));
-        const facilities = JSON.parse(sessionStorage.getItem('facilities'));
-        const price = sessionStorage.getItem('price');
-        const bathroomData = JSON.parse(sessionStorage.getItem('bathroomData'));
-        const roomName = sessionStorage.getItem('roomName') || "Phòng Giường Đôi";
-        const nonRefundableSettings = JSON.parse(sessionStorage.getItem('nonRefundableSettings')) || DEFAULT_NON_REFUNDABLE_SETTINGS;
-        const weeklyPricingSettings = JSON.parse(sessionStorage.getItem('weeklyPricingSettings')) || DEFAULT_WEEKLY_PRICING_SETTINGS;
-        const cancelPolicy = JSON.parse(sessionStorage.getItem('cancelPolicy')) || DEFAULT_CANCEL_POLICY;
-        const id = sessionStorage.getItem('id');
-
-        let rooms = JSON.parse(sessionStorage.getItem('rooms')) || [];
-        const roomCount = rooms.length + 1;
-
-        const newRoom = {
-            id: id ? parseInt(id) : roomCount,
-            roomDetails,
-            facilities,
-            price,
-            // bathroomData,
-            roomName,
-            // groupDiscounts,
-            // nonRefundableSettings,
-            // weeklyPricingSettings,
-            // cancelPolicy,
-            createdAt: new Date().toISOString()
-        };
-        if (!id) {
-            rooms.push(newRoom);
-        } else {
-            rooms = rooms.map((room) => room.id === parseInt(id) ? newRoom : room)
-        }
-
-        sessionStorage.setItem('rooms', JSON.stringify(rooms));
-
-        sessionStorage.removeItem('id');
-
-        sessionStorage.setItem('roomStep', 1);
+    const clearSessionStorage = () => {
         sessionStorage.removeItem('roomDetails');
-        sessionStorage.removeItem('comfortOptions');
+        sessionStorage.removeItem('facilities');
         sessionStorage.removeItem('price');
-        sessionStorage.removeItem('bathroomData');
         sessionStorage.removeItem('roomName');
-        sessionStorage.removeItem('groupDiscounts');
-        sessionStorage.removeItem('nonRefundableSettings');
-        sessionStorage.removeItem('weeklyPricingSettings');
-        sessionStorage.removeItem('cancelPolicy');
-
-        navigate('/create-hotel');
+        sessionStorage.removeItem('id');
+        sessionStorage.setItem('roomStep', 1);
     };
 
     return (
@@ -158,10 +190,10 @@ export const Step5 = ({ prevStep }) => {
                         <Col className="text-end">
                             <Button
                                 variant="primary"
-                                onClick={toCreateHotel}
+                                onClick={handleFinalSubmit}
                                 disabled={!price}
                             >
-                                Tiếp tục &gt;
+                                {hotelId ? "Create Room" : "Tiếp tục"} &gt;
                             </Button>
                         </Col>
                     </Row>
