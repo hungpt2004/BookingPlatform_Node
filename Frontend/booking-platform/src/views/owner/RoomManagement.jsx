@@ -5,6 +5,7 @@ import axiosInstance from "../../utils/AxiosInstance";
 import Sidebar from "../../components/navbar/AdminSidebar";
 import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar";
 import { useLocation, useNavigate, } from "react-router-dom";
+import { Typography } from 'antd';
 
 const RoomManagePage = () => {
     const navigate = useNavigate();
@@ -30,6 +31,9 @@ const RoomManagePage = () => {
     const [bedOptions, setBedOptions] = useState([]);
     const [facilityOptions, setFacilityOptions] = useState([]);
     const [error, setError] = useState("");
+
+    const commissionRate = 0.15;
+
 
     useEffect(() => {
         const initializeBedTypes = () => {
@@ -85,8 +89,9 @@ const RoomManagePage = () => {
 
     const handleSubmitRoom = async () => {
         try {
-            // Prepare the bed array in required format
-            console.log("formDataAtSubmit::", formData);
+            // Calculate net price after commission
+            const netPrice = parseFloat((formData.price * (1 - commissionRate)).toFixed(2));
+
             const formattedBeds = formData.bedTypes
                 .map(bed => ({
                     bed: bed._id,
@@ -94,13 +99,9 @@ const RoomManagePage = () => {
                 }));
 
             const payload = {
-                type: formData.type,
-                capacity: formData.capacity,
-                price: formData.price,
-                quantity: formData.quantity,
-                description: formData.description,
+                ...formData,
+                price: netPrice, // Use net price for storage
                 bed: formattedBeds,
-                facilities: formData.facilities
             };
 
             console.log("payload::", payload);
@@ -220,6 +221,7 @@ const RoomManagePage = () => {
                         type="link"
                         onClick={() => {
                             // Transform bed data to match bedTypes structure
+                            const grossPrice = parseFloat((room.price / (1 - commissionRate)).toFixed(2));
                             const transformedBedTypes = bedOptions.map(bedOption => ({
                                 _id: bedOption._id,
                                 name: bedOption.name,
@@ -227,6 +229,7 @@ const RoomManagePage = () => {
                                 count: room.bed?.find(b =>
                                     (b.bed._id || b.bed) === bedOption._id // Handle both cases
                                 )?.quantity || 0 // Default to 0 if not found
+
                             }));
 
                             setFormData({
@@ -235,6 +238,12 @@ const RoomManagePage = () => {
                             });
                             setSelectedRoom(room);
                             setShowRoomModal(true);
+                            setFormData({
+                                ...room,
+                                price: grossPrice, // Show original price before commission
+                                bedTypes: transformedBedTypes,
+                            });
+
                         }}
                     >
                         {console.log("transformedBedTypes::", bedOptions.map(bed => ({
@@ -330,6 +339,35 @@ const RoomManagePage = () => {
         </Form.Item>
     );
 
+    const renderPriceWithCommission = () => (
+        <Form.Item label="Price">
+            <InputNumber
+                min={1}
+                value={formData.price}
+                onChange={value => setFormData({ ...formData, price: value })}
+                required
+                className="w-100"
+                formatter={value => `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                parser={value => value.replace(/\$\s?|(,*)/g, '')}
+                placeholder="Enter price"
+            />
+            <div style={{ marginTop: 8, padding: '8px 12px', background: '#fafafa', borderRadius: 4 }}>
+                <Typography.Text type="secondary" style={{ display: 'block', fontSize: 12 }}>
+                    <span style={{ float: 'left' }}>Service Fee ({commissionRate * 100}%):</span>
+                    <span style={{ float: 'right' }}>
+                        ${(formData.price * commissionRate).toFixed(2)}
+                    </span>
+                </Typography.Text>
+                <div style={{ clear: 'both' }}></div>
+                <Typography.Text strong style={{ display: 'block', fontSize: 12, marginTop: 4 }}>
+                    <span style={{ float: 'left' }}>Your Earnings:</span>
+                    <span style={{ float: 'right', color: '#389e0d' }}>
+                        ${(formData.price * (1 - commissionRate)).toFixed(2)}
+                    </span>
+                </Typography.Text>
+            </div>
+        </Form.Item>
+    );
 
     return (
         <div className="d-flex">
@@ -418,15 +456,7 @@ const RoomManagePage = () => {
                                 </Form.Item>
 
                             </div>
-                            <Form.Item label="Price">
-                                <InputNumber
-                                    min={1}
-                                    value={formData.price}
-                                    onChange={value => setFormData({ ...formData, price: value })}
-                                    required
-                                    className="w-100"
-                                />
-                            </Form.Item>
+                            {renderPriceWithCommission()}
                         </Form>
                     </Modal>
                     {/* Delete Confirmation Modal */}

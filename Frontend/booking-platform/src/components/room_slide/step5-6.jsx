@@ -123,7 +123,7 @@ export const Step5 = ({ prevStep }) => {
     };
 
     return (
-        <Container className="mt-4 w-50">
+        <Container className="mt-5 pt-2 w-50">
             <h3 className="mb-3 fw-bold">Thiết lập giá mỗi đêm cho phòng này</h3>
             <Row>
                 <Col md={8}>

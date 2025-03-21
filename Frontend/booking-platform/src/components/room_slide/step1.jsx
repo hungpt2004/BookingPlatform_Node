@@ -155,7 +155,7 @@ export const Step1 = ({ nextStep, prevStep }) => {
 
     return (
         <Container style={{ maxWidth: "65%" }}>
-            <h3 className="fw-bold mt-4">Chi tiết phòng</h3>
+            <h3 className="fw-bold mt-5 pt-2">Chi tiết phòng</h3>
 
             <Row className="mt-3">
                 <Col md={8}>

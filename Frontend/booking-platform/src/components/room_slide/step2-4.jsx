@@ -160,7 +160,7 @@ export const Step3 = ({ nextStep, prevStep }) => {
     };
 
     return (
-        <Container className="mt-4 w-50">
+        <Container className="mt-5 pt-2 w-50">
             <h3 className="mb-3 fs-3 fw-bold">Khách có thể sử dụng gì trong phòng này?</h3>
             <Card className="p-3 mb-3">
                 <div className="mb-3">
@@ -238,7 +238,7 @@ export const Step4 = ({ nextStep, prevStep }) => {
     };
 
     return (
-        <Container className="mt-4 w-50">
+        <Container className="mt-5 pt-2 w-50">
             <h3 className="mb-3 fw-bold">Tên của phòng này là gì?</h3>
             <Row>
                 <Col md={8}>
