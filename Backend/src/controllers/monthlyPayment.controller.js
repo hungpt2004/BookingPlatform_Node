@@ -66,53 +66,70 @@ exports.getDashBoardData = asyncWrapper(async (req, res) => {
   const currentUser = req.user;
 
   try {
-    // Get all hotels of owner
+    // Lấy tất cả khách sạn của chủ sở hữu
     const ownerHotels = await hotel.find({ owner: currentUser._id });
     const hotelIds = ownerHotels.map((item) => item._id);
 
-    // Get all reservations of owner hotels
+    // Lấy tất cả đơn đặt phòng của khách sạn thuộc chủ sở hữu
     const reservations = await reservation.find({ hotel: { $in: hotelIds } });
 
-    // Count active hotels
+    // Đếm số khách sạn đang hoạt động
     const activeHotelCount = await hotel.countDocuments({
       owner: currentUser._id,
       ownerStatus: "ACTIVE",
       adminStatus: "APPROVED",
     });
 
-    // Total reservations
+    // Tổng số lượng đơn đặt phòng
     const totalReservationAmount = reservations.length;
 
-    // Total revenue (only successful bookings)
+    // Tổng doanh thu (chỉ tính đơn thành công)
     const totalRevenue = reservations
       .filter((res) =>
         ["COMPLETED", "CHECKED OUT", "PROCESSING", "BOOKED"].includes(res.status)
       )
       .reduce((sum, res) => sum + res.totalPrice, 0);
 
-    // Count canceled reservations
+    // Đếm số đơn đặt phòng bị hủy
     const cancelReservation = reservations.filter((res) =>
       ["CANCELLED", "PENDING"].includes(res.status)
     ).length;
 
-    // Normal reservations (successful bookings)
+    // Đơn đặt phòng hợp lệ
     const normalReservations = totalReservationAmount - cancelReservation;
 
-    // Initialize revenue per month
-    const monthlyRevenue = Array(12).fill(0); // Mảng chứa doanh thu từng tháng
+    // Khởi tạo doanh thu theo tháng
+    const monthlyRevenue = Array(12).fill(0);
 
-    // Lọc dữ liệu doanh thu theo từng tháng
+    // Duyệt qua từng đơn đặt phòng
     reservations.forEach((res) => {
       if (["COMPLETED", "CHECKED OUT", "PROCESSING", "BOOKED"].includes(res.status)) {
-        const monthIndex = new Date(res.checkInDate).getMonth(); // Lấy tháng (0-11)
-        monthlyRevenue[monthIndex] += res.totalPrice; // Cộng tổng doanh thu vào tháng tương ứng
+        const checkIn = new Date(res.checkInDate);
+        const checkOut = new Date(res.checkOutDate);
+
+        let startMonth = checkIn.getMonth();
+        let endMonth = checkOut.getMonth();
+
+        if (startMonth === endMonth) {
+          // Nếu check-in và check-out cùng một tháng -> cộng dồn vào tháng đó
+          monthlyRevenue[startMonth] += res.totalPrice;
+        } else {
+          // Nếu check-in và check-out khác tháng -> chia doanh thu theo số ngày
+          let totalDays = (checkOut - checkIn) / (1000 * 60 * 60 * 24); // Tổng số ngày ở
+          let revenuePerDay = res.totalPrice / totalDays;
+
+          let tempDate = new Date(checkIn);
+          while (tempDate <= checkOut) {
+            let monthIndex = tempDate.getMonth();
+            monthlyRevenue[monthIndex] += revenuePerDay; // Cộng vào tháng tương ứng
+            tempDate.setDate(tempDate.getDate() + 1); // Tăng ngày lên 1
+          }
+        }
       }
     });
 
-    // Tính doanh thu trung bình của từng tháng
-    const averageMonthlyRevenue = monthlyRevenue.map((revenue) =>
-      hotelIds.length > 0 ? Math.round(revenue / hotelIds.length) : 0
-    );
+    // Làm tròn giá trị doanh thu
+    const formattedMonthlyRevenue = monthlyRevenue.map((revenue) => Math.round(revenue));
 
     return res.status(200).json({
       totalHotel: ownerHotels.length,
@@ -121,12 +138,13 @@ exports.getDashBoardData = asyncWrapper(async (req, res) => {
       totalReservationAmount,
       cancelReservation,
       normalReservations,
-      averageMonthlyRevenue, // Thêm dữ liệu trung bình theo tháng
+      monthlyRevenue: formattedMonthlyRevenue, // Doanh thu theo tháng
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 });
+
 
 exports.createMonthlyPayment = asyncWrapper(async(req, res) => {
 
