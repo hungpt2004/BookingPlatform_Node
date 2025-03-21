@@ -271,7 +271,7 @@ const BookingSchedule = () => {
     if (loading) {
         return (
             <div>
-                <Sidebar />
+                <AdminSidebar />
                 <Container className="mt-5 text-center">
                     <Spinner animation="border" role="status" />
                     <p className="mt-2">Loading reservations...</p>
@@ -445,7 +445,7 @@ const BookingSchedule = () => {
                                 navigate(`/reservation-details/${selectedReservation._id}`);
                             }}
                         >
-                            View Full Details
+                            View Customer Receit
                         </Button>
                     )}
                 </Modal.Footer>
