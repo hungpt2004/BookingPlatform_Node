@@ -36,51 +36,39 @@ exports.searchAndFilterHotels = async (req, res) => {
     }
 
     const allHotels = await Hotel.find(query);
-
-    const filteredByCapacity = await Promise.all(
+    const hotelsWithRooms = await Promise.all(
       allHotels.map(async (hotel) => {
         const rooms = await Room.find({ hotel: hotel._id });
-        const availableRooms = rooms.filter(
-          (room) => room.capacity >= Number(numberOfPeople)
-        );
-        return { hotel, availableRooms };
+        return { hotel, rooms };
       })
     );
 
-    const hotelsWithCapacity = filteredByCapacity.filter(
-      (hotel) => hotel.availableRooms.length > 0
-    );
-    let finalHotels = hotelsWithCapacity;
+    let finalHotels = [];
+
     if (checkinDate && checkoutDate) {
-      if (checkinDate > checkoutDate) {
-        return res.status(400).json({
-          error: true,
-          message: "CheckInDate cannot be before CheckOutDate",
-        });
-      }
-
-      if (new Date(checkoutDate) < new Date()) {
-        return res.status(400).json({
-          error: true,
-          message: "CheckOutDate cannot be in the past",
-        });
-      }
-
-      const reservedRooms = await Reservation.find({
-        checkInDate: { $lt: new Date(checkoutDate) },
-        checkOutDate: { $gt: new Date(checkinDate) },
-      }).distinct("rooms");
-
-      const availableHotels = hotelsWithCapacity.map((hotel) => {
-        const availableRooms = hotel.availableRooms.filter(
-          (room) => !reservedRooms.some(reservedRoom => reservedRoom.equals(room._id))
-        );
-        return { hotel: hotel.hotel, availableRooms };
+      const overlappingReservations = await Reservation.find({
+        $and: [
+          { checkInDate: { $lt: new Date(checkoutDate) } },
+          { checkOutDate: { $gt: new Date(checkinDate) } }
+        ]
       });
 
-      finalHotels = availableHotels.filter(
-        (hotel) => hotel.availableRooms.length > 0
+      const reservedRoomIds = overlappingReservations.flatMap(reservation =>
+        reservation.rooms.map(room => room.room.toString())
       );
+
+      finalHotels = hotelsWithRooms.map(({ hotel, rooms }) => {
+        const availableRooms = rooms.filter(room =>
+          !reservedRoomIds.includes(room._id.toString())
+        );
+        const totalCapacity = availableRooms.reduce((sum, room) => sum + room.capacity, 0);
+        return { hotel, availableRooms, totalCapacity };
+      }).filter(({ totalCapacity }) => totalCapacity >= Number(numberOfPeople));
+    } else {
+      finalHotels = hotelsWithRooms.map(({ hotel, rooms }) => {
+        const totalCapacity = rooms.reduce((sum, room) => sum + room.capacity, 0);
+        return { hotel, availableRooms: rooms, totalCapacity };
+      }).filter(({ totalCapacity }) => totalCapacity >= Number(numberOfPeople));
     }
 
     const startIndex = (page - 1) * limit;
@@ -95,9 +83,10 @@ exports.searchAndFilterHotels = async (req, res) => {
       message: HOTEL.SUCCESS
     });
   } catch (error) {
+    console.error('Server error:', error);
     res.status(500).json({
       error: true,
-      message: error
+      message: error.message || 'Internal server error'
     });
   }
 };

@@ -223,7 +223,15 @@ export const HomePage = () => {
           page: newPage
         }
       });
-
+      console.log('Search params:', {
+        hotelName,
+        address,
+        checkinDate,
+        checkoutDate,
+        hotelRating: `${minRating}-5`,
+        numberOfPeople,
+        page: newPage
+      });
       setHotels(response.data.hotels);
       setTotalPages(response.data.totalPages);
       setPage(newPage);
