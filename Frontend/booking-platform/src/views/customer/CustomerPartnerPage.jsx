@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Card, 
-  Select, 
-  DatePicker, 
-  Table, 
-  Row, 
-  Col, 
-  Typography, 
-  Button, 
-  Statistic, 
+import {
+  Card,
+  Select,
+  DatePicker,
+  Table,
+  Row,
+  Col,
+  Typography,
+  Button,
+  Statistic,
   Space,
   Tag
 } from 'antd';
@@ -52,7 +52,7 @@ const CustomPartnerPage = () => {
   // Mock data fetch function
   const fetchData = () => {
     setLoading(true);
-    
+
     // Simulate API call
     setTimeout(() => {
       // Generate mock data
@@ -60,7 +60,7 @@ const CustomPartnerPage = () => {
       for (let i = 1; i <= 20; i++) {
         const hotelId = Math.floor(Math.random() * 5) + 1;
         const hotel = hotels.find(h => h.id === hotelId.toString());
-        
+
         mockData.push({
           key: i,
           id: `INV-${selectedYear}${selectedMonth.toString().padStart(2, '0')}${i.toString().padStart(3, '0')}`,
@@ -73,12 +73,12 @@ const CustomPartnerPage = () => {
           paymentDate: Math.random() > 0.3 ? `${selectedYear}-${selectedMonth}-${Math.floor(Math.random() * 28) + 1}` : null,
         });
       }
-      
+
       // Filter by selected hotel if not 'all'
-      const filteredData = selectedHotel === 'all' 
-        ? mockData 
+      const filteredData = selectedHotel === 'all'
+        ? mockData
         : mockData.filter(item => item.hotelId === selectedHotel);
-      
+
       setData(filteredData);
       setLoading(false);
     }, 1000);
@@ -172,133 +172,131 @@ const CustomPartnerPage = () => {
   return (
     <>
       <div className='d-flex'>
-         <AdminSideBar/>
-         <div className='content w-100'>
-            <AdminCustomNavbar/>
-            <div style={{ padding: '24px' }}>
-      <Title level={3}>Báo cáo thanh toán theo tháng</Title>
-      
-      {/* Filters */}
-      <Card style={{ marginBottom: '24px' }}>
-        <Row gutter={24} align="middle">
-          <Col xs={24} sm={8} md={6} lg={4}>
-            <div style={{ marginBottom: '8px' }}>Tháng</div>
-            <Select
-              style={{ width: '100%' }}
-              value={selectedMonth}
-              onChange={setSelectedMonth}
-              options={months}
-            />
-          </Col>
-          <Col xs={24} sm={8} md={6} lg={4}>
-            <div style={{ marginBottom: '8px' }}>Năm</div>
-            <Select
-              style={{ width: '100%' }}
-              value={selectedYear}
-              onChange={setSelectedYear}
-              options={years}
-            />
-          </Col>
-          <Col xs={24} sm={8} md={12} lg={8}>
-            <div style={{ marginBottom: '8px' }}>Khách sạn</div>
-            <Select
-              style={{ width: '100%' }}
-              value={selectedHotel}
-              onChange={setSelectedHotel}
-              placeholder="Chọn khách sạn"
-            >
-              <Option value="all">Tất cả khách sạn</Option>
-              {hotels.map(hotel => (
-                <Option key={hotel.id} value={hotel.id}>{hotel.name}</Option>
-              ))}
-            </Select>
-          </Col>
-          <Col xs={24} md={24} lg={8} style={{ display: 'flex', justifyContent: 'flex-end', marginTop: { xs: '16px', lg: '28px' } }}>
-            <Button
-              type="primary"
-              icon={<SearchOutlined />}
-              onClick={fetchData}
-              loading={loading}
-            >
-              Tìm kiếm
-            </Button>
-          </Col>
-        </Row>
-      </Card>
-      
-      {/* Statistics Cards */}
-      <Row gutter={16} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Tổng doanh thu"
-              value={totalRevenue}
-              precision={0}
-              formatter={(value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Tổng hoa hồng"
-              value={totalCommission}
-              precision={0}
-              formatter={(value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Số lượng đặt phòng"
-              value={totalReservations}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Đã thanh toán"
-              value={paidReservations}
-              suffix={`/ ${data.length}`}
-            />
-          </Card>
-        </Col>
-      </Row>
-      
-      {/* Table */}
-      <Card>
-        <Table
-          columns={columns}
-          dataSource={data}
-          loading={loading}
-          scroll={{ x: 1200 }}
-          pagination={{
-            showSizeChanger: true,
-            showTotal: (total) => `Tổng ${total} bản ghi`,
-            defaultPageSize: 10,
-            pageSizeOptions: ['10', '20', '50'],
-          }}
-          summary={() => (
-            <Table.Summary fixed>
-              <Table.Summary.Row>
-                <Table.Summary.Cell index={0} colSpan={2}><strong>Tổng cộng</strong></Table.Summary.Cell>
-                <Table.Summary.Cell index={2}><strong>{totalReservations}</strong></Table.Summary.Cell>
-                <Table.Summary.Cell index={3}>
-                  <strong>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalRevenue)}</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={4}>
-                  <strong>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalCommission)}</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={5} colSpan={3}></Table.Summary.Cell>
-              </Table.Summary.Row>
-            </Table.Summary>
-          )}
-        />
-      </Card>
-    </div>
-         </div>
+        <div className='content w-100'>
+          <div style={{ padding: '24px' }}>
+            <Title level={3}>Báo cáo thanh toán theo tháng</Title>
+
+            {/* Filters */}
+            <Card style={{ marginBottom: '24px' }}>
+              <Row gutter={24} align="middle">
+                <Col xs={24} sm={8} md={6} lg={4}>
+                  <div style={{ marginBottom: '8px' }}>Tháng</div>
+                  <Select
+                    style={{ width: '100%' }}
+                    value={selectedMonth}
+                    onChange={setSelectedMonth}
+                    options={months}
+                  />
+                </Col>
+                <Col xs={24} sm={8} md={6} lg={4}>
+                  <div style={{ marginBottom: '8px' }}>Năm</div>
+                  <Select
+                    style={{ width: '100%' }}
+                    value={selectedYear}
+                    onChange={setSelectedYear}
+                    options={years}
+                  />
+                </Col>
+                <Col xs={24} sm={8} md={12} lg={8}>
+                  <div style={{ marginBottom: '8px' }}>Khách sạn</div>
+                  <Select
+                    style={{ width: '100%' }}
+                    value={selectedHotel}
+                    onChange={setSelectedHotel}
+                    placeholder="Chọn khách sạn"
+                  >
+                    <Option value="all">Tất cả khách sạn</Option>
+                    {hotels.map(hotel => (
+                      <Option key={hotel.id} value={hotel.id}>{hotel.name}</Option>
+                    ))}
+                  </Select>
+                </Col>
+                <Col xs={24} md={24} lg={8} style={{ display: 'flex', justifyContent: 'flex-end', marginTop: { xs: '16px', lg: '28px' } }}>
+                  <Button
+                    type="primary"
+                    icon={<SearchOutlined />}
+                    onClick={fetchData}
+                    loading={loading}
+                  >
+                    Tìm kiếm
+                  </Button>
+                </Col>
+              </Row>
+            </Card>
+
+            {/* Statistics Cards */}
+            <Row gutter={16} style={{ marginBottom: '24px' }}>
+              <Col xs={24} sm={12} md={6}>
+                <Card>
+                  <Statistic
+                    title="Tổng doanh thu"
+                    value={totalRevenue}
+                    precision={0}
+                    formatter={(value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)}
+                  />
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Card>
+                  <Statistic
+                    title="Tổng hoa hồng"
+                    value={totalCommission}
+                    precision={0}
+                    formatter={(value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)}
+                  />
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Card>
+                  <Statistic
+                    title="Số lượng đặt phòng"
+                    value={totalReservations}
+                  />
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Card>
+                  <Statistic
+                    title="Đã thanh toán"
+                    value={paidReservations}
+                    suffix={`/ ${data.length}`}
+                  />
+                </Card>
+              </Col>
+            </Row>
+
+            {/* Table */}
+            <Card>
+              <Table
+                columns={columns}
+                dataSource={data}
+                loading={loading}
+                scroll={{ x: 1200 }}
+                pagination={{
+                  showSizeChanger: true,
+                  showTotal: (total) => `Tổng ${total} bản ghi`,
+                  defaultPageSize: 10,
+                  pageSizeOptions: ['10', '20', '50'],
+                }}
+                summary={() => (
+                  <Table.Summary fixed>
+                    <Table.Summary.Row>
+                      <Table.Summary.Cell index={0} colSpan={2}><strong>Tổng cộng</strong></Table.Summary.Cell>
+                      <Table.Summary.Cell index={2}><strong>{totalReservations}</strong></Table.Summary.Cell>
+                      <Table.Summary.Cell index={3}>
+                        <strong>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalRevenue)}</strong>
+                      </Table.Summary.Cell>
+                      <Table.Summary.Cell index={4}>
+                        <strong>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalCommission)}</strong>
+                      </Table.Summary.Cell>
+                      <Table.Summary.Cell index={5} colSpan={3}></Table.Summary.Cell>
+                    </Table.Summary.Row>
+                  </Table.Summary>
+                )}
+              />
+            </Card>
+          </div>
+        </div>
       </div>
     </>
   );

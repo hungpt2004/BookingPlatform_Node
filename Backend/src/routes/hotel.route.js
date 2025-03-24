@@ -11,6 +11,7 @@ const CloudinaryZipFile = require("../utils/uploadToCloudinary")
 //GET
 HotelRouter.get("/get-all-hotel", HotelController.getAllHotels); //customer
 HotelRouter.get("/get-owned-hotel", protect, restrictTo("OWNER"), HotelController.getOwnedHotels); //owned
+HotelRouter.get("/get-owner-hotel/:ownerId", HotelController.getOwnerHotels);
 
 HotelRouter.get(
   "/total/:hotelId",

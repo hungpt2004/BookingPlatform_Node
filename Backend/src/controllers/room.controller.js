@@ -58,7 +58,7 @@ exports.createRoom = asyncHandler(async (req, res) => {
 exports.updateRoom = asyncHandler(async (req, res) => {
   try {
     const { roomId } = req.params;
-    const { type, capacity, price, quantity, bed, facilities } = req.body;
+    const { name, type, capacity, price, quantity, bed, facilities } = req.body;
 
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -71,6 +71,7 @@ exports.updateRoom = asyncHandler(async (req, res) => {
         roomId,
         {
           $set: {
+            name,
             type,
             capacity,
             price,
@@ -209,7 +210,7 @@ exports.getRoomAvailability = asyncHandler(async (req, res) => {
   try {
     const selectedCheckIn = new Date(checkInDate);
     const selectedCheckOut = new Date(checkOutDate);
-    
+
     // Fetch overlapping reservations
     const overlappingReservations = await Reservation.find({
       hotel: hotelId,
@@ -219,16 +220,16 @@ exports.getRoomAvailability = asyncHandler(async (req, res) => {
         { checkOutDate: { $gt: selectedCheckIn } },
       ],
     }).populate("rooms");
-    
+
     // Get all rooms for this hotel
     const allRooms = await Room.find({ hotel: hotelId });
-    
+
     // Safely extract booked room IDs
     const bookedRoomIds = overlappingReservations
       .flatMap(res => res.rooms || [])
       .filter(room => room && room._id)
       .map(room => room._id.toString());
-    
+
     // Filter out booked rooms
     const availableRooms = allRooms.filter(
       room => !bookedRoomIds.includes(room._id.toString())

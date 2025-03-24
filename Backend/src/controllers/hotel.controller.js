@@ -44,10 +44,37 @@ exports.getOwnedHotels = asyncHandler(async (req, res) => {
   return res.status(200).json({
     error: false,
     hotels,
-    message: "Get all owned hotel",
+    message: "Get all owner hotel",
   });
 });
 
+exports.getOwnerHotels = asyncHandler(async (req, res) => {
+  const { ownerId } = req.params;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const skip = (page - 1) * limit;
+
+  const [hotels, total] = await Promise.all([
+    Hotel.find({ owner: ownerId })
+      .skip(skip)
+      .limit(limit),
+    Hotel.countDocuments({ owner: ownerId })
+  ]);
+
+  if (!hotels.length) {
+    return res.status(404).json({
+      error: true,
+      message: "No hotels found",
+    });
+  }
+
+  res.status(200).json({
+    error: false,
+    hotels,
+    total,
+    message: "Get all owned hotel",
+  });
+});
 
 
 exports.getHotelDetailById = asyncHandler(async (req, res) => {
