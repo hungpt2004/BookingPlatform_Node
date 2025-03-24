@@ -89,7 +89,6 @@ const Receipt = () => {
 
   return (
     <>
-      <CustomToast/>
       <CustomNavbar />
       <div className="container p-4 bg-white shadow rounded" style={{marginTop: '150px'}}>
         <div className="d-flex justify-content-between border-bottom pb-3">

@@ -1,23 +1,98 @@
 import { useState, useEffect } from "react";
 import { Container, Form, Button, Card, Row, Col, Table } from "react-bootstrap";
-import { FaTimes, FaCheck, FaInfo, FaChevronDown } from "react-icons/fa";
+import { FaTimes, FaCheck } from "react-icons/fa";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
-import { FaChevronLeft, FaCircleCheck, FaCircleInfo, FaPeopleGroup, FaPerson } from "react-icons/fa6";
+import { useNavigate, useParams } from "react-router-dom";
+import { FaChevronLeft, FaCircleCheck, FaCircleInfo } from "react-icons/fa6";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 import { DEFAULT_CANCEL_POLICY, DEFAULT_WEEKLY_PRICING_SETTINGS, DEFAULT_NON_REFUNDABLE_SETTINGS } from "./Constant";
+import axiosInstance from "../../utils/AxiosInstance";
 
-export const Step5 = ({ nextStep, prevStep }) => {
+export const Step5 = ({ prevStep }) => {
     const [price, setPrice] = useState("");
     const [open, setOpen] = useState(true);
     const commissionRate = 0.15;
+    const navigate = useNavigate();
+    const { hotelId } = useParams();
 
+    // Store original price without commission
     useEffect(() => {
         if (price) {
-            sessionStorage.setItem("price", price);
+            sessionStorage.setItem("price", Number(price));
         }
-    }, [price])
+    }, [price]);
 
+    const handleFinalSubmit = () => {
+        if (hotelId) {
+            handleCreateRoom();
+        } else {
+            toCreateHotel();
+        }
+    };
+
+    const handleCreateRoom = async () => {
+        try {
+            const roomData = {
+                name: sessionStorage.getItem('roomName') || "Phòng Giường Đôi",
+                capacity: JSON.parse(sessionStorage.getItem('roomDetails'))?.capacity || 2,
+                price: Number(price) || 0,
+                type: JSON.parse(sessionStorage.getItem('roomDetails'))?.type || "Phòng Giường Đôi",
+                quantity: JSON.parse(sessionStorage.getItem('roomDetails'))?.roomQuantity || 1,
+                description: JSON.parse(sessionStorage.getItem('roomDetails'))?.description || "Default Description",
+                facilities: JSON.parse(sessionStorage.getItem('facilities')) || [],
+                bed: JSON.parse(sessionStorage.getItem('roomDetails'))?.bedTypes?.map(bed => ({
+                    bed: bed._id, // Should be valid ObjectId
+                    quantity: bed.count
+                })) || []
+            };
+
+            const response = await axiosInstance.post(
+                `/room/create-room/${hotelId}`,
+                roomData
+            );
+
+            if (response.data.error === false) {
+                clearSessionStorage();
+                navigate(`/room-management?hotelId=${hotelId}`);
+            }
+        } catch (error) {
+            console.error("Room creation failed:", error);
+            alert(error.response?.data?.message || "Failed to create room");
+        }
+    };
+
+    const toCreateHotel = () => {
+        const roomData = {
+            roomName: sessionStorage.getItem('roomName'),
+            price: Number(price),
+            roomDetails: JSON.parse(sessionStorage.getItem('roomDetails')) || {},
+            facilities: JSON.parse(sessionStorage.getItem('facilities')) || [],
+            bedTypes: JSON.parse(sessionStorage.getItem('roomDetails'))?.bedTypes?.map(bed => ({
+                bedId: bed._id, // Should be valid ObjectId
+                count: bed.count
+            })) || []
+        };
+
+        // Update session storage with complete room data
+        let rooms = JSON.parse(sessionStorage.getItem('rooms')) || [];
+        const id = sessionStorage.getItem('id');
+
+        if (id) {
+            rooms = rooms.map(room =>
+                room.id === parseInt(id) ? { ...room, ...roomData } : room
+            );
+        } else {
+            rooms.push({
+                ...roomData,
+                id: rooms.length + 1,
+                createdAt: new Date().toISOString()
+            });
+        }
+
+        sessionStorage.setItem('rooms', JSON.stringify(rooms));
+        clearSessionStorage();
+        navigate('/create-hotel');
+    };
 
     const handlePriceChange = (e) => {
         const rawValue = e.target.value.replace(/[^0-9]/g, "");
@@ -38,9 +113,17 @@ export const Step5 = ({ nextStep, prevStep }) => {
         setOpen(false);
     };
 
+    const clearSessionStorage = () => {
+        sessionStorage.removeItem('roomDetails');
+        sessionStorage.removeItem('facilities');
+        sessionStorage.removeItem('price');
+        sessionStorage.removeItem('roomName');
+        sessionStorage.removeItem('id');
+        sessionStorage.setItem('roomStep', 1);
+    };
 
     return (
-        <Container className="mt-4 w-50">
+        <Container className="mt-5 pt-2 w-50">
             <h3 className="mb-3 fw-bold">Thiết lập giá mỗi đêm cho phòng này</h3>
             <Row>
                 <Col md={8}>
@@ -69,7 +152,7 @@ export const Step5 = ({ nextStep, prevStep }) => {
                         {price > 0 && (
                             <div className="mb-4 ps-3">
                                 <h6 >
-                                    15,00% Hoa hồng cho Booking.com
+                                    15,00% Hoa hồng cho Travelofy.com
                                 </h6>
                                 <div className="ps-5" style={{ fontSize: "0.8rem" }}>
                                     <div className="d-flex align-items-center mb-2" >
@@ -107,10 +190,10 @@ export const Step5 = ({ nextStep, prevStep }) => {
                         <Col className="text-end">
                             <Button
                                 variant="primary"
-                                onClick={nextStep}
+                                onClick={handleFinalSubmit}
                                 disabled={!price}
                             >
-                                Tiếp tục &gt;
+                                {hotelId ? "Create Room" : "Tiếp tục"} &gt;
                             </Button>
                         </Col>
                     </Row>

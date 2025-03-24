@@ -1,8 +1,10 @@
 const asyncWrapper = require('../middlewares/asyncHandler');
 const hotelFacility = require('../models/hotelFacility');
+const hotel = require('../models/hotel')
 
 
 exports.getAllHotelFacilities = asyncWrapper(async (req, res) => {
+
     const hotelFacilities = await hotelFacility.find();
 
     if (hotelFacilities.length === 0) {

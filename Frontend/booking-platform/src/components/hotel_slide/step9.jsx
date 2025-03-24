@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button, Card, Container, Table } from "react-bootstrap";
-import { FaCheckCircle, FaImage, FaBook, FaChevronUp } from "react-icons/fa";
+import { FaCheckCircle, FaImage, FaBook} from "react-icons/fa";
 import BedSvg from "../../../public/bed.svg";
 import BedImg from "../../../public/bedroom.jpg";
 import PropTypes from "prop-types"
@@ -113,14 +113,14 @@ export const Step9 = ({ nextStep, prevStep }) => {
                                                             <tr>
                                                                 <td className="text-muted fw-bold">Lượng khách</td>
                                                                 <td className="text-muted  fw-bold">Giường</td>
-                                                                <td className="text-muted  fw-bold">Phòng tắm</td>
+                                                                {/* <td className="text-muted  fw-bold">Phòng tắm</td> */}
                                                                 <td className="text-muted  fw-bold">Giá</td>
                                                                 <td className="text-muted  fw-bold">Phòng loại này</td>
                                                             </tr>
                                                             <tr>
                                                                 <td className="text-muted">{room.roomDetails.capacity}</td>
                                                                 <td className="text-muted"> {bedCount}</td>
-                                                                <td className="text-muted"> {room.bathroomData.isPrivateBathroom ? "Riêng" : "Chung"}</td>
+                                                                {/* <td className="text-muted"> {room.bathroomData.isPrivateBathroom ? "Riêng" : "Chung"}</td> */}
                                                                 <td className="text-muted"> {room.price} VNĐ</td>
                                                                 <td className="text-muted"> {room.roomDetails.roomQuantity}</td>
                                                             </tr>

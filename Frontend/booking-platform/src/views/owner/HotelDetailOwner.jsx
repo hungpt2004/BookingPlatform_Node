@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Spinner, Alert, Button, Badge, Form } from 'react-bootstrap';
 import axios from 'axios';
 import { BASE_URL } from '../../utils/Constant';
-import { OwnerNavbar } from '../../components/navbar/OwnerNavbar';
+import { AdminCustomNavbar } from '../../components/navbar/AdminCustomNavbar';
+import AdminSidebar from '../../components/navbar/OwnerSidebar';
 
 const HotelDetailOwnerPage = () => {
     const { hotelId } = useParams();
@@ -90,8 +91,8 @@ const HotelDetailOwnerPage = () => {
         return (
             <Container className="mt-5">
                 <Alert variant="danger">{error}</Alert>
-                <Button variant="outline-secondary" onClick={() => navigate('/booking-management')}>
-                    Back to Hotels
+                <Button variant="outline-secondary" onClick={() => navigate('/room-management')}>
+                    Back to Rooms Overview
                 </Button>
             </Container>
         );
@@ -99,14 +100,16 @@ const HotelDetailOwnerPage = () => {
 
     return (
         <>
-            <OwnerNavbar />
+            <div className="d-flex">
+                <AdminSidebar />
+                <div className="booking-app flex-grow-1" style={{ paddingLeft: "20px" }}>
             <Container className="py-4">
                 <Button
                     variant="outline-secondary"
-                    onClick={() => navigate('/booking-management')}
+                    onClick={() => navigate('/room-management')}
                     className="mb-4"
                 >
-                    &larr; Back to Hotels
+                    &larr;  Back to Rooms Overview
                 </Button>
 
                 {hotel && (
@@ -204,6 +207,8 @@ const HotelDetailOwnerPage = () => {
                     ))}
                 </Row>
             </Container>
+            </div>
+            </div>
         </>
     );
 };

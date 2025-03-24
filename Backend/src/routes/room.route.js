@@ -1,6 +1,7 @@
 const express = require('express');
 const RoomRouter = express.Router();
-const RoomController = require('../controllers/room.controller')
+const RoomController = require('../controllers/room.controller');
+const { protect } = require('../controllers/authenticate.controller');
 
 
 RoomRouter.post("/create-room/:hotelId", RoomController.createRoom);
@@ -10,6 +11,10 @@ RoomRouter.post("/create-facility/:roomId", RoomController.createRoomFacility);
 RoomRouter.get("/get-facility/:roomId", RoomController.getRoomFacilitiesByRoomId);
 RoomRouter.get("/get-room-owner/:hotelId", RoomController.getRoomByHotelIdOwner);
 RoomRouter.get("/get-room-availability/:hotelId", RoomController.getRoomAvailability);
-//RoomRouter.get("/get-room-by-id/:roomId", RoomController.getRoomById);
+RoomRouter.get("/get-room-by-id/:roomId", RoomController.getRoomById);
+
+RoomRouter.put('/update/:roomId', protect, RoomController.updateRoom);
+RoomRouter.delete('/delete/:roomId', RoomController.deleteRoom);
+
 
 module.exports = RoomRouter;

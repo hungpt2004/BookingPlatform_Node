@@ -11,17 +11,20 @@ import {
   FaUserCog,
   FaSignOutAlt,
   FaBars,
-  FaTimes
+  FaTimes,
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
-import './sidebar.css'
+import "./sidebar.css";
+import { useAuthStore } from "../../store/authStore";
 
-const Sidebar = () => {
+const OwnerSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [activeMenu, setActiveMenu] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
-
+  
+  const {logout} = useAuthStore();
+ 
   // Submenus
   const menus = [
     {
@@ -33,22 +36,28 @@ const Sidebar = () => {
       title: "Quản lý khách sạn",
       icon: <FaHotel />,
       submenus: [
-        { title: "Danh sách khách sạn", path: "/hotels" },
-        { title: "Thêm khách sạn", path: "/hotels/add" },
+        { title: "Thông tin Khách Sạn", path: "/hotel-management" },
+        { title: "Lịch Booking", path: "/booking-schedule" },
+        { title: "Quản lý Booking", path: "/booking-management" },
+        { title: "Quản lý Doanh Thu", path: "/monthly-owner" },
       ],
     },
     {
       title: "Quản lý phòng",
       icon: <FaBuilding />,
       submenus: [
-        { title: "Danh sách phòng", path: "/rooms" },
+        { title: "Danh sách phòng", path: "/room-management" },
         { title: "Thêm phòng", path: "/rooms/add" },
       ],
     },
     {
-      title: "Quản lý doanh thu",
-      icon: <FaChartBar />,
-      path: "/monthly-owner",
+      title: "Quản lý dịch vụ",
+      icon: <FaBuilding />,
+      submenus: [
+        { title: "Danh sách dịch vụ", path: "/service-management" },
+        { title: "Danh sách đánh giá", path: "/feedback-management" },
+        { title: "Danh sách tiện ích", path: "/rooms/add" },
+      ],
     },
     {
       title: "Cài đặt",
@@ -85,12 +94,21 @@ const Sidebar = () => {
     });
   }, [location.pathname]);
 
+  const handleLogout = async () => {
+    if(localStorage.getItem('payment_link')) {
+      localStorage.removeItem('payment_link');
+    }
+    logout();
+    setUser(null);
+    navigate('/');
+  };
+
   return (
-    <div className={`sidebar-container ${collapsed ? "collapsed" : ""}`}>
+    <div className={`sidebar-container ${collapsed ? "collapsed" : ""} h-100vh`} style={{ height: '100vh', position: 'sticky', top: 0, overflowY: "hidden" }}>
       <div className="sidebar-header">
         <div className="logo-container">
-          {!collapsed && <img src='/logo.png' alt="Logo" className="logo" />}
-          {!collapsed && <span className="logo-text">Admin Panel</span>}
+          {!collapsed && <img src="/logo.png" alt="Logo" className="logo" />}
+          {!collapsed && <span className="logo-text">Owner Panel</span>}
         </div>
         <button className="toggle-button" onClick={toggleSidebar}>
           {collapsed ? <FaBars /> : <FaTimes />}
@@ -103,9 +121,8 @@ const Sidebar = () => {
             {menu.submenus ? (
               <>
                 <div
-                  className={`menu-title ${
-                    activeMenu === menu.title ? "active" : ""
-                  }`}
+                  className={`menu-title ${activeMenu === menu.title ? "active" : ""
+                    }`}
                   onClick={() => toggleSubmenu(menu.title)}
                 >
                   <div className="menu-icon">{menu.icon}</div>
@@ -154,13 +171,13 @@ const Sidebar = () => {
       </div>
 
       <div className="sidebar-footer">
-        <NavLink to="/profile" className="profile-link">
+        <NavLink to="/dashboard" className="profile-link">
           <div className="menu-icon">
             <FaUserCog />
           </div>
           {!collapsed && <span className="menu-text">Hồ sơ</span>}
         </NavLink>
-        <button className="logout-button" onClick={() => navigate("/logout")}>
+        <button className="logout-button" onClick={() => handleLogout()}>
           <div className="menu-icon">
             <FaSignOutAlt />
           </div>
@@ -171,4 +188,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default OwnerSidebar;

@@ -17,6 +17,9 @@ exports.authenticateToken = (req, res, next) => {
       return res.status(403).json({ error: true, message: "Invalid token" });
     }
     req.user = user; // Gắn thông tin người dùng vào req.user
+
+    console.log(user);
+
     next(); // Tiếp tục xử lý
   });
 };

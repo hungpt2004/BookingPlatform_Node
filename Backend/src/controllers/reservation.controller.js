@@ -351,7 +351,6 @@ Thông tin của hóa đơn thanh toán gồm
 - Tên khách sạn, địa chỉ, số điện thoại
 - Tên người dùng, email, điện thoại
 - thông tin reservation
-
 */
 
 exports.getReservationDetailById = asyncHandler(async (req, res) => {
@@ -386,6 +385,12 @@ exports.getReservationDetailById = asyncHandler(async (req, res) => {
   }
 });
 
+
+exports.refundMoneyForCustomer = asyncHandler(async (req, res) => {
+
+
+
+})
 
 
 //automatic update status of reservations
@@ -430,7 +435,8 @@ cron.schedule(
   "*/5 * * * *",
   () => {
     // autoUpdateReservationStatus();
-    // autoDeleteNotPaidReservation();
+    autoDeleteNotPaidReservation();
+    console.log(`Đã xóa not paid reservation sau 5 phút`)
   },
   {
     timezone: "Asia/Ho_Chi_Minh",

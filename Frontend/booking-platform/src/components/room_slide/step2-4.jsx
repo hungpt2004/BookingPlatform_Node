@@ -3,6 +3,7 @@ import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import PropTypes from "prop-types";
 import { FaChevronLeft, FaTimes } from "react-icons/fa";
 import { FaLightbulb } from "react-icons/fa6";
+import axiosInstance from "../../utils/AxiosInstance";
 
 export const Step2 = ({ nextStep, prevStep }) => {
     const savedData = JSON.parse(sessionStorage.getItem("bathroomData")) || {
@@ -123,48 +124,59 @@ export const Step2 = ({ nextStep, prevStep }) => {
     );
 };
 export const Step3 = ({ nextStep, prevStep }) => {
-    const storageKey = "comfortOptions";
-    const generalOptions = ["Giá treo quần áo", "TV màn hình phẳng", "Điều hòa không khí", "Ra trải giường",
-        "Bàn làm việc", "Dịch vụ báo thức", "Khăn tắm", "Tủ hoặc phòng để quần áo",
-        "Hệ thống sưởi", "Quạt máy", "Két an toàn", "Khăn tắm/Bộ khăn trải giường (có thu phí)",
-        "Hoàn toàn nằm ở tầng trệt"
-    ]
-    const outsidesOptions = ["Ban công", "Sân hiên", "Tầm nhìn ra khung cảnh"];
-    const foodDrinkOptions = ["Ấm đun nước điện", "Máy pha trà/cà phê", "Khu vực phòng ăn", "Bàn ăn", "Lò vi sóng"];
-
-    // Load data from sessionStorage or set an empty array
+    const storageKey = "facilities";
+    const [generalOptions, setGeneralOptions] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState(() => {
         const savedSelections = sessionStorage.getItem(storageKey);
         return savedSelections ? JSON.parse(savedSelections) : [];
     });
 
-    const handleCheckboxChange = (option) => {
-        const updatedSelections = selectedOptions.includes(option)
-            ? selectedOptions.filter((item) => item !== option)
-            : [...selectedOptions, option];
+    useEffect(() => {
+        const fetchFacilities = async () => {
+            try {
+                const response = await axiosInstance.get('/roomFacility/get-hotelfacilities');
+                setGeneralOptions(response.data.facilities);
+            } catch (error) {
+                console.error('Error fetching facilities:', error);
+                // Optionally set default facilities here
+                setGeneralOptions([
+                    { _id: "1", name: "Giá treo quần áo" },
+                    { _id: "2", name: "TV màn hình phẳng" },
+                    { _id: "3", name: "Wifi" },
+                    { _id: "4", name: "Tivi" },
+                ]); // Default facilities
+            }
+        };
+        fetchFacilities();
+    }, []);
+
+    const handleCheckboxChange = (facilityId) => {
+        const updatedSelections = selectedOptions.includes(facilityId)
+            ? selectedOptions.filter(id => id !== facilityId)
+            : [...selectedOptions, facilityId];
 
         setSelectedOptions(updatedSelections);
         sessionStorage.setItem(storageKey, JSON.stringify(updatedSelections));
     };
 
-
     return (
-        <Container className="mt-4 w-50">
+        <Container className="mt-5 pt-2 w-50">
             <h3 className="mb-3 fs-3 fw-bold">Khách có thể sử dụng gì trong phòng này?</h3>
             <Card className="p-3 mb-3">
                 <div className="mb-3">
                     <h5 className="fw-bold">Tiện nghi chung</h5>
-                    {generalOptions.map((item) => (
+                    {generalOptions.map((facility) => (
                         <Form.Check
-                            key={item}
-                            label={item}
-                            checked={selectedOptions.includes(item)}
-                            onChange={() => handleCheckboxChange(item)}
+                            key={facility._id}
+                            label={facility.name}
+                            checked={selectedOptions.includes(facility._id)}
+                            onChange={() => handleCheckboxChange(facility._id)}
                         />
                     ))}
-
                 </div>
-                <hr />
+
+                {/* Commented out other sections */}
+                {/* <hr />
                 <div className="mt-3 mb-3">
                     <h5 className="fw-bold">Không gian ngoài trời và tầm nhìn</h5>
                     {outsidesOptions.map((item) => (
@@ -187,8 +199,7 @@ export const Step3 = ({ nextStep, prevStep }) => {
                             onChange={() => handleCheckboxChange(item)}
                         />
                     ))}
-
-                </div >
+                </div> */}
             </Card>
 
             <Row className="mt-3">
@@ -227,7 +238,7 @@ export const Step4 = ({ nextStep, prevStep }) => {
     };
 
     return (
-        <Container className="mt-4 w-50">
+        <Container className="mt-5 pt-2 w-50">
             <h3 className="mb-3 fw-bold">Tên của phòng này là gì?</h3>
             <Row>
                 <Col md={8}>
@@ -240,10 +251,10 @@ export const Step4 = ({ nextStep, prevStep }) => {
                         <Form.Group controlId="roomName">
                             <Form.Label><strong>Tên phòng</strong></Form.Label>
                             <Form.Select value={roomName} onChange={handleRoomChange}>
-                                <option value="Phòng Giường Đôi">Phòng Giường Đôi</option>
-                                <option value="Phòng Giường Đơn">Phòng Giường Đơn</option>
-                                <option value="Phòng Gia Đình">Phòng Gia Đình</option>
-                                <option value="Phòng Suite">Phòng Suite</option>
+                                <option value="Phòng giường đôi">Phòng giường đôi</option>
+                                <option value="Phòng giường đơn">Phòng giường đơn</option>
+                                <option value="Phòng giường 4 người">Phòng giường 4 người</option>
+                                <option value="Phòng 2 giường đơn">Phòng 2 giường đơn</option>
                             </Form.Select>
                         </Form.Group>
                     </Card>

@@ -4,7 +4,10 @@ import { Form } from 'react-bootstrap';
 const CustomInput = ({ label, type, value, onChange, placeHolder, min, max }) => {
    return (
       <>
+         {label && <label className="form-label">{label}</label>}
+
          <Form.Control
+
             className='rounded-0 p-3'
             type={type}
             // min={type === 'number' ? 0 : null}

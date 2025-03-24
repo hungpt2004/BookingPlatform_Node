@@ -5,11 +5,11 @@ const { ROOM } = require('../utils/constantMessage')
 
 exports.getBedByRoomId = asyncHandler(async (req, res) => {
 
-   const {roomId} = req.params
+   const { roomId } = req.params
 
    console.log(roomId)
 
-   if(!roomId){
+   if (!roomId) {
       return res.status(500).json({
          error: true,
          message: ROOM.INVALID_ID
@@ -17,11 +17,11 @@ exports.getBedByRoomId = asyncHandler(async (req, res) => {
    }
 
    const bed = await Room.findOne(
-      {_id: roomId},
+      { _id: roomId },
    )
-   .populate('bed')
+      .populate('bed')
 
-   if(!bed) {
+   if (!bed) {
       return res.status(500).json({
          error: true,
          message: ROOM.NOT_FOUND
@@ -38,15 +38,28 @@ exports.getBedByRoomId = asyncHandler(async (req, res) => {
 
 exports.getBedByBedId = asyncHandler(async (req, res) => {
 
-   const {id} = req.params;
+   const { id } = req.params;
 
    const bed = await Bed.findOne(
-      {_id: id}
+      { _id: id }
    )
 
    return res.status(200).json({
       error: false,
       bed,
+      message: ROOM.SUCCESS
+   })
+
+})
+
+// get all bed
+exports.getAllBed = asyncHandler(async (req, res) => {
+
+   const beds = await Bed.find()
+
+   return res.status(200).json({
+      error: false,
+      beds,
       message: ROOM.SUCCESS
    })
 

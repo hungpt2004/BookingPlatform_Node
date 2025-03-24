@@ -63,25 +63,6 @@ export const HomePage = () => {
     }
   }, [showHotels]);
 
-  // Toggle favorite function
-  const toggleFavorite = async (hotelId) => {
-    try {
-      if (favorites.includes(hotelId)) {
-        // Remove from favorites
-        await axiosInstance.delete('/favorite/remove-favorite', {
-          data: { hotelId }
-        });
-        setFavorites(favorites.filter(id => id !== hotelId));
-      } else {
-        // Add to favorites
-        await axiosInstance.post('/favorite/add-favorite', { hotelId });
-        setFavorites([...favorites, hotelId]);
-      }
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-    }
-  };
-
 
   useEffect(() => {
     const fetchCities = async () => {
@@ -223,7 +204,15 @@ export const HomePage = () => {
           page: newPage
         }
       });
-
+      console.log('Search params:', {
+        hotelName,
+        address,
+        checkinDate,
+        checkoutDate,
+        hotelRating: `${minRating}-5`,
+        numberOfPeople,
+        page: newPage
+      });
       setHotels(response.data.hotels);
       setTotalPages(response.data.totalPages);
       setPage(newPage);
@@ -494,7 +483,7 @@ export const HomePage = () => {
               <div className='row'>
                 {newData.map((item, index) => {
                   return (
-                    <div className='col-md-6 d-flex'>
+                    <div key={index} className='col-md-6 d-flex'>
                       <Card className='border-0 rounded flex-fill'>
                         <Card.Body>
                           <Card.Img
