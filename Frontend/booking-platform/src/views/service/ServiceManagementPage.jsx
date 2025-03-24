@@ -11,7 +11,7 @@ import {
    MessageOutlined,
 } from "@ant-design/icons"
 import moment from "moment"
-import Sidebar from "../../components/navbar/AdminSidebar"
+import Sidebar from "../../components/navbar/OwnerSidebar"
 import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar"
 import { BASE_URL } from "../../utils/Constant"
 import { CustomFailedToast, CustomSuccessToast } from "../../components/toast/CustomToast"
@@ -198,11 +198,9 @@ const ServiceTable = () => {
    return (
       <div className="d-flex row w-100">
          <div className="col-md-3">
-            <Sidebar />
          </div>
          <div className="col-md-8">
             <div className="d-flex flex-column">
-               <AdminCustomNavbar />
                <div className="d-flex justify-content-between align-items-center mb-4">
                   <Title level={3} style={{ margin: 0 }}>
                      <span style={{ borderBottom: "3px solid #1890ff", paddingBottom: "5px" }}>Customer Feedbacks</span>

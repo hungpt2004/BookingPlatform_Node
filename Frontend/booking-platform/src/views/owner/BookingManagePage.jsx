@@ -2,9 +2,9 @@ import { useState, useEffect } from "react"
 import { Navbar, Nav, Container, Row, Col, Form, Button, Dropdown, Card } from "react-bootstrap"
 import { Printer, Download, Filter, FileIcon as FileEarmark, Hotel, Building, User } from "lucide-react"
 import { BASE_URL } from '../../utils/Constant';
-import AdminSidebar from '../../components/navbar/AdminSidebar';
+import AdminSidebar from '../../components/navbar/OwnerSidebar';
 import axios from "axios"
-import Sidebar from "../../components/navbar/AdminSidebar";
+import Sidebar from "../../components/navbar/OwnerSidebar";
 import axiosInstance from "../../utils/AxiosInstance";
 import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar";
 
@@ -55,9 +55,7 @@ export default function BookingManagePage() {
 
     return (
         <><div className="d-flex">
-            <AdminSidebar />
             <div className="booking-app flex-grow-1" style={{ paddingLeft: "20px" }}>
-
                 <Container className="py-4">
                     <div className="d-flex justify-content-between align-items-center mb-4">
                         <label className="text-dark fw-bold fs-3">Khách sạn của tôi</label>

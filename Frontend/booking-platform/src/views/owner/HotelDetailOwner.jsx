@@ -4,7 +4,7 @@ import { Container, Row, Col, Card, Spinner, Alert, Button, Badge, Form } from '
 import axios from 'axios';
 import { BASE_URL } from '../../utils/Constant';
 import { AdminCustomNavbar } from '../../components/navbar/AdminCustomNavbar';
-import AdminSidebar from '../../components/navbar/AdminSidebar';
+import AdminSidebar from '../../components/navbar/OwnerSidebar';
 
 const HotelDetailOwnerPage = () => {
     const { hotelId } = useParams();

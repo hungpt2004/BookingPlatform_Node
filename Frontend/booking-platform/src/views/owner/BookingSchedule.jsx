@@ -9,7 +9,7 @@ import '../owner/BookingSchedule.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import AdminSidebar from '../../components/navbar/AdminSidebar'
+import AdminSidebar from '../../components/navbar/OwnerSidebar'
 
 const localizer = momentLocalizer(moment);
 

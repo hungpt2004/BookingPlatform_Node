@@ -17,11 +17,22 @@ import { NavLink } from "react-router-dom";
 import "./sidebar.css";
 import { useAuthStore } from "../../store/authStore";
 
-const Sidebar = () => {
+const AdminSideBar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [activeMenu, setActiveMenu] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
+
+  const {logout} = useAuthStore();
+
+  const handleLogout = async () => {
+    if(localStorage.getItem('payment_link')) {
+      localStorage.removeItem('payment_link');
+    }
+    logout();
+    setUser(null);
+    navigate('/');
+  };
 
   // Submenus
   const menus = [
@@ -31,29 +42,25 @@ const Sidebar = () => {
       path: "/dashboard",
     },
     {
-      title: "Quản lý khách sạn",
+      title: "Quản Lý Cộng Tác",
       icon: <FaHotel />,
       submenus: [
-        { title: "Thông tin Khách Sạn", path: "/hotel-management" },
-        { title: "Lịch Booking", path: "/booking-schedule" },
-        { title: "Quản lý Booking", path: "/booking-management" },
+        { title: "Danh Sách Khách Sạn", path: "#" },
       ],
     },
     {
-      title: "Quản lý phòng",
+      title: "Quản Lý Khách Hàng",
       icon: <FaBuilding />,
       submenus: [
-        { title: "Danh sách phòng", path: "/room-management" },
-        { title: "Thêm phòng", path: "/rooms/add" },
+        { title: "Yêu cầu hủy đơn", path: "#" },
       ],
     },
     {
-      title: "Quản lý dịch vụ",
+      title: "Quản Lý Doanh Thu",
       icon: <FaBuilding />,
       submenus: [
-        { title: "Danh sách dịch vụ", path: "/service-management" },
-        { title: "Danh sách đánh giá", path: "/feedback-management" },
-        { title: "Danh sách tiện ích", path: "/rooms/add" },
+        { title: "Hoàn Tiền Khách Sạn", path: "#" },
+        { title: "Hoàn Tiền Khách Hàng", path: "#" },
       ],
     },
     {
@@ -91,18 +98,12 @@ const Sidebar = () => {
     });
   }, [location.pathname]);
 
-  const handleLogout = () => {
-    logout();
-    setUser(null);
-    navigate('/');
-  };
-
   return (
-    <div className={`sidebar-container ${collapsed ? "collapsed" : ""} h-100vh`} style={{ height: '100vh', position: 'sticky', top: 0, overflowY: "hidden" }}>
+    <div className={`sidebar-container ${collapsed ? "collapsed" : ""}`}>
       <div className="sidebar-header">
         <div className="logo-container">
           {!collapsed && <img src="/logo.png" alt="Logo" className="logo" />}
-          {!collapsed && <span className="logo-text">Owner Panel</span>}
+          {!collapsed && <span className="logo-text">Admin Panel</span>}
         </div>
         <button className="toggle-button" onClick={toggleSidebar}>
           {collapsed ? <FaBars /> : <FaTimes />}
@@ -115,8 +116,9 @@ const Sidebar = () => {
             {menu.submenus ? (
               <>
                 <div
-                  className={`menu-title ${activeMenu === menu.title ? "active" : ""
-                    }`}
+                  className={`menu-title ${
+                    activeMenu === menu.title ? "active" : ""
+                  }`}
                   onClick={() => toggleSubmenu(menu.title)}
                 >
                   <div className="menu-icon">{menu.icon}</div>
@@ -171,7 +173,7 @@ const Sidebar = () => {
           </div>
           {!collapsed && <span className="menu-text">Hồ sơ</span>}
         </NavLink>
-        <button className="logout-button" onClick={handleLogout}>
+        <button className="logout-button" onClick={() => handleLogout()}>
           <div className="menu-icon">
             <FaSignOutAlt />
           </div>
@@ -182,4 +184,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default AdminSideBar;

@@ -14,8 +14,7 @@ import {
 } from 'antd';
 import { SearchOutlined, PrinterOutlined, ExportOutlined } from '@ant-design/icons';
 import { AdminCustomNavbar } from '../../components/navbar/AdminCustomNavbar';
-import Sidebar from '../../components/navbar/CustomeSidebar';
-import AdminSideBar from '../../components/navbar/AdminSidebarSecond';
+import AdminSideBar from '../../components/navbar/AdminSidebar';
 
 const { Title } = Typography;
 const { Option } = Select;

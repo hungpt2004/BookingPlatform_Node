@@ -6,14 +6,12 @@ const HotelRouter = require("./src/routes/hotel.route");
 const ReservationRouter = require("./src/routes/reservation.route");
 const PaymentRouter = require("./src/routes/payment.route");
 const authenticateRoute = require("./src/routes/authenticate.route");
-const BookingRouter = require('./src/routes/booking.route');
 const FavoriteRouter = require('./src/routes/favorite.route');
 const FeedbackRouter = require("./src/routes/feedback.route");
 const RoomRouter = require("./src/routes/room.route");
 const BedRouter = require("./src/routes/bed.route");
 const HotelServiceRouter = require("./src/routes/hotel.service.route");
 const hotelFacilityRouter = require("./src/routes/hotelFacility.route");
-const ServiceRouter = require('./src/routes/service.route');
 const roomFacilityRouter = require('./src/routes/roomFacility.route');
 require("dotenv").config();
 const fileupload = require("express-fileupload");
@@ -74,9 +72,6 @@ app.use("/reservation", ReservationRouter);
 
 //Payment
 app.use("/payment", PaymentRouter);
-
-//Booking
-app.use("/booking", BookingRouter);
 
 //Favorite
 app.use("/favorite", FavoriteRouter);

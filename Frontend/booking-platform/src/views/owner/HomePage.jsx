@@ -1,6 +1,6 @@
 import { Search, ThumbsUp, ThumbsDown, Clock } from "lucide-react";
 import { Button, Container, Table, Alert, Form, InputGroup } from "react-bootstrap";
-import AdminSideBar from "../../components/navbar/AdminSidebarSecond";
+import AdminSideBar from "../../components/navbar/AdminSidebar";
 
 export default function BookingDashboard() {
     return (

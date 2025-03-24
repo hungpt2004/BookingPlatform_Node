@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { Table, Space, Input, Button as AntButton, Modal } from "antd"
 import { Button, Container, Row, Col, Form } from "react-bootstrap"
 import { SearchOutlined, EditOutlined, DeleteOutlined, FileImageOutlined, PlusOutlined } from "@ant-design/icons"
-import Sidebar from "../../components/navbar/AdminSidebar"
+import Sidebar from "../../components/navbar/OwnerSidebar"
 import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar"
 import { CustomSuccessToast } from "../../components/toast/CustomToast"
 import { CustomFailedToast } from "../../components/toast/CustomToast"
@@ -246,12 +246,10 @@ const HotelManagementPage = () => {
    return (
       <>
          <div className="d-flex row">
-            <div className="col-md-3">
-               <Sidebar />
+            <div className="col-md-2">
             </div>
             <div className="col-md-8">
                <div className="d-flex flex-column">
-                  <AdminCustomNavbar />
                   <Container fluid className="mt-4">
                      <Row className="mb-4">
                         <Col>

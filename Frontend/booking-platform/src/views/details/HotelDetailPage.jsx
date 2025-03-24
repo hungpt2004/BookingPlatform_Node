@@ -157,17 +157,6 @@ export const HotelDetailPage = () => {
 
    }, [searchParams]);
 
-   // Add the search bar components
-   const handleDateChange = (type, value) => {
-
-      const today = new Date().toISOString().split('T')[0];
-      const newErrors = { ...dateErrors };
-      const [showGalleryModal, setShowGalleryModal] = useState(false);
-
-
-      //Show all image in modal
-      const handleShowGalleryModal = () => setShowGalleryModal(true);
-      const handleCloseGalleryModal = () => setShowGalleryModal(false);
 
       const handleDateChange = (type, value) => {
 
@@ -228,7 +217,7 @@ export const HotelDetailPage = () => {
          try {
             const response = await axios.get(`${BASE_URL}/hotel/get-hotel-detail/${id}`);
             if (response.data && response.data.hotel) {
-               setCurrentHotel(response.data.hotel);
+               setCurrentHotel(response.data?.hotel);
                setListFacility(response.data.hotel?.facilities);
                setListService(response.data.hotel?.services);
                setError("");
@@ -464,19 +453,19 @@ export const HotelDetailPage = () => {
                            <Card className="hotel-details-card h-100 border-0 shadow-sm">
                               <Card.Header className="bg-white border-bottom-0 pt-3">
                                  <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <h3 className="hotel-name mb-0">{currentHotel.hotelName}</h3>
+                                    <h3 className="hotel-name mb-0">{currentHotel?.hotelName}</h3>
                                     <div className="d-flex align-items-center">
                                        <div className="rating-label me-2">
-                                          {RatingConsider(currentHotel.rating)}
+                                          {RatingConsider(currentHotel?.rating)}
                                        </div>
                                        <div className="rating-badge" style={{ backgroundColor: '#003b95' }}>
-                                          <span className="rating-score">{currentHotel.rating}</span>
+                                          <span className="rating-score">{currentHotel?.rating}</span>
                                        </div>
                                     </div>
                                  </div>
                                  <p className="hotel-location text-secondary mb-0">
                                     <FaMapMarkerAlt className="me-1" />
-                                    {currentHotel.address}
+                                    {currentHotel?.address}
                                  </p>
                               </Card.Header>
 
@@ -742,5 +731,4 @@ export const HotelDetailPage = () => {
             )}
          </>
       );
-   };
-}
+   }

@@ -6,9 +6,7 @@ import "chart.js/auto";
 import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar";
 import axiosInstance from "../../utils/AxiosInstance";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
-import Sidebar from "../../components/navbar/CustomeSidebar";
-import AdminSidebar from "../../components/navbar/AdminSidebar"
-import axios from "axios";
+import AdminSidebar from "../../components/navbar/OwnerSidebar"
 
 // Dashboard Overview Component
 const DashboardOverview = () => {
@@ -24,27 +22,11 @@ const DashboardOverview = () => {
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState("yearly");
 
-  //Get data of hotel ownner
-  useEffect(() => {
-    const fetchOwnerHotel = async () => {
-      try {
-
-        const response = await axiosInstance.get('/hotel/get-owned-hotel')
-        if (response.data && response.data.hotels) {
-
-        }
-      } catch (error) {
-
-      }
-    }
-  })
-
-
   //Get data chart dashboard
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axiosInstance("/monthly-payment");
+        const response = await axiosInstance("/monthly-payment/owner");
         if (response.data) {
           setDashboardData({
             totalReservations: response.data.totalReservationAmount,
@@ -52,7 +34,7 @@ const DashboardOverview = () => {
             activeHotels: response.data.activeHotel,
             successBooking: response.data.normalReservations,
             pendingBookings: response.data.cancelReservation,
-            revenueData: response.data.averageMonthlyRevenue,
+            revenueData: response.data.monthlyRevenue,
           });
         }
         setTimeout(() => {
@@ -156,7 +138,6 @@ const DashboardOverview = () => {
 
   return (
     <div className="d-flex">
-      <AdminSidebar />
       <div className="content w-100">
         <div className="container-fluid px-4 py-3">
           <div className="d-flex justify-content-between align-items-center mb-4">

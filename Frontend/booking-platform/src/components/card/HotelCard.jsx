@@ -22,6 +22,8 @@ const HotelCard = ({ hotel, goToDetail, isFavorite, toggleFavorite }) => {
     }
   };
 
+  console.log(`Danh sach room ${rooms}`)
+
   useEffect(() => {
     fetchRoomByHotelId();
   }, []);

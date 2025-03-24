@@ -483,7 +483,7 @@ export const HomePage = () => {
               <div className='row'>
                 {newData.map((item, index) => {
                   return (
-                    <div className='col-md-6 d-flex'>
+                    <div key={index} className='col-md-6 d-flex'>
                       <Card className='border-0 rounded flex-fill'>
                         <Card.Body>
                           <Card.Img

@@ -1,6 +1,6 @@
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa6";
 import { FaCalendarCheck } from "react-icons/fa";
-import AdminSideBar from "../../components/navbar/AdminSidebarSecond";
+import AdminSideBar from "../../components/navbar/AdminSidebar";
 
 export default function FinancePage() {
     return (

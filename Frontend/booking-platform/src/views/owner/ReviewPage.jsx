@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Navbar, Nav, Container, Row, Col, Form, Button, Dropdown, Card } from "react-bootstrap"
 import { Printer, Download, Filter, FileIcon as FileEarmark } from "lucide-react"
-import Sidebar from "../../components/navbar/AdminSidebar"
+import Sidebar from "../../components/navbar/OwnerSidebar"
 
 export default function ReviewPage() {
 

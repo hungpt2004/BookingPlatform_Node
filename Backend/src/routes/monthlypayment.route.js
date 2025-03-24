@@ -22,9 +22,15 @@ MonthlyRouter.use(authController.protect);
 
 // Lấy dữ liệu dashboard - chỉ cho phép OWNER truy cập
 MonthlyRouter.get(
-  "/",
+  "/owner",
   authController.restrictTo("OWNER"),
   MonthlyController.getDashBoardData
+);
+
+MonthlyRouter.get(
+  "/admin",
+  authController.restrictTo("ADMIN"),
+  MonthlyController.getAdminDashBoardData
 );
 
 MonthlyRouter.post(

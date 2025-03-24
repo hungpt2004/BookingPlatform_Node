@@ -199,7 +199,7 @@ const BookingStepTwo = () => {
     <>
       <CustomToast/>
       <CustomNavbar />
-      <div className="py-4" style={{ backgroundColor: "#f5f5f5" }}>
+      <div className="py-4 mt-5" style={{ backgroundColor: "#f5f5f5" }}>
         <Container className="py-3" style={{ maxWidth: "85%" }}>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h4 className="mb-0 fw-bold">Complete Your Booking</h4>

@@ -14,10 +14,10 @@ import {
 } from 'antd';
 import { SearchOutlined, PrinterOutlined, ExportOutlined } from '@ant-design/icons';
 import { AdminCustomNavbar } from '../../components/navbar/AdminCustomNavbar';
-import Sidebar from '../../components/navbar/CustomeSidebar';
 import axiosInstance from '../../utils/AxiosInstance';
 import { CustomFailedToast, CustomSuccessToast, CustomToast } from '../../components/toast/CustomToast';
 import { BASE_URL } from '../../utils/Constant';
+import Sidebar from '../../components/navbar/OwnerSidebar';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -197,11 +197,8 @@ const MonthlyPayment = () => {
 
   return (
     <>
-      <CustomToast/>
       <div className='d-flex'>
-        <Sidebar />
         <div className='content w-100'>
-          <AdminCustomNavbar />
           <div style={{ padding: '24px' }}>
             <Title level={3}>Báo cáo thanh toán theo tháng</Title>
 

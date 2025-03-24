@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { Navbar, Nav, Container, Row, Col, Form, Button, Dropdown, Card, Pagination, Badge } from "react-bootstrap"
 import { Printer, Download, Filter, FileIcon as FileEarmark, Hotel, Building, User, ChevronLeft, ChevronRight, Bed } from "lucide-react"
 import { BASE_URL } from '../../utils/Constant';
-import AdminSidebar from '../../components/navbar/AdminSidebar';
+import AdminSidebar from '../../components/navbar/OwnerSidebar';
 import axios from "axios"
 
 export default function RoomManagePage() {
@@ -287,7 +287,6 @@ export default function RoomManagePage() {
 
     return (
         <><div className="d-flex">
-        <AdminSidebar />
         <div className="booking-app flex-grow-1" style={{ paddingLeft: "20px" }}>
 
                 <Container className="py-4">

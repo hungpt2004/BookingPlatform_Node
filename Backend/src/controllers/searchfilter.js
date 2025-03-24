@@ -16,6 +16,8 @@ exports.searchAndFilterHotels = async (req, res) => {
       limit = 4,
     } = req.query;
 
+    console.log('Address ',address)
+
     let query = {};
 
     if (hotelName) {
