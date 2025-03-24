@@ -116,11 +116,11 @@ const OwnerManagementPage = () => {
             key: 'ban status',
             render: (_, record) => (
                 <Select
-                    value={record.isVerified ? "normal" : "locked"}
-                    onChange={(value) => handleStatusChange(record._id, value === "normal")}
+                    value={record.isVerified ? "active" : "locked"}
+                    onChange={(value) => handleStatusChange(record._id, value === "active")}
                     options={[
                         { label: "Locked", value: "locked" },
-                        { label: "Normal", value: "normal" },
+                        { label: "Active", value: "active" },
                     ]}
                     className='w-50'
                 >
