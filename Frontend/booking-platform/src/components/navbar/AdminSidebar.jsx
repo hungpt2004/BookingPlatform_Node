@@ -23,10 +23,10 @@ const AdminSideBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const {logout} = useAuthStore();
+  const { logout } = useAuthStore();
 
   const handleLogout = async () => {
-    if(localStorage.getItem('payment_link')) {
+    if (localStorage.getItem('payment_link')) {
       localStorage.removeItem('payment_link');
     }
     logout();
@@ -45,7 +45,9 @@ const AdminSideBar = () => {
       title: "Quản Lý Cộng Tác",
       icon: <FaHotel />,
       submenus: [
-        { title: "Danh Sách Khách Sạn", path: "#" },
+        { title: "Danh Sách Khách Sạn", path: "/" },
+        { title: "Cộng Tác Khách Hàng", path: "customer-partner" },
+        { title: "Cộng Tác Chủ Khách Sạn", path: "hotel-partner" },
       ],
     },
     {
@@ -116,9 +118,8 @@ const AdminSideBar = () => {
             {menu.submenus ? (
               <>
                 <div
-                  className={`menu-title ${
-                    activeMenu === menu.title ? "active" : ""
-                  }`}
+                  className={`menu-title ${activeMenu === menu.title ? "active" : ""
+                    }`}
                   onClick={() => toggleSubmenu(menu.title)}
                 >
                   <div className="menu-icon">{menu.icon}</div>

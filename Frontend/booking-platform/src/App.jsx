@@ -45,6 +45,8 @@ import ServiceTable from "./views/service/ServiceManagementPage";
 import FavoriteListPage from "./views/favorite/FavoriteListPage";
 import OwnerLayout from "./views/layout_render/OwnerLayout";
 import AdminLayout from "./views/layout_render/AdminLayout";
+import OwnerManagementPage from "./views/customer/HotelPartnerPage";
+import RoomManagementPage from "./views/owner/RoomManagement2";
 
 function App() {
   const { user, isAuthenticated } = useAuthStore();
@@ -133,6 +135,7 @@ function App() {
             <Route path="/dashboard" element={<DashboardOverview />} />
             <Route path="/monthly-owner" element={<MonthlyPayment />} />
             <Route path='/room-management/' element={<RoomManagePage />} />
+            <Route path='/room-management-2/' element={<RoomManagementPage />} />
             <Route path='/booking-schedule/:hotelId' element={<HotelReservations />} />
             <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage />} />
             <Route path="/hotel-management" element={<HotelManagementPage />} />
@@ -140,6 +143,9 @@ function App() {
             <Route path="/service-management" element={<ServiceTable />} />
             <Route path="/booking-management" element={<BookingManagePage />} />
             <Route path="/booking-schedule" element={<BookingSchedule />} />
+            <Route path="/create-hotel" element={<Createhotel />} />
+            <Route path='/create-room' element={<CreateRoom />} />
+            <Route path='/create-room/:hotelId' element={<CreateRoom />} />
           </Route>
         </Route>
 
@@ -148,16 +154,13 @@ function App() {
           <Route element={<AdminLayout />}>
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/customer-partner" element={<CustomPartnerPage />} />
-            <Route path="/hotel-partner" />
+            <Route path="/hotel-partner" element={<OwnerManagementPage />} />
           </Route>
         </Route>
 
         {/* Catch-all route - redirects to appropriate homepage based on role */}
         <Route path="*" element={<RoleRedirect />} />
 
-        <Route path="/create-hotel" element={<Createhotel />} />
-        <Route path='/create-room' element={<CreateRoom />} />
-        <Route path='/create-room/:hotelId' element={<CreateRoom />} />
         <Route path='/cancel-policy' element={<CancelPolicy />} />
         <Route path='/edit-capacity-price' element={<PricePerPerson />} />
         <Route path='/edit-non-refundable' element={<PriceNoRefund />} />

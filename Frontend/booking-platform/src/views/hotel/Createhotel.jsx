@@ -46,7 +46,6 @@ export const Createhotel = () => {
 
     return (
         <>
-            <CustomNavbar />
             <div className="container-fluid mt-3 p-0  justify-content-center">
                 <ProgressBar now={(step / steps.length) * 100} label={`${Math.round((step / steps.length) * 100)}%`} />
                 {steps[step - 1]}
