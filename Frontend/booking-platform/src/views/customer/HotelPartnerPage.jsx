@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Table, Switch, Tag, message, Modal, Button, Descriptions, Spin, Select } from 'antd';
 import axiosInstance from '../../utils/AxiosInstance';
-import Sidebar from '../../components/navbar/AdminSidebar';
-import { AdminCustomNavbar } from '../../components/navbar/AdminCustomNavbar';
 import { EyeOutlined } from '@ant-design/icons';
 
 const OwnerManagementPage = () => {
