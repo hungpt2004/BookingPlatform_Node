@@ -74,8 +74,7 @@ export const OwnerCustomNavbar = () => {
           <Dropdown align="end">
             <Dropdown.Toggle variant="white" id="dropdown-basic" className="d-flex align-items-center border-0">
               <div className="d-none d-sm-flex flex-column align-items-end me-2">
-                {/* <span className="fw-bold text-dark">{user?.name}</span> */}
-                <small className="text-muted">Administrator</small>
+                <small className="text-muted">{user?.name}</small>
               </div>
               <Image
                 src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
@@ -87,10 +86,10 @@ export const OwnerCustomNavbar = () => {
             </Dropdown.Toggle>
             <Dropdown.Menu className="shadow border-0 py-2">
               <Dropdown.Item>
-              <div className="user-details">
-                {/* <h6>{user.name}</h6> */}
-                {/* <p>{user.email}</p> */}
-              </div>
+                <div className="user-details">
+                  {/* <h6>{user.name}</h6> */}
+                  {/* <p>{user.email}</p> */}
+                </div>
               </Dropdown.Item>
               <Dropdown.Item href="#" className="py-2">
                 <FaUserCircle className="me-2 text-secondary" /> Thông tin tài khoản

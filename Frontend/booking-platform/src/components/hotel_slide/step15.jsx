@@ -304,7 +304,7 @@ const Step15 = ({ prevStep }) => {
                                 <div className={`border rounded d-flex align-items-center ${isValid ? "" : "border-danger"}`}>
                                     <PhoneInput
                                         country={"vn"}
-                                        value={user ? user.phone : phone}
+                                        value={user ? user.phoneNumber : phone}
                                         onChange={handleChange}
                                         inputStyle={{ border: "none", width: "100%" }}
                                         buttonStyle={{ border: "none", background: "transparent" }}
