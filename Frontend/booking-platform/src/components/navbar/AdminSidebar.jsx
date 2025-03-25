@@ -23,15 +23,15 @@ const AdminSideBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const {logout} = useAuthStore();
+  const { logout } = useAuthStore();
 
   const handleLogout = async () => {
-    if(localStorage.getItem('payment_link')) {
-      localStorage.removeItem('payment_link');
+    if (localStorage.getItem("payment_link")) {
+      localStorage.removeItem("payment_link");
     }
     logout();
     setUser(null);
-    navigate('/');
+    navigate("/");
   };
 
   // Submenus
@@ -46,14 +46,13 @@ const AdminSideBar = () => {
       icon: <FaHotel />,
       submenus: [
         { title: "Danh Sách Khách Sạn", path: "#" },
+        { title: "Phê Duyệt Khách Sạn", path: "/hotel-approval" },
       ],
     },
     {
       title: "Quản Lý Khách Hàng",
       icon: <FaBuilding />,
-      submenus: [
-        { title: "Yêu cầu hủy đơn", path: "#" },
-      ],
+      submenus: [{ title: "Yêu cầu hủy đơn", path: "#" }],
     },
     {
       title: "Quản Lý Doanh Thu",
