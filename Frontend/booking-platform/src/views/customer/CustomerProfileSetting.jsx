@@ -33,7 +33,7 @@ export default function CustomerProfileSetting() {
       setCmnd(userData.cmnd || "");
       setId(userData._id);
       setEmail(userData.email);
-    } catch (error) {
+    } catch {
       toast.error("Error fetching user data");
     }
   };
@@ -46,7 +46,7 @@ export default function CustomerProfileSetting() {
       await axiosInstance.patch(`/customer/update-profile`, updates);
       toast.success("Profile updated successfully");
       await fetchCurrentUser();
-    } catch (error) {
+    } catch {
       toast.error("Failed to update profile");
     } finally {
       setIsUpdating(false);
@@ -71,7 +71,7 @@ export default function CustomerProfileSetting() {
       setShowModal(false);
       setAvatarFile(null);
       await fetchCurrentUser();
-    } catch (error) {
+    } catch {
       toast.error("Failed to update avatar");
     } finally {
       setIsUploadingAvatar(false);
@@ -164,60 +164,60 @@ export default function CustomerProfileSetting() {
       </div>
 
       {showModal && (
-  <>
-    <div className="modal d-block" tabIndex="-1">
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">Update Profile Picture</h5>
-            <button
-              type="button"
-              className="btn-close"
-              onClick={() => setShowModal(false)}
-            ></button>
-          </div>
-          <form onSubmit={handleAvatarUpdate}>
-            <div className="modal-body">
-              <div className="mb-3">
-                <label className="form-label">Choose Image</label>
-                <input
-                  type="file"
-                  className="form-control"
-                  accept="image/*"
-                  onChange={(e) => setAvatarFile(e.target.files[0])}
-                />
+        <>
+          <div className="modal d-block" tabIndex="-1">
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Update Profile Picture</h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setShowModal(false)}
+                  ></button>
+                </div>
+                <form onSubmit={handleAvatarUpdate}>
+                  <div className="modal-body">
+                    <div className="mb-3">
+                      <label className="form-label">Choose Image</label>
+                      <input
+                        type="file"
+                        className="form-control"
+                        accept="image/*"
+                        onChange={(e) => setAvatarFile(e.target.files[0])}
+                      />
+                    </div>
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setShowModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={!avatarFile || isUploadingAvatar}
+                    >
+                      {isUploadingAvatar ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          Uploading...
+                        </>
+                      ) : (
+                        "Upload"
+                      )}
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setShowModal(false)}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={!avatarFile || isUploadingAvatar}
-              >
-                {isUploadingAvatar ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Uploading...
-                  </>
-                ) : (
-                  "Upload"
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    <div className="modal-backdrop show" onClick={() => setShowModal(false)}></div>
-  </>
-)}
+          </div>
+          <div className="modal-backdrop show" onClick={() => setShowModal(false)}></div>
+        </>
+      )}
     </>
   );
 }

@@ -123,7 +123,10 @@ exports.signup = catchAsync(async (req, res, next) => {
     isVerified: false,
     image: imageUrl,
     verificationToken: hashedToken,
-    verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+    verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,// 24 hours
+    cmnd: "N/A",
+    address: "N/A",
+    phoneNumber: "N/A",
   });
 
   // Send OTP

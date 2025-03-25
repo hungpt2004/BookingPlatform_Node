@@ -167,7 +167,6 @@ export const LoginPage = () => {
     try {
       // Store the response data from the login function
       const data = await login(email, password);
-
       toast.success("Đăng nhập thành công", {
         position: "top-center",
         autoClose: 2000,
