@@ -1,12 +1,11 @@
 import { Search, ThumbsUp, ThumbsDown, Clock } from "lucide-react";
 import { Button, Container, Table, Alert, Form, InputGroup } from "react-bootstrap";
-import { OwnerNavbar } from "../../components/navbar/OwnerNavbar";
+import AdminSideBar from "../../components/navbar/AdminSidebar";
 
 export default function BookingDashboard() {
     return (
         <>
-            <OwnerNavbar />
-
+            <AdminSideBar/>
             <Container className="py-4">
                 {/* Header */}
                 <div className="d-flex justify-content-between align-items-center mb-4">

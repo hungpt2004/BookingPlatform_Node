@@ -14,7 +14,7 @@ const monthlyPaymentSchema = new Schema({
   year: { 
     type: Number, 
     required: true,
-    default: 2025
+    default: new Date().getFullYear()
   }, 
   amount: { 
     type: Number, 
@@ -28,7 +28,6 @@ const monthlyPaymentSchema = new Schema({
   }, // Trạng thái thanh toán
   paymentDate: {
     type: Date,
-    required: true,
     default: null
   }
 }, { timestamps: true }, {versionKey: false});

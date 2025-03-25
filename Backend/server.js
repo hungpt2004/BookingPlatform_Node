@@ -6,7 +6,6 @@ const HotelRouter = require("./src/routes/hotel.route");
 const ReservationRouter = require("./src/routes/reservation.route");
 const PaymentRouter = require("./src/routes/payment.route");
 const authenticateRoute = require("./src/routes/authenticate.route");
-const BookingRouter = require('./src/routes/booking.route');
 const FavoriteRouter = require('./src/routes/favorite.route');
 const FeedbackRouter = require("./src/routes/feedback.route");
 const RoomRouter = require("./src/routes/room.route");
@@ -14,7 +13,6 @@ const BedRouter = require("./src/routes/bed.route");
 const HotelServiceRouter = require("./src/routes/hotel.service.route");
 const hotelFacilityRouter = require("./src/routes/hotelFacility.route");
 const roomFacilityRouter = require('./src/routes/roomFacility.route');
-
 require("dotenv").config();
 const fileupload = require("express-fileupload");
 const app = express(); //Create server
@@ -36,6 +34,7 @@ const allowedOrigins = ["http://localhost:5173"];
 app.use(
   cors({
     origin: function (origin, callback) {
+      console.log(`Lỗi đến từ ${origin}`)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -59,9 +58,10 @@ app.use(
   })
 );
 
+//Customer
 app.use("/customer", UserRouter);
 
-//Middleware Routing
+//Authentication
 app.use("/user", authenticateRoute);
 
 //Hotel
@@ -72,9 +72,6 @@ app.use("/reservation", ReservationRouter);
 
 //Payment
 app.use("/payment", PaymentRouter);
-
-//Booking
-app.use("/booking", BookingRouter);
 
 //Favorite
 app.use("/favorite", FavoriteRouter);

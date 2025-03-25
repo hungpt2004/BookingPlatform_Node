@@ -9,7 +9,8 @@ export const Step1 = ({ nextStep }) => {
 
 
     return (
-        <>
+        <>  <br></br>
+            <br></br>
             <div className="text-center mt-5">
                 <h1>Tạo khách sạn của bạn thật nhanh với Travelofy</h1>
                 <h3>Để bắt đầu, hãy chọn chỗ nghỉ mà bạn muốn đăng ký trên Travelofy</h3>
@@ -73,7 +74,7 @@ export const Step2 = ({ nextStep, prevStep }) => {
         saveHotelDescription();
     }, [selected]);
     return (
-        <Container className="mt-4 pb-5">
+        <Container className="pb-5" style={{marginTop: '100px'}}>
             <h2 className="text-center mb-4" style={{ userSelect: "none" }}>Chỗ nghỉ nào trong danh sách dưới đây giống với chỗ nghỉ của Quý vị nhất?</h2>
 
             <Card className="p-4 shadow-sm">
@@ -196,7 +197,7 @@ export const Step3 = ({ nextStep, prevStep, selectedHotel }) => {
     };
 
     return (
-        <Container className='mt-4 pb-5'>
+        <Container className="pb-5" style={{marginTop: '100px'}}>
             <h2 className="text-center mb-4" style={{ userSelect: "none" }}>
                 Quý vị định đăng ký bao nhiêu khách sạn?
             </h2>
@@ -260,7 +261,7 @@ export const Step4 = ({ nextStep, prevStep, hotelType }) => {
         prevStep();
     }
     return (
-        <Container className="mt-5 pb-5 d-flex justify-content-center">
+        <Container className="pb-5 d-flex justify-content-center" style={{marginTop: '100px'}}>
             <Card className="p-4 shadow-sm" style={{ width: "420px" }}>
                 <Card.Body className="text-center">
                     <p className="fw-semibold">Quý vị đang đăng:</p>

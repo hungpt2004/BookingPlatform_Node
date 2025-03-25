@@ -3,6 +3,11 @@ const HotelServiceRouter = express.Router();
 const HotelServiceController = require("../controllers/hotel.service.controller");
 
 HotelServiceRouter.get(
+  "/get-all-hotel-services",
+  HotelServiceController.getAllHotelServices
+);
+
+HotelServiceRouter.get(
   "/get-all-hotel-services/:hotelId",
   HotelServiceController.getAllHotelServicesByHotelId
 );

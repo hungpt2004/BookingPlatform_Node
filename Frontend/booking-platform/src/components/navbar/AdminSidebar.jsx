@@ -15,12 +15,24 @@ import {
 } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import "./sidebar.css";
+import { useAuthStore } from "../../store/authStore";
 
-const Sidebar = () => {
+const AdminSideBar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [activeMenu, setActiveMenu] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
+
+  const {logout} = useAuthStore();
+
+  const handleLogout = async () => {
+    if(localStorage.getItem('payment_link')) {
+      localStorage.removeItem('payment_link');
+    }
+    logout();
+    setUser(null);
+    navigate('/');
+  };
 
   // Submenus
   const menus = [
@@ -30,25 +42,26 @@ const Sidebar = () => {
       path: "/dashboard",
     },
     {
-      title: "Quản lý khách sạn",
+      title: "Quản Lý Cộng Tác",
       icon: <FaHotel />,
       submenus: [
-        { title: "Lịch Booking", path: "/booking-management" },
-        { title: "Booking Management", path: "/hotels/add" },
+        { title: "Danh Sách Khách Sạn", path: "#" },
       ],
     },
     {
-      title: "Quản lý phòng",
+      title: "Quản Lý Khách Hàng",
       icon: <FaBuilding />,
       submenus: [
-        { title: "Danh sách phòng", path: "/rooms" },
-        { title: "Thêm phòng", path: "/rooms/add" },
+        { title: "Yêu cầu hủy đơn", path: "#" },
       ],
     },
     {
-      title: "Quản lý doanh thu",
-      icon: <FaChartBar />,
-      path: "/monthly-owner",
+      title: "Quản Lý Doanh Thu",
+      icon: <FaBuilding />,
+      submenus: [
+        { title: "Hoàn Tiền Khách Sạn", path: "#" },
+        { title: "Hoàn Tiền Khách Hàng", path: "#" },
+      ],
     },
     {
       title: "Cài đặt",
@@ -160,7 +173,7 @@ const Sidebar = () => {
           </div>
           {!collapsed && <span className="menu-text">Hồ sơ</span>}
         </NavLink>
-        <button className="logout-button" onClick={() => navigate("/logout")}>
+        <button className="logout-button" onClick={() => handleLogout()}>
           <div className="menu-icon">
             <FaSignOutAlt />
           </div>
@@ -171,4 +184,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default AdminSideBar;

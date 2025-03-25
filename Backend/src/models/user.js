@@ -51,7 +51,6 @@ const UserSchema = new Schema(
         ref: "Hotel",
       },
     ], // Mảng các khách sạn yêu thích (tham chiếu đến Hotel)
-
     image: {
       public_ID: {
         type: String,

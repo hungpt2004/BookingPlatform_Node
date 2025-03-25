@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   Card,
-  Container,
   Alert,
   Row,
   Col,
@@ -10,12 +9,9 @@ import {
   ProgressBar,
 } from "react-bootstrap";
 import { Line } from "react-chartjs-2";
-import { Routes, Route, useParams, useNavigate } from "react-router-dom";
 import "chart.js/auto";
-import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar";
 import axiosInstance from "../../utils/AxiosInstance";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
-import Sidebar from "../../components/navbar/CustomeSidebar";
 
 // Dashboard Overview Component
 const AdminDashboard = () => {
@@ -34,15 +30,15 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axiosInstance("/monthly-payment");
+        const response = await axiosInstance("/monthly-payment/admin");
         if (response.data) {
           setDashboardData({
             totalReservations: response.data.totalReservationAmount,
             revenue: formatCurrencyVND(response.data.totalRevenue),
-            activeHotels: response.data.activeHotel,
+            activeHotels: response.data.activeHotelCount,
             successBooking: response.data.normalReservations,
             pendingBookings: response.data.cancelReservation,
-            revenueData: response.data.averageMonthlyRevenue,
+            revenueData: response.data.monthlyRevenue,
           });
         }
         setTimeout(() => {
@@ -145,8 +141,8 @@ const AdminDashboard = () => {
   const successRate =
     dashboardData.totalReservations > 0
       ? Math.round(
-          (dashboardData.successBooking / dashboardData.totalReservations) * 100
-        )
+        (dashboardData.successBooking / dashboardData.totalReservations) * 100
+      )
       : 0;
 
   if (loading)
@@ -175,9 +171,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="d-flex">
-      <Sidebar />
       <div className="content w-100">
-        <AdminCustomNavbar />
         <div className="container-fluid px-4 py-3">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div>

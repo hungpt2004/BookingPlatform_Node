@@ -1,0 +1,37 @@
+.hotel-card {
+   transition: transform 0.3s ease, box-shadow 0.3s ease;
+   border: none;
+   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+ }
+ 
+ .hotel-card:hover {
+   transform: translateY(-5px);
+   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+ }
+ 
+ .favorite-icon {
+   cursor: pointer;
+   transition: transform 0.2s ease;
+ }
+ 
+ .favorite-icon:hover {
+   transform: scale(1.2);
+ }
+ 
+ .price-tag {
+   font-weight: bold;
+   color: #28a745;
+ }
+ 
+ .amenities-container {
+   display: flex;
+   flex-wrap: wrap;
+   margin-bottom: 1rem;
+ }
+ 
+ .modal-body {
+   max-height: 70vh;
+   overflow-y: auto;
+ }
+ 
+ 

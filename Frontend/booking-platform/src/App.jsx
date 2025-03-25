@@ -4,7 +4,6 @@ import { LoginPage } from "./views/login/LoginPage";
 import { HomePage } from "./views/home/HomePage";
 import { HistoryTransaction } from "./views/transaction/HistoryTransaction";
 import "./App.css";
-import { RegisterPage } from "./views/register/RegisterPage";
 import { EmailVerificationPage } from "./views/verify_email/EmailVerificationPage";
 import BookingStepTwo from "./views/booking/BookingStepTwo";
 import { HotelDetailPage } from "./views/details/HotelDetailPage";
@@ -15,8 +14,8 @@ import FavoriteHotelsList from "./views/favorite/FavoriteHotelsList"
 import CustomerProfileSetting from "./views/customer/CustomerProfileSetting";
 import FeedbackPage from "./views/feedback/feedback";
 import CancelPaymentPage from "./views/status/CancelPaymentPage";
-import DashboardPage from "./views/dashBoard/DashboardPage";
-import DashboardOverview from "./views/dashBoard/DashboardPage";
+import DashboardPage from "./views/dashboard/OwnerDashBoard";
+import DashboardOverview from "./views/dashboard/OwnerDashBoard";
 import Receipt from "./views/receipt/ReceiptPaymentPage";
 import MonthlyPayment from "./views/monthly_payment/MonthlyPaymentPage";
 import { useAuthStore } from "./store/authStore";
@@ -33,11 +32,19 @@ import PricePerWeek from './views/room/roomPriceType/PricePerWeek'
 import HotelPhotos from './views/hotel/CreateHotelPhotos'
 import BookingManagePage from './views/owner/BookingManagePage'
 import ReviewPage from './views/owner/ReviewPage'
-import OwnerHomePage from './views/owner/HomePage'
-import FinancePage from './views/owner/FinancePage'
 import HotelReservations from './views/owner/BookingSchedule'
 import HotelDetailOwnerPage from './views/owner/HotelDetailOwner'
 import BookingSchedule from "./views/owner/BookingSchedule";
+import RoomManagePage from "./views/owner/RoomManagement";
+import OwnerHomePage from './views/owner/HomePage'
+import FinancePage from './views/owner/FinancePage'
+import CustomPartnerPage from "./views/customer/CustomerPartnerPage";
+import HotelManagementPage from "./views/hotel/HotelManagementPage";
+import FeedbackTable from "./views/feedback/FeedbackOwnerPage";
+import ServiceTable from "./views/service/ServiceManagementPage";
+import FavoriteListPage from "./views/favorite/FavoriteListPage";
+import OwnerLayout from "./views/layout_render/OwnerLayout";
+import AdminLayout from "./views/layout_render/AdminLayout";
 
 function App() {
   const { user, isAuthenticated } = useAuthStore();
@@ -99,11 +106,12 @@ function App() {
       <Routes>
         {/* Public routes - accessible to all */}
         <Route path="/" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
         <Route path="/verify-email" element={<EmailVerificationPage />} />
         <Route path="/forgot" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/redirect" element={<RoleRedirect />} />
+
+        {/* Note sửa lỗi home */}
 
         {/* Customer routes */}
         <Route element={<ProtectedRoute allowedRoles={["CUSTOMER"]} />}>
@@ -116,19 +124,32 @@ function App() {
           <Route path="/update-customer" element={<CustomerProfileSetting />} />
           <Route path="/feedback" element={<FeedbackPage />} />
           <Route path="/receipt/:id" element={<Receipt />} />
-          <Route path="/favorite" element={<FavoriteHotelsList />} />
+          <Route path="/favorite" element={<FavoriteListPage />} />
         </Route>
 
         {/* Owner routes */}
         <Route element={<ProtectedRoute allowedRoles={["OWNER"]} />}>
-          <Route path="/dashboard" element={<DashboardOverview />} />
-          <Route path="/monthly-owner" element={<MonthlyPayment />} />
+          <Route element={<OwnerLayout />}>
+            <Route path="/dashboard" element={<DashboardOverview />} />
+            <Route path="/monthly-owner" element={<MonthlyPayment />} />
+            <Route path='/room-management/' element={<RoomManagePage />} />
+            <Route path='/booking-schedule/:hotelId' element={<HotelReservations />} />
+            <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage />} />
+            <Route path="/hotel-management" element={<HotelManagementPage />} />
+            <Route path="/feedback-management" element={<FeedbackTable />} />
+            <Route path="/service-management" element={<ServiceTable />} />
+            <Route path="/booking-management" element={<BookingManagePage />} />
+            <Route path="/booking-schedule" element={<BookingSchedule />} />
+          </Route>
         </Route>
 
         {/* Admin routes */}
         <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          {/* Add other admin routes here */}
+          <Route element={<AdminLayout />}>
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/customer-partner" element={<CustomPartnerPage />} />
+            <Route path="/hotel-partner" />
+          </Route>
         </Route>
 
         {/* Catch-all route - redirects to appropriate homepage based on role */}
@@ -136,18 +157,19 @@ function App() {
 
         <Route path="/create-hotel" element={<Createhotel />} />
         <Route path='/create-room' element={<CreateRoom />} />
+        <Route path='/create-room/:hotelId' element={<CreateRoom />} />
         <Route path='/cancel-policy' element={<CancelPolicy />} />
         <Route path='/edit-capacity-price' element={<PricePerPerson />} />
         <Route path='/edit-non-refundable' element={<PriceNoRefund />} />
         <Route path='/edit-weekly-price' element={<PricePerWeek />} />
         <Route path='/create-photo' element={<HotelPhotos />} />
-
+        <Route path='/owner-homepage' element={<OwnerHomePage />} />
+        <Route path='/owner-finance' element={<FinancePage />} />
         <Route path='/booking-management' element={<BookingManagePage />} />
         <Route path='/reviews' element={<ReviewPage />} />
-        <Route path='/booking-schedule/:hotelId' element={<HotelReservations/>}/>        <Route path='/owner-homepage' element={<OwnerHomePage />} />
-        <Route path='/owner-finance' element={<FinancePage />} />
+        <Route path='/booking-schedule/:hotelId' element={<HotelReservations />} />
         <Route path="/dashboard/*" element={<DashboardPage />} />
-        <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage/>}/>
+        <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage />} />
       </Routes>
     </Router>
   );

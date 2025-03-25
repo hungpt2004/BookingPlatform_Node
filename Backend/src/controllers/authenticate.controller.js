@@ -54,7 +54,6 @@ const createSendToken = (user, statusCode, res) => {
   });
 };
 
-
 // Send OTP
 const sendOTP = async (email, verificationToken) => {
   try {
@@ -228,15 +227,25 @@ exports.resendEmailVerification = catchAsync(async (req, res, next) => {
 // Login
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
+
+  console.log(email);
+  console.log(password);
+
   if (!email || !password) {
     return next(new AppError("Please provide email and password!", 400));
   }
 
   const user = await User.findOne({ email }).select("+password");
 
+  const check = await bcrypt.compare(password, user.password);
 
-  
-  if (!user || !(await user.correctPassword(password, user.password))) {
+  console.log(`Hashed password from DB: ${user.name}`);
+  console.log(`Hashed password from DB: ${user.password}`);
+  console.log(`Password entered: ${password}`);
+
+  console.log(`Check password: ${check}`);
+
+  if (!user || !(await bcrypt.compare(password, user.password))) {
     return next(new AppError("Incorrect email or password", 401));
   }
 

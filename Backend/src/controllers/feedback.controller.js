@@ -24,13 +24,14 @@ async function checkProfanityWithGemini(content) {
     console.error("Lỗi kiểm tra nội dung bằng Gemini:", error);
     return false; // Nếu lỗi xảy ra, mặc định không chặn nội dung
   }
-}
+};
 
 exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
+  
   const { hotelId } = req.params;
 
   const [listFeedback, userFeeback] = await Promise.all([
-    Feedback.find({ hotel: hotelId }).populate("user"),
+    Feedback.find({ hotel: hotelId }).populate("user").populate('hotel'),
     Feedback.find(
       { hotel: hotelId },
       {
@@ -41,6 +42,10 @@ exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
       }
     ).populate("user"),
   ]);
+
+  if(!hotelId) {
+    listFeedback = await Feedback.find();
+  }
 
   if (listFeedback.length === 0) {
     return res.send("No have any feedback")
@@ -201,7 +206,6 @@ exports.deleteFeedback = asyncHandler(async (req, res) => {
   });
 });
 
-
 //get feedback by user_id
 exports.getFeedbackByUserAndReservation = asyncHandler(async (req, res) => {
   const userId = req.user.id;
@@ -232,7 +236,6 @@ exports.getFeedbackByUserAndReservation = asyncHandler(async (req, res) => {
     });
   }
 });
-
 
 const calculateAvgRatingHotel = async (hotelId) => {
   // Sử dụng aggregate để tính trung bình rating

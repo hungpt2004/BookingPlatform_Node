@@ -3,13 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Spinner, Alert, Container, Badge, Button, Card, Row, Col, Modal } from 'react-bootstrap';
 import axios from 'axios';
 import { BASE_URL } from '../../utils/Constant';
-import { OwnerNavbar } from '../../components/navbar/OwnerNavbar';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import '../owner/BookingSchedule.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import AdminSidebar from '../../components/navbar/OwnerSidebar'
 
 const localizer = momentLocalizer(moment);
 
@@ -271,7 +271,7 @@ const BookingSchedule = () => {
     if (loading) {
         return (
             <div>
-                <OwnerNavbar />
+                <AdminSidebar />
                 <Container className="mt-5 text-center">
                     <Spinner animation="border" role="status" />
                     <p className="mt-2">Loading reservations...</p>
@@ -283,7 +283,6 @@ const BookingSchedule = () => {
     if (error) {
         return (
             <div>
-                <OwnerNavbar />
                 <Container className="mt-5">
                     <Alert variant="danger">{error}</Alert>
                     <Button variant="outline-secondary" onClick={handleBackClick} className="mt-3">
@@ -295,8 +294,9 @@ const BookingSchedule = () => {
     }
 
     return (
-        <div>
-            <OwnerNavbar />
+        <div className="d-flex">
+                <AdminSidebar />
+                <div className="booking-app flex-grow-1" style={{ paddingLeft: "20px" }}>
             <Container className="py-4">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <h3 className="mb-0">Booking Schedule</h3>
@@ -445,7 +445,7 @@ const BookingSchedule = () => {
                                 navigate(`/reservation-details/${selectedReservation._id}`);
                             }}
                         >
-                            View Full Details
+                            View Customer Receit
                         </Button>
                     )}
                 </Modal.Footer>
@@ -530,6 +530,7 @@ const BookingSchedule = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
+        </div>
         </div>
     );
 };

@@ -3,6 +3,7 @@ const Hotel = require("../models/hotel");
 const asyncHandler = require("../middlewares/asyncHandler");
 
 exports.addFavoriteHotel = asyncHandler(async (req, res) => {
+  
   const userId = req.user._id;
 
   const { hotelId } = req.body;
@@ -38,6 +39,9 @@ exports.addFavoriteHotel = asyncHandler(async (req, res) => {
   if (!user.favorites.includes(hotelId)) {
     user.favorites.push(hotelId);
     await user.save();
+
+    console.log("Đã tạo favorite thành công !");
+
     return res.status(200).json({
       error: false,
       message: "Hotel added to favorites successfully",
@@ -53,11 +57,12 @@ exports.addFavoriteHotel = asyncHandler(async (req, res) => {
 
 // Get all favorite hotels of a user
 exports.getFavoriteHotels = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
 
-  console.log(userId);
+  const user = req.user;
+
+  console.log(user.id);
   // Validate input
-  if (!userId) {
+  if (!user.id) {
     return res.status(400).json({
       error: true,
       message: "Missing required userId",
@@ -66,20 +71,23 @@ exports.getFavoriteHotels = asyncHandler(async (req, res) => {
 
   // Check if the user exists
   try {
-    const user = await User.findById(userId).populate("favorites");
+    const currentUser = await User.findById(user.id).populate("favorites");
 
-    if (!user) {
+    if (!currentUser) {
       return res.status(404).json({
         error: true,
         message: "User not found",
       });
     }
+    
+    console.log("Đã lấy dữ liệu từ BE")
 
     return res.status(200).json({
       error: false,
       message: "Favorites fetched successfully",
-      favorites: user.favorites,
+      favorites: currentUser.favorites,
     });
+
   } catch (error) {
     return res.status(500).json(error.message);
   }

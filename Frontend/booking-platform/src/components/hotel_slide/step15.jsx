@@ -200,7 +200,9 @@ const Step15 = ({ prevStep }) => {
             if (response.data.success) {
                 CustomSuccessToast('Khách sạn đã được tạo thành công! Vui lòng chờ đợi xét duyệt đăng ký của bạn.');
                 clearSessionStorageExceptToken();
-                 navigate('/home');
+                setTimeout(() => {
+                    navigate('/home');
+                }, 800)
             } else {
                 CustomFailedToast(`Lỗi: ${response.data.message}`);
             }

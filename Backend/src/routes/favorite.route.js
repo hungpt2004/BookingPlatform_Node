@@ -1,6 +1,5 @@
 const express = require("express");
 const FavoriteRouter = express.Router();
-const authenticateToken = require("../utils/authenticateToken");
 const FavoriteController = require("../controllers/favorite.controller");
 const {
     restrictTo,
