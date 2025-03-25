@@ -14,65 +14,82 @@ const refundingReservation = require("../models/refundingReservation");
 exports.getMonthlyPaymentByMonthYear = asyncWrapper(async (req, res) => {
   const currentUserId = req.user.id;
 
-  console.log(currentUserId);
-
   try {
     let { month, year, hotelId, name } = req.query;
 
+    console.log(hotelId)
+
     const currentDate = dayjs();
-    month = month ? parseInt(month) : currentDate.month() + 1; // Thêm +1 để đúng format
+    month = month ? parseInt(month) : currentDate.month() + 1;
     year = year ? parseInt(year) : currentDate.year();
+
+    if (month < 1 || month > 12) {
+      return res.status(400).json({
+        success: false,
+        message: "Month must be between 1 and 12.",
+      });
+    }
 
     let filter = { year, month };
 
-    // Validate month
-    if (month) {
-      month = parseInt(month);
-      if (month < 1 || month > 12) {
-        return res.status(400).json({
-          success: false,
-          message: "Month must be between 1 and 12.",
-        });
-      }
-      filter.month = month;
+    // Lọc danh sách các khách sạn thuộc sở hữu của owner hiện tại
+    const ownedHotels = await hotel.find({ owner: currentUserId }).select("_id");
+
+    // Nếu owner không có khách sạn nào
+    if (ownedHotels.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        reservations: 0,
+      });
     }
 
-    // Lọc danh sách các khách sạn thuộc sở hữu của owner hiện tại
-    const ownedHotels = await hotel
-      .find({ owner: currentUserId })
-      .select("_id");
-
+    // Nếu có hotelId, kiểm tra xem hotel đó có thuộc về owner không
     if (hotelId) {
-      // Nếu có hotelId trong query, chỉ lấy monthlyPayments cho khách sạn đó
+      console.log(hotelId)
       hotelId = new mongoose.Types.ObjectId(hotelId);
+      if (!ownedHotels.some((h) => h._id.equals(hotelId))) {
+        return res.status(400).json({
+          success: false,
+          message: "You do not own this hotel.",
+        });
+      }
       filter.hotel = hotelId;
+      console.log("khong co")
     } else {
-      // Nếu không có, lấy tất cả các khách sạn của owner
       filter.hotel = { $in: ownedHotels.map((hotel) => hotel._id) };
     }
 
     if (name) {
-      filter.name = { $regex: name, $options: "i" }; // Case-insensitive search
+      filter.name = { $regex: name, $options: "i" };
     }
 
-    // Lấy danh sách monthlyPayments dựa trên filter
+    // Lấy danh sách monthlyPayments
     const monthlyPayments = await monthlyPayment.find(filter).populate("hotel");
+
+    // Tạo khoảng thời gian cho tháng hiện tại
+    const startDate = new Date(`${year}-${month.toString().padStart(2, "0")}-01`);
+    const endDate = new Date(new Date(startDate).setMonth(startDate.getMonth() + 1));
 
     // Lọc reservation theo tháng, năm cho các khách sạn thuộc owner
     let reservationFilter = {
       hotel: { $in: ownedHotels.map((hotel) => hotel._id) },
-      checkInDate: {
-        $gte: new Date(`${year}-${month}-01`),
-        $lt: new Date(`${year}-${month + 1}-01`),
-      },
+      checkInDate: { $lt: endDate },
+      checkOutDate: { $gte: startDate },
     };
 
-    // Nếu có hotelId trong query thì chỉ lấy reservation của khách sạn đó
+    // Nếu có hotelId, chỉ lấy reservation của khách sạn đó
     if (hotelId) {
       reservationFilter.hotel = hotelId;
     }
 
+    // Lấy tổng số lượng reservations
     const reservations = await reservation.countDocuments(reservationFilter);
+
+    // Kiểm tra dữ liệu trả về
+    console.log(await reservation.find(reservationFilter));
+
+    console.log(reservationFilter)
 
     return res.status(200).json({
       success: true,
@@ -87,6 +104,7 @@ exports.getMonthlyPaymentByMonthYear = asyncWrapper(async (req, res) => {
     });
   }
 });
+
 
 exports.getMonthlyPaymentByMonthYearAdmin = asyncWrapper(async (req, res) => {
   try {
