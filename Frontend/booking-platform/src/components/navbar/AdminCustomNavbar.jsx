@@ -74,8 +74,7 @@ export const AdminCustomNavbar = () => {
           <Dropdown align="end">
             <Dropdown.Toggle variant="white" id="dropdown-basic" className="d-flex align-items-center border-0">
               <div className="d-none d-sm-flex flex-column align-items-end me-2">
-                {/* <span className="fw-bold text-dark">{user?.name}</span> */}
-                <small className="text-muted">Administrator</small>
+                <small className="text-muted">{user?.name}</small>
               </div>
               <Image
                 src="https://mdbcdn.b-cdn.net/img/new/avatars/2.webp"
