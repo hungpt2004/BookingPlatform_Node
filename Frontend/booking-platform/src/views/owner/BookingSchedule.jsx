@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Spinner, Alert, Container, Badge, Button, Card, Row, Col, Modal } from 'react-bootstrap';
+import { Spinner, Alert, Container, Badge, Button, Card, Row, Col, Modal, Pagination } from 'react-bootstrap';
 import axios from 'axios';
 import { BASE_URL } from '../../utils/Constant';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
@@ -10,10 +10,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import AdminSidebar from '../../components/navbar/OwnerSidebar'
+import { useAuthStore } from '../../store/authStore';
 
 const localizer = momentLocalizer(moment);
 
 const BookingSchedule = () => {
+    const { user, isAuthenticated } = useAuthStore();
     const [reservations, setReservations] = useState([]);
     const [calendarEvents, setCalendarEvents] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -26,16 +28,36 @@ const BookingSchedule = () => {
     const [selectedCardData, setSelectedCardData] = useState(null);
     const { hotelId } = useParams();
     const navigate = useNavigate();
+    const [currentPage, setCurrentPage] = useState(1);
+    const [reservationsPerPage] = useState(6);
+
+    const indexOfLastReservation = currentPage * reservationsPerPage;
+    const indexOfFirstReservation = indexOfLastReservation - reservationsPerPage;
+    const currentReservations = reservations.slice(indexOfFirstReservation, indexOfLastReservation);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
 
     useEffect(() => {
         const fetchReservations = async () => {
             try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    setError('Authentication required. Please log in.');
+                if (!isAuthenticated) {
+                    setError('You are not authenticated. Please log in.');
                     setLoading(false);
                     return;
                 }
+
+                const token = 
+                    sessionStorage.getItem('token') || 
+                    localStorage.getItem('token') || 
+                    user?.token;
+
+                if (!token) {
+                    setError('No valid authentication token found.');
+                    setLoading(false);
+                    return;
+                }
+
                 if (!hotelId) {
                     setError('Hotel ID is missing. Please go back and select a hotel.');
                     setLoading(false);
@@ -104,7 +126,7 @@ const BookingSchedule = () => {
         };
 
         fetchReservations();
-    }, [hotelId]);
+    }, [hotelId, isAuthenticated]);
 
     const getStatusBadge = (status) => {
         return status || 'UNKNOWN';
@@ -295,7 +317,6 @@ const BookingSchedule = () => {
 
     return (
         <div className="d-flex">
-                <AdminSidebar />
                 <div className="booking-app flex-grow-1" style={{ paddingLeft: "20px" }}>
             <Container className="py-4">
                 <div className="d-flex justify-content-between align-items-center mb-4">
@@ -328,9 +349,42 @@ const BookingSchedule = () => {
                         {reservations.length === 0 ? (
                             <Alert variant="info">No reservations found for this hotel</Alert>
                         ) : (
-                            <Row>
-                                {reservations.map(reservation => renderReservationCard(reservation))}
-                            </Row>
+                            <>
+                                <Row>
+                                    {currentReservations.map(reservation => renderReservationCard(reservation))}
+                                </Row>
+
+                                {/* Pagination */}
+                                <div className="d-flex justify-content-center mt-4">
+                                    <Pagination>
+                                        <Pagination.First 
+                                            onClick={() => setCurrentPage(1)} 
+                                            disabled={currentPage === 1} 
+                                        />
+                                        <Pagination.Prev 
+                                            onClick={() => setCurrentPage(currentPage - 1)} 
+                                            disabled={currentPage === 1} 
+                                        />
+                                        {[...Array(Math.ceil(reservations.length / reservationsPerPage)).keys()].map(number => (
+                                            <Pagination.Item 
+                                                key={number + 1} 
+                                                active={number + 1 === currentPage}
+                                                onClick={() => paginate(number + 1)}
+                                            >
+                                                {number + 1}
+                                            </Pagination.Item>
+                                        ))}
+                                        <Pagination.Next 
+                                            onClick={() => setCurrentPage(currentPage + 1)} 
+                                            disabled={currentPage === Math.ceil(reservations.length / reservationsPerPage)} 
+                                        />
+                                        <Pagination.Last 
+                                            onClick={() => setCurrentPage(Math.ceil(reservations.length / reservationsPerPage))} 
+                                            disabled={currentPage === Math.ceil(reservations.length / reservationsPerPage)} 
+                                        />
+                                    </Pagination>
+                                </div>
+                            </>
                         )}
                     </Card.Body>
                 </Card>

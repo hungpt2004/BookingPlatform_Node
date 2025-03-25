@@ -24,6 +24,10 @@ const UserSchema = new Schema(
       type: String,
       default: "N/A"
     },
+    isLocked: { 
+      type: Boolean, 
+      default: false 
+    },
     createOn: { type: Date, default: new Date().getTime() },
     cmnd: { type: String, default: "N/A" },
     updatedAt: { type: Date, default: new Date().getTime() },

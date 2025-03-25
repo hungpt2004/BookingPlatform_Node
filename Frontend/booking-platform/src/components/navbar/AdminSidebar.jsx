@@ -54,6 +54,7 @@ const AdminSideBar = () => {
       title: "Quản Lý Khách Hàng",
       icon: <FaBuilding />,
       submenus: [
+        { title: "Cộng Tác Khách Hàng", path: "list-customer" },
         { title: "Yêu cầu hủy đơn", path: "#" },
       ],
     },

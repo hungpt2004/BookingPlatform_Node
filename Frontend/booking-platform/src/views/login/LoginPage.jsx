@@ -158,30 +158,35 @@ export const LoginPage = () => {
     img.onload = () => setIsImageLoaded(true);
   }, []);
 
-  // Handle login form submission
   const handleLogin = async (e) => {
     e.preventDefault();
-
     setLoading(true);
-
     try {
-      // Store the response data from the login function
       const data = await login(email, password);
-
+      const user = data.data.user;
+  
+      if (user.isLocked) {
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("user");
+        toast.error("Your account is banned. Please contact support.", {
+          position: "top-center",
+          autoClose: 2000,
+        });
+        setLoading(false);
+        return; 
+      }
+  
       toast.success("Đăng nhập thành công", {
         position: "top-center",
         autoClose: 2000,
       });
-
-      // Close modal after successful login and navigate based on role
+  
       setTimeout(() => {
         setLoading(false);
         setShowLoginModal(false);
-
-        // Navigate based on user role
-        if (data.data.user.role === "OWNER") {
+        if (user.role === "OWNER") {
           navigate("/dashboard");
-        } else if (data.data.user.role === "ADMIN") {
+        } else if (user.role === "ADMIN") {
           navigate("/admin-dashboard");
         } else {
           navigate("/home");
@@ -195,6 +200,8 @@ export const LoginPage = () => {
       });
     }
   };
+  
+  
 
   const handleSignUp = async (e) => {
     e.preventDefault();

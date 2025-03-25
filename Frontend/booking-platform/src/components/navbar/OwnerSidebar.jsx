@@ -37,7 +37,6 @@ const OwnerSidebar = () => {
       icon: <FaHotel />,
       submenus: [
         { title: "Thông tin Khách Sạn", path: "/hotel-management" },
-        { title: "Lịch Booking", path: "/booking-schedule" },
         { title: "Quản lý Booking", path: "/booking-management" },
         { title: "Quản lý Doanh Thu", path: "/monthly-owner" },
       ],

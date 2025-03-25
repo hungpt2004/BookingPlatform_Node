@@ -198,8 +198,9 @@ exports.getRoomByHotelIdOwner = asyncHandler(async (req, res) => {
 
 exports.getRoomAvailability = asyncHandler(async (req, res) => {
   const { hotelId } = req.params;
-  const { checkInDate, checkOutDate } = req.query;
+  const { checkInDate, checkOutDate, page = 1, limit = 10 } = req.query;
 
+  // Validate inputs
   if (!hotelId || !checkInDate || !checkOutDate) {
     return res.status(400).json({
       error: true,
@@ -210,6 +211,9 @@ exports.getRoomAvailability = asyncHandler(async (req, res) => {
   try {
     const selectedCheckIn = new Date(checkInDate);
     const selectedCheckOut = new Date(checkOutDate);
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+    const skip = (pageNumber - 1) * limitNumber;
 
     // Fetch overlapping reservations
     const overlappingReservations = await Reservation.find({
@@ -219,26 +223,45 @@ exports.getRoomAvailability = asyncHandler(async (req, res) => {
         { checkInDate: { $lt: selectedCheckOut } },
         { checkOutDate: { $gt: selectedCheckIn } },
       ],
-    }).populate("rooms");
+    }).populate("rooms.room");
 
     // Get all rooms for this hotel
     const allRooms = await Room.find({ hotel: hotelId });
 
-    // Safely extract booked room IDs
-    const bookedRoomIds = overlappingReservations
-      .flatMap(res => res.rooms || [])
-      .filter(room => room && room._id)
-      .map(room => room._id.toString());
+    // Calculate total booked quantity per room
+    const roomBookedQuantities = {};
+    overlappingReservations.forEach(res => {
+      res.rooms.forEach(roomItem => {
+        const roomId = roomItem.room._id.toString();
+        const quantity = roomItem.quantity;
+        roomBookedQuantities[roomId] = (roomBookedQuantities[roomId] || 0) + quantity;
+      });
+    });
 
-    // Filter out booked rooms
-    const availableRooms = allRooms.filter(
-      room => !bookedRoomIds.includes(room._id.toString())
-    );
+    // Determine available rooms with remaining quantity
+    const availableRooms = allRooms
+      .map(room => {
+        const booked = roomBookedQuantities[room._id.toString()] || 0;
+        const available = room.quantity - booked;
+        return {
+          ...room.toObject(),
+          availableQuantity: available,
+        };
+      })
+      .filter(room => room.availableQuantity > 0);
+
+    // Apply pagination
+    const paginatedRooms = availableRooms.slice(skip, skip + limitNumber);
+    const totalRooms = availableRooms.length;
+    const totalPages = Math.ceil(totalRooms / limitNumber);
 
     return res.status(200).json({
       error: false,
       message: "Rooms fetched successfully",
-      rooms: availableRooms,
+      rooms: paginatedRooms,
+      totalRooms,
+      totalPages,
+      currentPage: pageNumber,
     });
   } catch (error) {
     console.error("Error fetching room availability:", error);
