@@ -30,6 +30,7 @@ export const OwnerCustomNavbar = () => {
   }, []);
 
   const handleLogout = () => {
+    sessionStorage.clear();
     logout();
     setUser(null);
     navigate('/');
@@ -98,7 +99,7 @@ export const OwnerCustomNavbar = () => {
                 <FaCog className="me-2 text-secondary" /> Cài đặt
               </Dropdown.Item>
               <Dropdown.Divider />
-              <Dropdown.Item href="#" className="py-2 text-danger">
+              <Dropdown.Item onClick={handleLogout}  className="py-2 text-danger">
                 <FaSignOutAlt className="me-2" /> Đăng xuất
               </Dropdown.Item>
             </Dropdown.Menu>

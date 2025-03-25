@@ -103,6 +103,7 @@ const OwnerSidebar = () => {
     if(sessionStorage.getItem('token')){
       sessionStorage.removeItem('token')
     }
+    sessionStorage.clear();
     logout();
     setUser(null);
     navigate('/');

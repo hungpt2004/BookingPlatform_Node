@@ -148,9 +148,7 @@ function App() {
             <Route path="/feedback-management" element={<FeedbackTable />} />
             <Route path="/service-management" element={<ServiceTable />} />
             <Route path="/booking-management" element={<BookingManagePage />} />
-            <Route path='/create-room' element={<CreateRoom />} />
-            <Route path='/create-room/:hotelId' element={<CreateRoom />} />
-          </Route>
+           </Route>
         </Route>
 
         {/* Admin routes */}
@@ -182,6 +180,8 @@ function App() {
         <Route path="/dashboard/*" element={<DashboardPage />} />
         <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage />} />
         <Route path="/create-hotel" element={<Createhotel />} />
+        <Route path='/create-room' element={<CreateRoom />} />
+        <Route path='/create-room/:hotelId' element={<CreateRoom />} />
       </Routes>
     </Router>
   );
