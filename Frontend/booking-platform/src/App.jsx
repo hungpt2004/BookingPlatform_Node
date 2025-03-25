@@ -47,6 +47,7 @@ import OwnerLayout from "./views/layout_render/OwnerLayout";
 import AdminLayout from "./views/layout_render/AdminLayout";
 import PaymentOwnerPage from "./views/monthly_payment/PaymentOwnerPage";
 import PaymentCustomerPage from "./views/monthly_payment/PaymentCustomerPage";
+import HotelApprovalPage from "./views/hotel-approval/HotelApprovalPage";
 
 function App() {
   const { user, isAuthenticated } = useAuthStore();
@@ -152,6 +153,7 @@ function App() {
             <Route path="/customer-partner" element={<CustomPartnerPage />} />
             <Route path="/payment-owner" element={<PaymentOwnerPage />} />
             <Route path="/payment-customer" element={<PaymentCustomerPage />} />
+            <Route path="/hotel-approval" element={<HotelApprovalPage />} />
           </Route>
         </Route>
 

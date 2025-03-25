@@ -369,4 +369,3 @@ const styles = `
 `
 
 export default ServiceTable
-
