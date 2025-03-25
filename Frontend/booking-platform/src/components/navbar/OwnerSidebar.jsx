@@ -39,6 +39,8 @@ const OwnerSidebar = () => {
         { title: "Thông tin Khách Sạn", path: "/hotel-management" },
         { title: "Quản lý Booking", path: "/booking-management" },
         { title: "Quản lý Doanh Thu", path: "/monthly-owner" },
+        { title: "Tạo khách sạn", path: "/create-hotel" }
+
       ],
     },
     {

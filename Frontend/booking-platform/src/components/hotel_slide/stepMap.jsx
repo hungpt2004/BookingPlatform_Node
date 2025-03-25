@@ -2,9 +2,10 @@ import { Card, Button, Form, Row, Col, InputGroup, Alert } from 'react-bootstrap
 import { useState, useEffect, useRef } from 'react';
 import { FaInfoCircle } from 'react-icons/fa';
 import PropTypes from 'prop-types';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { CustomFailedToast, CustomToast } from '../toast/CustomToast';
 
 // Fix for Leaflet marker icon issues in React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -53,13 +54,14 @@ const bottomButtonsStyle = {
 };
 
 const defaultCenter = {
-    lat: 10.8231, // Default to Vietnam coordinates
+    lat: 10.8231, // Default to Ho Chi Minh City
     lng: 106.6297
 };
+
 const stepContainer = {
-    width: "100%",          // Dấu % phải để trong chuỗi
-    maxWidth: "3500px",    // Không có khoảng trắng giữa maxWidth
-    margin: "auto",        // Phải đặt trong chuỗi
+    width: "100%",
+    maxWidth: "3500px",
+    margin: "auto",
     marginTop: '100px',
     height: 'auto'
 };
@@ -73,6 +75,15 @@ function MapEvents({ onMapClick, updateMapPin }) {
             }
         },
     });
+    return null;
+}
+
+// Component to update map center when position changes
+function MapUpdater({ position }) {
+    const map = useMap();
+    useEffect(() => {
+        map.flyTo(position, 15, { duration: 1 });
+    }, [map, position]);
     return null;
 }
 
@@ -102,7 +113,6 @@ function DraggableMarker({ position, setPosition, geocode }) {
 }
 
 const Step5 = ({ nextStep, prevStep }) => {
-    // Get saved location data from sessionStorage if available
     const [locationData, setLocationData] = useState(() => {
         const savedLocation = sessionStorage.getItem("hotelLocation");
         return savedLocation ? JSON.parse(savedLocation) : {
@@ -117,28 +127,20 @@ const Step5 = ({ nextStep, prevStep }) => {
     });
 
     const [showInfoAlert, setShowInfoAlert] = useState(true);
-    const mapRef = useRef(null);
 
-    // Handle input changes
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-
-        // For checkbox use the checked value, otherwise use the input value
         const inputValue = type === 'checkbox' ? checked : value;
-
-        // Update state with new values
         setLocationData({
             ...locationData,
             [name]: inputValue
         });
     };
 
-    // Save location data to sessionStorage when it changes
     useEffect(() => {
         sessionStorage.setItem("hotelLocation", JSON.stringify(locationData));
     }, [locationData]);
 
-    // Geocode coordinates to address using Nominatim (OpenStreetMap's geocoding service)
     const reverseGeocode = async (latlng) => {
         if (!locationData.updateMapPin) return;
 
@@ -151,13 +153,9 @@ const Step5 = ({ nextStep, prevStep }) => {
 
             if (data && data.address) {
                 const { road, house_number, city, town, village, postcode, country_code } = data.address;
-
-                // Build address string
                 let addressStr = '';
                 if (house_number) addressStr += house_number + ' ';
                 if (road) addressStr += road;
-
-                // Determine city (could be in city, town, or village field)
                 const cityName = city || town || village || '';
 
                 setLocationData(prev => ({
@@ -173,55 +171,58 @@ const Step5 = ({ nextStep, prevStep }) => {
         }
     };
 
-    // Geocode address to coordinates using Nominatim
+    const [isGeocoding, setIsGeocoding] = useState(false);
+
     const geocodeAddress = async () => {
-        if (!locationData.address) return;
+        if (!locationData.address || locationData.address.length < 3) {
+            CustomFailedToast.warning("Please enter a more detailed address");
+            return;
+        }
+
+        setIsGeocoding(true);
 
         try {
             const query = encodeURIComponent(locationData.address);
             const response = await fetch(
                 `https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1&addressdetails=1`,
-                { headers: { 'Accept-Language': 'vi' } }
+                {
+                    headers: {
+                        'Accept-Language': 'vi',
+                        'Referer': 'your-website.com'
+                    }
+                }
             );
+
+            if (!response.ok) throw new Error("Geocoding failed");
+
             const data = await response.json();
 
-            if (data && data.length > 0) {
-                const { lat, lon } = data[0];
-                const position = {
-                    lat: parseFloat(lat),
-                    lng: parseFloat(lon)
-                };
-
-                // Extract address details
-                if (data[0].address) {
-                    const { city, town, village, postcode, country_code } = data[0].address;
-                    const cityName = city || town || village || '';
-
-                    setLocationData(prev => ({
-                        ...prev,
-                        position,
-                        city: cityName || prev.city,
-                        postalCode: postcode || prev.postalCode,
-                        country: country_code || prev.country
-                    }));
-                } else {
-                    setLocationData(prev => ({
-                        ...prev,
-                        position
-                    }));
-                }
-
-                // Center map on the new position
-                if (mapRef.current) {
-                    mapRef.current.setView(position, 15);
-                }
+            if (!data || data.length === 0) {
+                throw new Error("Address not found");
             }
+
+            const { lat, lon } = data[0];
+            const newPosition = { lat: parseFloat(lat), lng: parseFloat(lon) };
+
+            // Update state with new position
+            setLocationData(prev => ({
+                ...prev,
+                position: newPosition,
+                ...(data[0].address && {
+                    city: data[0].address.city || prev.city,
+                    postalCode: data[0].address.postcode || prev.postalCode,
+                    country: data[0].address.country_code || prev.country
+                })
+            }));
+
         } catch (error) {
-            console.error("Error in geocoding:", error);
+            console.error("Geocoding error:", error);
+            CustomFailedToast.error(error.message || "Error searching address");
+        } finally {
+            setIsGeocoding(false);
         }
     };
 
-    // Handle map click - update position and optionally address
     const handleMapClick = (e) => {
         const newPosition = {
             lat: e.latlng.lat,
@@ -236,17 +237,13 @@ const Step5 = ({ nextStep, prevStep }) => {
         reverseGeocode(newPosition);
     };
 
-    // Check if form is valid
     const isFormValid = locationData.address && locationData.country && locationData.city;
 
-    // Handle continuing to next step
     const handleContinue = () => {
-        // Save current data to sessionStorage
         sessionStorage.setItem("hotelLocation", JSON.stringify(locationData));
         nextStep();
     };
 
-    // Handle address search
     const handleAddressSearch = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -255,21 +252,17 @@ const Step5 = ({ nextStep, prevStep }) => {
     };
 
     return (
-        <div className='pt-1'style={stepContainer}>
-            {/* Fullscreen map with floating card */}
+        <div className='pt-1' style={stepContainer}>
+            <CustomToast />
             <div style={contentWrapperStyle}>
-                {/* OpenStreetMap Component - Full screen */}
                 <div style={mapContainerStyle}>
                     <MapContainer
                         center={[locationData.position.lat, locationData.position.lng]}
                         zoom={15}
                         style={{ height: '100%', width: '100%' }}
-                        whenCreated={mapInstance => {
-                            mapRef.current = mapInstance;
-                        }}
                     >
                         <TileLayer
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         />
                         <DraggableMarker
@@ -286,19 +279,18 @@ const Step5 = ({ nextStep, prevStep }) => {
                             onMapClick={handleMapClick}
                             updateMapPin={locationData.updateMapPin}
                         />
+                        <MapUpdater position={[locationData.position.lat, locationData.position.lng]} />
                     </MapContainer>
                 </div>
 
-                {/* Floating Form Card */}
                 <Card style={floatingCardStyle} className="p-3 shadow">
-
                     <Form>
                         <Form.Group className="mb-3">
-                            <Form.Label className="fw-bold">Tìm địa chỉ của Quý vị</Form.Label>
+                            <Form.Label className="fw-bold">Find your address</Form.Label>
                             <InputGroup>
                                 <Form.Control
                                     type="text"
-                                    placeholder="Nhập tên phố, số nhà..."
+                                    placeholder="Enter street name, house number..."
                                     name="address"
                                     value={locationData.address}
                                     onChange={handleInputChange}
@@ -308,17 +300,22 @@ const Step5 = ({ nextStep, prevStep }) => {
                                 <Button
                                     variant="outline-secondary"
                                     onClick={geocodeAddress}
+                                    disabled={isGeocoding}
                                 >
-                                    Tìm kiếm
+                                    {isGeocoding ? (
+                                        <span className="spinner-border spinner-border-sm me-2"></span>
+                                    ) : (
+                                        'Search'
+                                    )}
                                 </Button>
                             </InputGroup>
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Số căn hộ hoặc tầng (không bắt buộc)</Form.Label>
+                            <Form.Label>Apartment or floor (optional)</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Căn hộ, tòa nhà, tầng, v.v."
+                                placeholder="Apartment, building, floor, etc."
                                 name="apartment"
                                 value={locationData.apartment}
                                 onChange={handleInputChange}
@@ -326,31 +323,31 @@ const Step5 = ({ nextStep, prevStep }) => {
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label className="fw-bold">Vùng/quốc gia</Form.Label>
+                            <Form.Label className="fw-bold">Region/Country</Form.Label>
                             <Form.Select
                                 name="country"
                                 value={locationData.country}
                                 onChange={handleInputChange}
                                 required
                             >
-                                <option value="">Chọn quốc gia</option>
-                                <option value="vn">Việt Nam</option>
-                                <option value="gb">Vương Quốc Anh</option>
-                                <option value="us">Hoa Kỳ</option>
-                                <option value="jp">Nhật Bản</option>
-                                <option value="kr">Hàn Quốc</option>
+                                <option value="">Select country</option>
+                                <option value="vn">Vietnam</option>
+                                <option value="gb">United Kingdom</option>
+                                <option value="us">United States</option>
+                                <option value="jp">Japan</option>
+                                <option value="kr">South Korea</option>
                                 <option value="sg">Singapore</option>
-                                <option value="th">Thái Lan</option>
+                                <option value="th">Thailand</option>
                             </Form.Select>
                         </Form.Group>
 
                         <Row className="mb-3">
                             <Col md={6}>
                                 <Form.Group>
-                                    <Form.Label className="fw-bold">Thành phố</Form.Label>
+                                    <Form.Label className="fw-bold">City</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Nhập tên thành phố"
+                                        placeholder="Enter city name"
                                         name="city"
                                         value={locationData.city}
                                         onChange={handleInputChange}
@@ -360,10 +357,10 @@ const Step5 = ({ nextStep, prevStep }) => {
                             </Col>
                             <Col md={6}>
                                 <Form.Group>
-                                    <Form.Label className="fw-bold">Mã bưu chính</Form.Label>
+                                    <Form.Label className="fw-bold">Postal Code</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Nhập mã bưu chính"
+                                        placeholder="Enter postal code"
                                         name="postalCode"
                                         value={locationData.postalCode}
                                         onChange={handleInputChange}
@@ -375,7 +372,7 @@ const Step5 = ({ nextStep, prevStep }) => {
                         <Form.Group className="mb-4">
                             <Form.Check
                                 type="checkbox"
-                                label="Cập nhật địa chỉ khi đi chuyển ghim trên bản đồ."
+                                label="Update address when moving the pin on the map."
                                 name="updateMapPin"
                                 checked={locationData.updateMapPin}
                                 onChange={handleInputChange}
@@ -386,7 +383,7 @@ const Step5 = ({ nextStep, prevStep }) => {
                             <Alert variant="info" className="d-flex align-items-start">
                                 <FaInfoCircle className="me-2 mt-1" />
                                 <div>
-                                    Vị trí ghim đó có sai không? Nếu vị trí ghim đó không chính xác, Quý vị có thể bỏ chọn lựa chọn ở trên và nhấn hoặc chạm vào bản đồ để di chuyển ghim đến đúng vị trí.
+                                    Is the pin location incorrect? If the pin is not accurate, you can uncheck the option above and click or tap on the map to move the pin to the correct location.
                                 </div>
                                 <button
                                     type="button"
@@ -399,10 +396,9 @@ const Step5 = ({ nextStep, prevStep }) => {
                     </Form>
                 </Card>
 
-                {/* Bottom Navigation Buttons */}
                 <div style={bottomButtonsStyle}>
                     <Button variant="secondary" onClick={prevStep} className="shadow">
-                        Quay lại
+                        Back
                     </Button>
                     <Button
                         variant="primary"
@@ -410,7 +406,7 @@ const Step5 = ({ nextStep, prevStep }) => {
                         disabled={!isFormValid}
                         className="shadow"
                     >
-                        Tiếp tục
+                        Continue
                     </Button>
                 </div>
             </div>
