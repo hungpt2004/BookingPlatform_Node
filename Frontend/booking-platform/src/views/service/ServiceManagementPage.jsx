@@ -19,6 +19,7 @@ import {
   CalendarOutlined,
   EyeOutlined,
   MessageOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import Sidebar from "../../components/navbar/OwnerSidebar";
@@ -37,6 +38,7 @@ import {
   DeleteConfirmModal,
   UpdateModal,
 } from "../../components/modal/UpdateAndDeleteModal";
+import { AddServiceModal } from "../../components/modal/AddModal";
 
 const { Title, Text } = Typography;
 
@@ -56,6 +58,7 @@ const ServiceTable = () => {
   // MODAL
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
 
   // GET SERVICE BY HOTEL ID
@@ -145,6 +148,35 @@ const ServiceTable = () => {
     }
   };
 
+  // Function Add
+  const handleAdd = async (newService) => {
+    try {
+      if (!selectedHotel) {
+        throw new Error("Please select a hotel before adding a service");
+      }
+
+      const { name, description, price } = newService;
+
+      if (!name) throw new Error("Missing Name");
+      if (!description) throw new Error("Missing Description");
+      if (price === undefined || price === null || price <= 0)
+        throw new Error("Missing or invalid Price");
+
+      const response = await axiosInstance.post(
+        `/hotel-service/create-hotel-service/${selectedHotel}`,
+        { name, description, price }
+      );
+
+      if (response.data && response.data.message) {
+        CustomSuccessToast("Service added successfully");
+        fetchServices(); // Refresh the service list
+      }
+    } catch (error) {
+      console.error("Error adding service: ", error);
+      CustomFailedToast(error.message || "Failed to add service");
+    }
+  };
+
   const handleTableChange = (pagination) => {
     setPagination(pagination);
   };
@@ -165,9 +197,14 @@ const ServiceTable = () => {
     setIsDeleteModalVisible(true);
   };
 
+  const showAddModal = () => {
+    setIsAddModalVisible(true);
+  };
+
   const handleCloseModal = () => {
     setIsUpdateModalVisible(false);
     setIsDeleteModalVisible(false);
+    setIsAddModalVisible(false);
     setSelectedService(null);
   };
 
@@ -290,13 +327,23 @@ const ServiceTable = () => {
                   Hotel Services
                 </span>
               </Title>
-              <Button
-                type="primary"
-                onClick={fetchServices}
-                icon={<ReloadOutlined />}
-              >
-                Refresh Data
-              </Button>
+
+              <Space>
+                <Button
+                  type="primary"
+                  onClick={fetchServices}
+                  icon={<ReloadOutlined />}
+                >
+                  Refresh Data
+                </Button>
+                <Button
+                  type="primary"
+                  onClick={showAddModal}
+                  icon={<PlusOutlined />}
+                >
+                  Add Service
+                </Button>
+              </Space>
             </div>
 
             <Card className="mb-4 shadow-sm border-0">
@@ -390,6 +437,11 @@ const ServiceTable = () => {
         onClose={handleCloseModal}
         service={selectedService}
         onDelete={handleDelete}
+      />
+      <AddServiceModal
+        visible={isAddModalVisible}
+        onClose={handleCloseModal}
+        onAdd={handleAdd}
       />
     </>
   );

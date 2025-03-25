@@ -5,7 +5,7 @@ const HotelService = require("../models/hotelService.js");
 require("dotenv").config();
 
 
-// Get all hotel services
+// Get all hotel services - Son
 exports.getAllHotelServices = catchAsync(async (req, res) => {
   const hotelServices = await HotelService.find();
 
