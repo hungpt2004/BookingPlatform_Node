@@ -513,7 +513,7 @@ const sendEmailForCustomer = async (
           "{reservationId}",
           currentRefundReservation.reservation
         )
-        .replace("{decisionDate}", Date.now())
+        .replace("{decisionDate}", new Date())
     });
     console.log("Email sent successfully!");
   } catch (error) {
