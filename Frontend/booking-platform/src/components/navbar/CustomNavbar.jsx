@@ -9,13 +9,13 @@ import { Card } from 'react-bootstrap';
 import { useAuthStore } from '../../store/authStore';
 import { generateShortCutName } from '../../utils/GenerateShortName';
 import './CustomNavbar.css'
-
+import { CustomFailedToast, CustomToast } from '../toast/CustomToast'
 function CustomNavbar() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const { logout } = useAuthStore();
   const [scrolled, setScrolled] = useState(false);
-  
+
   // Xử lý sự kiện scroll
   useEffect(() => {
     const handleScroll = () => {
@@ -38,7 +38,23 @@ function CustomNavbar() {
     setUser(null);
     navigate('/');
   };
+  const checkbeforeCreateHotel = async () => {
+    try {
+      // Fetch the latest user data
+      const response = await axiosInstance.get('/customer/current-user');
+      const updatedUser = response.data.user;
+      setUser(updatedUser); // Update the local state
 
+      if (updatedUser.cmnd === 'N/A' || updatedUser.phoneNumber === 'N/A' || updatedUser.address === 'N/A') {
+        CustomFailedToast("Vui lòng Cập Nhật Thông Tin Cá Nhân trước khi đăng ký khách sạn");
+      } else {
+        navigate('/create-hotel');
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      CustomFailedToast("Có lỗi xảy ra khi kiểm tra thông tin");
+    }
+  }
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -53,12 +69,13 @@ function CustomNavbar() {
   }, []);
 
   return (
-    <Navbar 
-      collapseOnSelect 
-      expand="lg" 
+    <Navbar
+      collapseOnSelect
+      expand="lg"
       className={`navbar-custom ${scrolled ? 'navbar-scrolled' : ''}`}
       fixed="top"
     >
+      <CustomToast />
       <Container>
         <Navbar.Brand className='brand-logo' href="/home">
           Travelofy
@@ -76,7 +93,7 @@ function CustomNavbar() {
               <div className="dropdown-inner">
                 <NavDropdown.Item href="/favorite">
                   <i className="fas fa-heart me-2"></i>
-                  DS Yêu Thích 
+                  DS Yêu Thích
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item href="/transaction">
@@ -91,7 +108,7 @@ function CustomNavbar() {
               </div>
 
             </NavDropdown>
-            
+
             {user ? (
               <div className="profile-section">
                 <div className="user-avatar" onClick={() => document.getElementById('profile-dropdown').click()}>
@@ -121,9 +138,9 @@ function CustomNavbar() {
                       <i className="fas fa-cog me-2"></i>
                       Cài đặt tài khoản
                     </NavDropdown.Item>
-                    <NavDropdown.Item href="#action/3.1">
+                    <NavDropdown.Item onClick={checkbeforeCreateHotel}>
                       <i className="fas fa-home me-2"></i>
-                      Tài khoản chủ nhà
+                      Đăng kí khách sạn của bạn
                     </NavDropdown.Item>
                     <NavDropdown.Divider />
                     <NavDropdown.Item onClick={handleLogout} className="logout-item">
@@ -140,6 +157,7 @@ function CustomNavbar() {
         </Navbar.Collapse>
       </Container>
     </Navbar>
+
   );
 }
 

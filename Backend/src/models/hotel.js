@@ -49,6 +49,10 @@ const hotelSchema = new Schema(
       required: true,
     },
     images: [
+      // {
+      //   // public_ID: { type: String, required: true },
+      //   url: { type: String, required: true }
+      // },
       { type: String, required: true },
     ],
     //Thêm mảng lưu trữ hình ảnh
@@ -77,11 +81,7 @@ const hotelSchema = new Schema(
 
     decisionDate: {
       type: Date
-    },// Ngày quyết định (nếu có)
-
-    hotelParent: {
-      type: String
-    }// cty cha (neu co)
+    } // Ngày quyết định (nếu có)
 
   },
   { versionKey: false }
