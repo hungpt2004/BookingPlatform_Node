@@ -100,6 +100,7 @@ const OwnerSidebar = () => {
     if (localStorage.getItem('payment_link')) {
       localStorage.removeItem('payment_link');
     }
+    sessionStorage.clear();
     logout();
     setUser(null);
     navigate('/');

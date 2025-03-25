@@ -137,9 +137,9 @@ const Step5 = ({ nextStep, prevStep }) => {
         });
     };
 
-    useEffect(() => {
-        sessionStorage.setItem("hotelLocation", JSON.stringify(locationData));
-    }, [locationData]);
+    // useEffect(() => {
+    //     sessionStorage.setItem("hotelLocation", JSON.stringify(locationData));
+    // }, [locationData]);
 
     const reverseGeocode = async (latlng) => {
         if (!locationData.updateMapPin) return;
@@ -175,7 +175,7 @@ const Step5 = ({ nextStep, prevStep }) => {
 
     const geocodeAddress = async () => {
         if (!locationData.address || locationData.address.length < 3) {
-            CustomFailedToast.warning("Please enter a more detailed address");
+            CustomFailedToast.warning("Vui lòng nhập địa chỉ chi tiết hơn");
             return;
         }
 
@@ -217,7 +217,7 @@ const Step5 = ({ nextStep, prevStep }) => {
 
         } catch (error) {
             console.error("Geocoding error:", error);
-            CustomFailedToast.error(error.message || "Error searching address");
+            CustomFailedToast.error(error.message || "Lỗi khi tìm kiếm địa chỉ");
         } finally {
             setIsGeocoding(false);
         }
@@ -237,7 +237,7 @@ const Step5 = ({ nextStep, prevStep }) => {
         reverseGeocode(newPosition);
     };
 
-    const isFormValid = locationData.address && locationData.country && locationData.city;
+    const isFormValid = locationData.address && locationData.country && locationData.city && locationData.postalCode;
 
     const handleContinue = () => {
         sessionStorage.setItem("hotelLocation", JSON.stringify(locationData));
@@ -286,11 +286,11 @@ const Step5 = ({ nextStep, prevStep }) => {
                 <Card style={floatingCardStyle} className="p-3 shadow">
                     <Form>
                         <Form.Group className="mb-3">
-                            <Form.Label className="fw-bold">Find your address</Form.Label>
+                            <Form.Label className="fw-bold">Tìm địa chỉ của Quý vị</Form.Label>
                             <InputGroup>
                                 <Form.Control
                                     type="text"
-                                    placeholder="Enter street name, house number..."
+                                    placeholder="Nhập tên phố, số nhà..."
                                     name="address"
                                     value={locationData.address}
                                     onChange={handleInputChange}
@@ -305,17 +305,17 @@ const Step5 = ({ nextStep, prevStep }) => {
                                     {isGeocoding ? (
                                         <span className="spinner-border spinner-border-sm me-2"></span>
                                     ) : (
-                                        'Search'
+                                        'Tìm kiếm'
                                     )}
                                 </Button>
                             </InputGroup>
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>Apartment or floor (optional)</Form.Label>
+                            <Form.Label>Số căn hộ hoặc tầng (không bắt buộc)</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Apartment, building, floor, etc."
+                                placeholder="Căn hộ, tòa nhà, tầng, v.v."
                                 name="apartment"
                                 value={locationData.apartment}
                                 onChange={handleInputChange}
@@ -323,31 +323,31 @@ const Step5 = ({ nextStep, prevStep }) => {
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label className="fw-bold">Region/Country</Form.Label>
+                            <Form.Label className="fw-bold">Vùng/quốc gia</Form.Label>
                             <Form.Select
                                 name="country"
                                 value={locationData.country}
                                 onChange={handleInputChange}
                                 required
                             >
-                                <option value="">Select country</option>
-                                <option value="vn">Vietnam</option>
-                                <option value="gb">United Kingdom</option>
-                                <option value="us">United States</option>
-                                <option value="jp">Japan</option>
-                                <option value="kr">South Korea</option>
+                                <option value="">Chọn quốc gia</option>
+                                <option value="vn">Việt Nam</option>
+                                <option value="gb">Vương Quốc Anh</option>
+                                <option value="us">Hoa Kỳ</option>
+                                <option value="jp">Nhật Bản</option>
+                                <option value="kr">Hàn Quốc</option>
                                 <option value="sg">Singapore</option>
-                                <option value="th">Thailand</option>
+                                <option value="th">Thái Lan</option>
                             </Form.Select>
                         </Form.Group>
 
                         <Row className="mb-3">
                             <Col md={6}>
                                 <Form.Group>
-                                    <Form.Label className="fw-bold">City</Form.Label>
+                                    <Form.Label className="fw-bold">Thành phố</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Enter city name"
+                                        placeholder="Nhập tên thành phố"
                                         name="city"
                                         value={locationData.city}
                                         onChange={handleInputChange}
@@ -357,10 +357,10 @@ const Step5 = ({ nextStep, prevStep }) => {
                             </Col>
                             <Col md={6}>
                                 <Form.Group>
-                                    <Form.Label className="fw-bold">Postal Code</Form.Label>
+                                    <Form.Label className="fw-bold">Mã bưu chính</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Enter postal code"
+                                        placeholder="Nhập mã bưu chính"
                                         name="postalCode"
                                         value={locationData.postalCode}
                                         onChange={handleInputChange}
@@ -372,7 +372,7 @@ const Step5 = ({ nextStep, prevStep }) => {
                         <Form.Group className="mb-4">
                             <Form.Check
                                 type="checkbox"
-                                label="Update address when moving the pin on the map."
+                                label="Cập nhật địa chỉ khi di chuyển ghim trên bản đồ."
                                 name="updateMapPin"
                                 checked={locationData.updateMapPin}
                                 onChange={handleInputChange}
@@ -383,7 +383,7 @@ const Step5 = ({ nextStep, prevStep }) => {
                             <Alert variant="info" className="d-flex align-items-start">
                                 <FaInfoCircle className="me-2 mt-1" />
                                 <div>
-                                    Is the pin location incorrect? If the pin is not accurate, you can uncheck the option above and click or tap on the map to move the pin to the correct location.
+                                    Vị trí ghim đó có sai không? Nếu vị trí ghim đó không chính xác, Quý vị có thể bỏ chọn lựa chọn ở trên và nhấn hoặc chạm vào bản đồ để di chuyển ghim đến đúng vị trí.
                                 </div>
                                 <button
                                     type="button"
@@ -426,5 +426,8 @@ DraggableMarker.propTypes = {
     position: PropTypes.object,
     setPosition: PropTypes.func,
     geocode: PropTypes.func
+};
+MapUpdater.propTypes = {
+    position: PropTypes.object,
 };
 export default Step5;
