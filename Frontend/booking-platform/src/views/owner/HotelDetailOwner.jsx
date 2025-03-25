@@ -70,21 +70,23 @@ const HotelDetailOwnerPage = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(
-                `${BASE_URL}/room/get-room-availability/${hotelId}`,
+                `${BASE_URL}/room/filter-room-availability/${hotelId}`,
                 {
-                    params: {
-                        checkInDate,
-                        checkOutDate,
-                        page: currentPage,
-                        limit: itemsPerPage
-                    },
+                    params: { checkInDate, checkOutDate },
                     headers: { Authorization: `Bearer ${token}` },
                 }
             );
 
             if (response.data.error === false) {
-                setFilteredRooms(response.data.rooms);
-                setTotalPages(response.data.totalPages);
+                // Map the response to include availability information
+                const availabilityRooms = response.data.rooms.map(room => ({
+                    ...room,
+                    availableQuantity: room.availableQuantity,
+                    bookedQuantity: room.bookedQuantity,
+                    isFullyBooked: room.isFullyBooked
+                }));
+
+                setFilteredRooms(availabilityRooms);
             } else {
                 setError(response.data.message);
             }
@@ -92,6 +94,7 @@ const HotelDetailOwnerPage = () => {
             setError(err.response?.data?.message || 'Failed to fetch room availability');
         }
     };
+
 
     useEffect(() => {
         if (checkInDate && checkOutDate) {
@@ -208,7 +211,7 @@ const HotelDetailOwnerPage = () => {
                         <Row>
                             {filteredRooms.map((room) => (
                                 <Col md={6} lg={4} key={room._id} className="mb-4">
-                                    <Card className="h-100 shadow-sm">
+                                    <Card className={`h-100 shadow-sm ${room.isFullyBooked ? 'border-danger' : ''}`}>
                                         {room.images?.length > 0 ? (
                                             <Card.Img
                                                 variant="top"
@@ -224,9 +227,20 @@ const HotelDetailOwnerPage = () => {
                                         <Card.Body>
                                             <h5 className="mb-2">{room.type}</h5>
                                             <p className="text-muted">{room.price.toLocaleString()}₫/night</p>
-                                            <Badge bg="info" className="mb-3">
-                                                {room.availableQuantity} rooms available
+                                            <Badge
+                                                bg={room.isFullyBooked ? 'danger' : 'info'}
+                                                className="mb-3"
+                                            >
+                                                {room.isFullyBooked
+                                                    ? 'Fully Booked'
+                                                    : `${room.availableQuantity} rooms available`
+                                                }
                                             </Badge>
+                                            {room.bookedQuantity > 0 && (
+                                                <Badge bg="warning" className="ms-2">
+                                                    {room.bookedQuantity} rooms booked
+                                                </Badge>
+                                            )}
                                         </Card.Body>
                                     </Card>
                                 </Col>

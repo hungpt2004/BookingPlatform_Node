@@ -470,3 +470,80 @@ exports.getRoomById = asyncHandler(async (req, res) => {
   });
 }
 );
+
+exports.filterRoomAvailability = async (req, res) => {
+  const { hotelId } = req.params;
+  const { checkInDate, checkOutDate } = req.query;
+
+  if (!hotelId || !checkInDate || !checkOutDate) {
+    return res.status(400).json({
+      error: true,
+      message: "Missing required fields (hotelId, checkInDate, or checkOutDate).",
+    });
+  }
+
+  try {
+    const checkIn = new Date(checkInDate);
+    const checkOut = new Date(checkOutDate);
+
+    if (checkIn >= checkOut) {
+      return res.status(400).json({
+        error: true,
+        message: "Check-in date must be before check-out date",
+      });
+    }
+
+    // Find all rooms for the hotel
+    const rooms = await Room.find({ hotel: hotelId });
+
+    // Find reservations that overlap with the selected dates
+    const overlappingReservations = await Reservation.find({
+      hotel: hotelId,
+      status: { $nin: ["CANCELLED", "COMPLETED"] },
+      $and: [
+        { checkInDate: { $lt: checkOut } },
+        { checkOutDate: { $gt: checkIn } },
+      ],
+    }).populate("rooms.room");
+
+    // Create a map to track booked quantities for each room
+    const bookedQuantitiesMap = {};
+
+    // Calculate booked quantities for each room
+    overlappingReservations.forEach(reservation => {
+      reservation.rooms.forEach(reservedRoom => {
+        const roomId = reservedRoom.room._id.toString();
+        if (!bookedQuantitiesMap[roomId]) {
+          bookedQuantitiesMap[roomId] = 0;
+        }
+        bookedQuantitiesMap[roomId] += reservedRoom.quantity;
+      });
+    });
+
+    // Calculate available rooms
+    const availableRooms = rooms.map(room => {
+      const roomId = room._id.toString();
+      const bookedQuantity = bookedQuantitiesMap[roomId] || 0;
+      const availableQuantity = Math.max(room.quantity - bookedQuantity, 0);
+
+      return {
+        ...room.toObject(),
+        availableQuantity,
+        bookedQuantity,
+        isFullyBooked: availableQuantity === 0
+      };
+    });
+
+    return res.status(200).json({
+      error: false,
+      message: "Room availability fetched successfully",
+      rooms: availableRooms
+    });
+  } catch (error) {
+    console.error("Error fetching room availability:", error);
+    return res.status(500).json({
+      error: true,
+      message: "Internal Server Error",
+    });
+  }
+};

@@ -290,7 +290,6 @@ exports.cancelReservation = asyncHandler(async (req, res) => {
       });
     }
 
-    //Setting reservation become pending status
     await reservation.updateOne({
       $set: { status: "PENDING" },
     });
