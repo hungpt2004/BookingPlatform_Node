@@ -51,7 +51,7 @@ export const Step9 = ({ nextStep, prevStep }) => {
         return rooms.length > 0 && validPhoto;
     }
     return (
-        <Container style={{ maxWidth: "65%" }} >
+        <Container className="" style={{ maxWidth: "65%", marginTop: '100px'}} >
             {/* Basic Information Section */}
             <Card className="p-4 mt-3">
                 <div className="d-flex justify-content-between align-items-center">

@@ -34,7 +34,7 @@ export const Step6 = ({ nextStep, prevStep }) => {
         <>
             <br></br>
             <br></br>
-            <Container>
+            <Container className='mt-5'>
                 <h4 className="fw-bold mt-4">Cho chúng tôi biết thêm về hotel của Quý vị</h4>
 
                 <Card className="p-4 mt-3">
@@ -181,7 +181,7 @@ export const Step7 = ({ nextStep, prevStep }) => {
     }, [selectedOptions]);
 
     return (
-        <Container>
+        <Container className='mt-5'>
             <h4 className="fw-bold mt-5 pt-4">Khách có thể sử dụng gì tại khách sạn của Quý vị?</h4>
 
             <Card className="p-4 mt-3">

@@ -18,7 +18,7 @@ exports.searchAndFilterHotels = async (req, res) => {
 
     console.log('Address ',address)
 
-    let query = {};
+    let query = { adminStatus:"APPROVED", ownerStatus:"ACTIVE" };
 
     if (hotelName) {
       query.hotelName = { $regex: hotelName, $options: "i" };
