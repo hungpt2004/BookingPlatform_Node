@@ -1,0 +1,37 @@
+.owner-modal .ant-modal-content {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .modal-title {
+    font-size: 1.3em;
+    font-weight: 600;
+  }
+  
+  .owner-details-container {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+  
+  .owner-profile {
+    flex-shrink: 0;
+  }
+  
+  .profile-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e0e0e0;
+  }
+  
+  .owner-info p {
+    margin: 6px 0;
+    font-size: 0.95em;
+  }
+  
+  .status {
+    margin-top: 10px;
+  }
+  

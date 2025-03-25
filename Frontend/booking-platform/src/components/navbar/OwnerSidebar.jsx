@@ -22,9 +22,9 @@ const OwnerSidebar = () => {
   const [activeMenu, setActiveMenu] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
-  
-  const {logout} = useAuthStore();
- 
+
+  const { logout } = useAuthStore();
+
   // Submenus
   const menus = [
     {
@@ -37,7 +37,6 @@ const OwnerSidebar = () => {
       icon: <FaHotel />,
       submenus: [
         { title: "Thông tin Khách Sạn", path: "/hotel-management" },
-        { title: "Lịch Booking", path: "/booking-schedule" },
         { title: "Quản lý Booking", path: "/booking-management" },
         { title: "Quản lý Doanh Thu", path: "/monthly-owner" },
       ],
@@ -48,6 +47,7 @@ const OwnerSidebar = () => {
       submenus: [
         { title: "Danh sách phòng", path: "/room-management" },
         { title: "Thêm phòng", path: "/rooms/add" },
+        { title: "Quản lý phòng", path: "/room-management-2" },
       ],
     },
     {
@@ -95,7 +95,7 @@ const OwnerSidebar = () => {
   }, [location.pathname]);
 
   const handleLogout = async () => {
-    if(localStorage.getItem('payment_link')) {
+    if (localStorage.getItem('payment_link')) {
       localStorage.removeItem('payment_link');
     }
     logout();

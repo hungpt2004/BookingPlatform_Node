@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Table, Switch, Tag, message, Modal, Button, Descriptions, Spin, Select } from 'antd';
+import './customerModal.css';
 import axiosInstance from '../../utils/AxiosInstance';
 import { EyeOutlined } from '@ant-design/icons';
 
-const OwnerManagementPage = () => {
+const ListCustomerPage = () => {
     const [owners, setOwners] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedOwner, setSelectedOwner] = useState(null);
@@ -50,28 +51,6 @@ const OwnerManagementPage = () => {
             render: price => `$${price}`,
         },
     ];
-    const fetchOwnerHotels = async (ownerId, page = 1) => {
-        setHotelsLoading(true);
-        try {
-            const response = await axiosInstance.get(`/hotel/get-owner-hotel/${ownerId}`, {
-                params: {
-                    page: page,
-                    limit: pagination.pageSize
-                }
-            });
-
-            setOwnerHotels(response.data.hotels);
-            setPagination(prev => ({
-                ...prev,
-                total: response.data.total,
-                current: page,
-            }));
-        } catch (error) {
-            message.error('Failed to fetch hotels');
-        } finally {
-            setHotelsLoading(false);
-        }
-    };
 
     const handleHotelsTableChange = (pagination) => {
         fetchOwnerHotels(selectedOwner._id, pagination.current);
@@ -92,11 +71,11 @@ const OwnerManagementPage = () => {
             title: 'Status',
             key: 'status',
             render: (_, record) => (
-              <Tag color={!record.isLocked ? 'green' : 'volcano'}>
-                {!record.isLocked ? 'Active' : 'Locked'}
-              </Tag>
+                <Tag color={!record.isLocked ? 'green' : 'volcano'}>
+                    {!record.isLocked ? 'Active' : 'Locked'}
+                </Tag>
             ),
-          },
+        },
         {
             title: 'Details',
             key: 'details',
@@ -113,16 +92,16 @@ const OwnerManagementPage = () => {
             title: 'Ban Status',
             key: 'ban status',
             render: (_, record) => (
-              <Select
-                value={!record.isLocked ? "active" : "locked"}
-                onChange={(value) => handleStatusChange(record._id, value)}
-                options={[
-                  { label: "Locked", value: "locked" },
-                  { label: "Active", value: "active" },
-                ]}
-              />
+                <Select
+                    value={!record.isLocked ? "active" : "locked"}
+                    onChange={(value) => handleStatusChange(record._id, value)}
+                    options={[
+                        { label: "Locked", value: "locked" },
+                        { label: "Active", value: "active" },
+                    ]}
+                />
             ),
-          },
+        },
     ];
 
     const showOwnerDetails = (owner) => {
@@ -139,7 +118,7 @@ const OwnerManagementPage = () => {
     const fetchOwners = async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get('/customer/get-all-owner');
+            const response = await axiosInstance.get('/customer/get-all-customer');
             setOwners(response.data.users);
         } catch (error) {
             message.error('Failed to fetch owners');
@@ -152,27 +131,27 @@ const OwnerManagementPage = () => {
         // Map select value to the isLocked boolean
         const newIsLocked = status === "locked";
         try {
-          setOwners(prev => prev.map(owner =>
-            owner._id === userId ? { ...owner, updating: true } : owner
-          ));
-      
-          // Call the toggleLock API endpoint (ensure your backend route is set up accordingly)
-          await axiosInstance.put(`/customer/toggle-lock/${userId}`, {
-            isLocked: newIsLocked,
-          });
-      
-          setOwners(prev => prev.map(owner =>
-            owner._id === userId ? { ...owner, isLocked: newIsLocked, updating: false } : owner
-          ));
-      
-          message.success('Status updated successfully');
+            setOwners(prev => prev.map(owner =>
+                owner._id === userId ? { ...owner, updating: true } : owner
+            ));
+
+            // Call the toggleLock API endpoint (ensure your backend route is set up accordingly)
+            await axiosInstance.put(`/customer/toggle-lock/${userId}`, {
+                isLocked: newIsLocked,
+            });
+
+            setOwners(prev => prev.map(owner =>
+                owner._id === userId ? { ...owner, isLocked: newIsLocked, updating: false } : owner
+            ));
+
+            message.success('Status updated successfully');
         } catch (error) {
-          message.error('Failed to update status');
-          setOwners(prev => prev.map(owner =>
-            owner._id === userId ? { ...owner, updating: false } : owner
-          ));
+            message.error('Failed to update status');
+            setOwners(prev => prev.map(owner =>
+                owner._id === userId ? { ...owner, updating: false } : owner
+            ));
         }
-      };
+    };
 
     useEffect(() => {
         fetchOwners();
@@ -193,53 +172,45 @@ const OwnerManagementPage = () => {
                     />
 
                     <Modal
-                        title="Owner Details"
+                        title={<div className="modal-title">Owner Details</div>}
                         open={isModalVisible}
                         onCancel={handleCancel}
                         footer={null}
-                        width={800}
+                        width={600}
+                        centered
+                        className="owner-modal"
                     >
                         {selectedOwner && (
-                            <>
-                                <Descriptions bordered column={2}>
-                                    <Descriptions.Item label="Profile Image" span={2}>
-                                        {selectedOwner.image?.url ? (
-                                            <img
-                                                src={selectedOwner.image.url}
-                                                alt="Profile"
-                                                style={{
-                                                    width: 100,
-                                                    height: 100,
-                                                    borderRadius: 8
-                                                }}
-                                            />
-                                        ) : 'No image'}
-                                    </Descriptions.Item>
-
-                                    <Descriptions.Item label="Name">{selectedOwner.name}</Descriptions.Item>
-                                    <Descriptions.Item label="Email">{selectedOwner.email}</Descriptions.Item>
-                                    <Descriptions.Item label="Phone">{selectedOwner.phoneNumber || 'N/A'}</Descriptions.Item>
-                                    <Descriptions.Item label="Address">{selectedOwner.address || 'N/A'}</Descriptions.Item>
-                                    <Descriptions.Item label="CMND ">{selectedOwner.cmnd || 'N/A'}</Descriptions.Item>
-                                    <Descriptions.Item label="Status">
-                                        <Tag color={selectedOwner.isVerified ? 'green' : 'red'}>
-                                            {selectedOwner.isVerified ? 'Verified' : 'Unverified'}
-                                        </Tag>
-                                    </Descriptions.Item>
-                                </Descriptions>
-                                <div className='d-flex justify-content-center mt-2' >
-                                    <Button
-                                        type="primary"
-                                        size="large"
-                                        onClick={() => {
-                                            fetchOwnerHotels(selectedOwner._id);
-                                            setIsHotelsModalVisible(true);
-                                        }}
-                                    >
-                                        Hotel Owned List
-                                    </Button>
+                            <div className="owner-details-container">
+                                <div className="owner-profile">
+                                    {selectedOwner.image?.url ? (
+                                        <img
+                                            src={selectedOwner.image.url}
+                                            alt="Profile"
+                                            className="profile-img"
+                                        />
+                                    ) : (
+                                        <div className="no-image">No Image</div>
+                                    )}
                                 </div>
-                            </>
+                                <div className="owner-info">
+                                    <p>
+                                        <strong>Name:</strong> {selectedOwner.name}
+                                    </p>
+                                    <p>
+                                        <strong>Email:</strong> {selectedOwner.email}
+                                    </p>
+                                    <p>
+                                        <strong>Phone:</strong> {selectedOwner.phoneNumber || "N/A"}
+                                    </p>
+                                    <p>
+                                        <strong>Address:</strong> {selectedOwner.address || "N/A"}
+                                    </p>
+                                    <p>
+                                        <strong>CMND:</strong> {selectedOwner.cmnd || "N/A"}
+                                    </p>
+                                </div>
+                            </div>
                         )}
                     </Modal>
                     <Modal
@@ -268,4 +239,4 @@ const OwnerManagementPage = () => {
     );
 };
 
-export default OwnerManagementPage;
+export default ListCustomerPage;

@@ -22,6 +22,42 @@ exports.getAllUser = asyncHandler(async (req, res) => {
   
 });
 
+exports.getOwnerUser = asyncHandler(async (req, res) => {
+  const users = await User.find({ role: "OWNER" });
+
+  if (users.length === 0) {
+    return res.status(404).json({
+      error: true,
+      message: AUTH.USER_NOT_FOUND,
+    });
+  }
+
+  return res.status(200).json({
+    error: false,
+    users,
+    message: AUTH.GET_SUCCESS,
+  });
+});
+
+
+exports.getCustomerUser = asyncHandler(async (req, res) => {
+  const users = await User.find({ role: "CUSTOMER" });
+
+  if (users.length === 0) {
+    return res.status(404).json({
+      error: true,
+      message: AUTH.USER_NOT_FOUND,
+    });
+  }
+
+  return res.status(200).json({
+    error: false,
+    users,
+    message: AUTH.GET_SUCCESS,
+  });
+});
+
+
 exports.getCurrentUser = asyncHandler(async (req, res) => {
   const user = req.user;
 
@@ -58,7 +94,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   if (req.body.cmnd) {
     updates.cmnd = req.body.cmnd;
   }
-  
+
   if (Object.keys(updates).length === 0) {
     return res.status(500).json({
       status: "fail",
@@ -166,3 +202,20 @@ exports.getCurrentUser = asyncHandler(async (req, res) => {
   });
 });
 
+exports.toggleLock = asyncHandler(async (req, res, next) => {
+  const { isLocked } = req.body;
+  const updatedUser = await User.findByIdAndUpdate(
+    req.params.userId,
+    { isLocked },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedUser) {
+    return next(new AppError('User not found', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: { user: updatedUser },
+  });
+});

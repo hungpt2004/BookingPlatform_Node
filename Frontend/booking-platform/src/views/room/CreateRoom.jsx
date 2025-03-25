@@ -23,7 +23,6 @@ export const CreateRoom = () => {
 
     return (
         <>
-            <CustomNavbar />
             <div className="container-fluid mt-3 p-0 justify-content-center">
                 {/* Progress Bar */}
                 <ProgressBar

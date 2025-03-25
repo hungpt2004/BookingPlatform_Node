@@ -45,8 +45,10 @@ const AdminSideBar = () => {
       title: "Quản Lý Cộng Tác",
       icon: <FaHotel />,
       submenus: [
-        { title: "Danh Sách Khách Sạn", path: "#" },
         { title: "Phê Duyệt Khách Sạn", path: "/hotel-approval" },
+        { title: "Danh Sách Khách Sạn", path: "/" },
+        { title: "Cộng Tác Khách Hàng", path: "customer-partner" },
+        { title: "Cộng Tác Chủ Khách Sạn", path: "hotel-partner" },
       ],
     },
     {
@@ -54,6 +56,7 @@ const AdminSideBar = () => {
       icon: <FaBuilding />,
       submenus: [
         { title: "Yêu cầu hủy đơn", path: "/payment-customer" },
+        { title: "Cộng Tác Khách Hàng", path: "list-customer" },
       ],
     },
     {
@@ -116,9 +119,8 @@ const AdminSideBar = () => {
             {menu.submenus ? (
               <>
                 <div
-                  className={`menu-title ${
-                    activeMenu === menu.title ? "active" : ""
-                  }`}
+                  className={`menu-title ${activeMenu === menu.title ? "active" : ""
+                    }`}
                   onClick={() => toggleSubmenu(menu.title)}
                 >
                   <div className="menu-icon">{menu.icon}</div>

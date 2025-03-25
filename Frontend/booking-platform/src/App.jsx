@@ -48,6 +48,10 @@ import AdminLayout from "./views/layout_render/AdminLayout";
 import PaymentOwnerPage from "./views/monthly_payment/PaymentOwnerPage";
 import PaymentCustomerPage from "./views/monthly_payment/PaymentCustomerPage";
 import HotelApprovalPage from "./views/hotel-approval/HotelApprovalPage";
+import OwnerManagementPage from "./views/customer/HotelPartnerPage";
+import RoomManagementPage from "./views/owner/RoomManagement2";
+import LockStatusChecker from "./views/admin/checkban";
+import ListCustomerPage from "./views/admin/ListCustomerPage";
 
 function App() {
   const { user, isAuthenticated } = useAuthStore();
@@ -106,6 +110,7 @@ function App() {
 
   return (
     <Router>
+      <LockStatusChecker />
       <Routes>
         {/* Public routes - accessible to all */}
         <Route path="/" element={<LoginPage />} />
@@ -136,13 +141,16 @@ function App() {
             <Route path="/dashboard" element={<DashboardOverview />} />
             <Route path="/monthly-owner" element={<MonthlyPayment />} />
             <Route path='/room-management/' element={<RoomManagePage />} />
-            <Route path='/booking-schedule/:hotelId' element={<HotelReservations />} />
+            <Route path='/room-management-2/' element={<RoomManagementPage />} />
+            <Route path='/booking-schedule/:hotelId' element={<BookingSchedule />} />
             <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage />} />
             <Route path="/hotel-management" element={<HotelManagementPage />} />
             <Route path="/feedback-management" element={<FeedbackTable />} />
             <Route path="/service-management" element={<ServiceTable />} />
             <Route path="/booking-management" element={<BookingManagePage />} />
-            <Route path="/booking-schedule" element={<BookingSchedule />} />
+            <Route path="/create-hotel" element={<Createhotel />} />
+            <Route path='/create-room' element={<CreateRoom />} />
+            <Route path='/create-room/:hotelId' element={<CreateRoom />} />
           </Route>
         </Route>
 
@@ -154,15 +162,14 @@ function App() {
             <Route path="/payment-owner" element={<PaymentOwnerPage />} />
             <Route path="/payment-customer" element={<PaymentCustomerPage />} />
             <Route path="/hotel-approval" element={<HotelApprovalPage />} />
+            <Route path="/hotel-partner" element={<OwnerManagementPage />} />
+            <Route path="/list-customer" element={<ListCustomerPage />} />
           </Route>
         </Route>
 
         {/* Catch-all route - redirects to appropriate homepage based on role */}
         <Route path="*" element={<RoleRedirect />} />
 
-        <Route path="/create-hotel" element={<Createhotel />} />
-        <Route path='/create-room' element={<CreateRoom />} />
-        <Route path='/create-room/:hotelId' element={<CreateRoom />} />
         <Route path='/cancel-policy' element={<CancelPolicy />} />
         <Route path='/edit-capacity-price' element={<PricePerPerson />} />
         <Route path='/edit-non-refundable' element={<PriceNoRefund />} />
