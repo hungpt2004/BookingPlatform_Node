@@ -237,13 +237,10 @@ exports.login = catchAsync(async (req, res, next) => {
 
   const user = await User.findOne({ email }).select("+password");
 
-  const check = await bcrypt.compare(password, user.password);
 
   console.log(`Hashed password from DB: ${user.name}`);
   console.log(`Hashed password from DB: ${user.password}`);
   console.log(`Password entered: ${password}`);
-
-  console.log(`Check password: ${check}`);
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return next(new AppError("Incorrect email or password", 401));

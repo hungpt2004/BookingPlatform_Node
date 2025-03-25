@@ -52,7 +52,7 @@ const AdminSideBar = () => {
       title: "Quản Lý Khách Hàng",
       icon: <FaBuilding />,
       submenus: [
-        { title: "Yêu cầu hủy đơn", path: "#" },
+        { title: "Yêu cầu hủy đơn", path: "/payment-customer" },
       ],
     },
     {
@@ -60,7 +60,6 @@ const AdminSideBar = () => {
       icon: <FaBuilding />,
       submenus: [
         { title: "Trả Tiền Khách Sạn", path: "/payment-owner" },
-        { title: "Hoàn Tiền Khách Hàng", path: "/payment-customer" },
       ],
     },
     {

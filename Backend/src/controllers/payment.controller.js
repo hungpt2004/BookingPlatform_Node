@@ -243,10 +243,7 @@ exports.cancelPayment = asyncHandler(async (req, res) => {
       }
     }
 
-    const deleted = await Reservation.findOneAndDelete({ _id: id, user: currentUser.id }).session(session);
-    if (!deleted) {
-      throw new Error("Failed to delete reservation");
-    }
+    await Reservation.findOneAndDelete({ _id: id, user: currentUser.id }).session(session);
 
     await session.commitTransaction();
     session.endSession();

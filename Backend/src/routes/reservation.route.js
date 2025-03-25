@@ -46,5 +46,11 @@ ReservationRouter.post(
   protect,
   ReservationController.cancelReservation
 );
+ReservationRouter.get(
+  "/search-refund",
+  protect,
+  authController.restrictTo("ADMIN"),
+  ReservationController.getRefundingReservations
+)
 
 module.exports = ReservationRouter;

@@ -21,7 +21,8 @@ const refundingReservationSchema = new Schema({
     default: Date.now 
   }, // Ngày gửi yêu cầu
   decisionDate: { 
-    type: Date 
+    type: Date ,
+    default: null
   } // Ngày quyết định (nếu có)
 }, { timestamps: true }, {versionKey: false});
 

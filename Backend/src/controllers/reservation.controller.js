@@ -1,10 +1,10 @@
 const asyncHandler = require("../middlewares/asyncHandler");
-const Reservation = require('../models/reservation')
+const Reservation = require("../models/reservation");
 const RefundingReservation = require("../models/refundingReservation");
 const Room = require("../models/room");
 const cron = require("node-cron");
 const { RESERVATION } = require("../utils/constantMessage");
-const Hotel = require('../models/hotel');
+const Hotel = require("../models/hotel");
 
 exports.getALlReservation = asyncHandler(async (req, res) => {
   let perPage = 9;
@@ -116,7 +116,7 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   const currentUser = req.user;
   const paymentLink = req.cookies["payment_link"];
 
-  console.log(`user ${currentUser.id}`)
+  console.log(`user ${currentUser.id}`);
 
   console.log(`Page ${page}`);
 
@@ -174,11 +174,10 @@ exports.getReservationByStatus = asyncHandler(async (req, res) => {
   });
 });
 
-
 exports.getHotelReservations = asyncHandler(async (req, res) => {
   const { hotelId } = req.params;
   const user = req.user;
-  if (!hotelId || hotelId === 'undefined') {
+  if (!hotelId || hotelId === "undefined") {
     return res.status(400).json({
       error: true,
       message: "Valid Hotel ID is required",
@@ -188,29 +187,30 @@ exports.getHotelReservations = asyncHandler(async (req, res) => {
   try {
     const hotel = await Hotel.findOne({
       _id: hotelId,
-      owner: user.id
+      owner: user.id,
     });
 
     if (!hotel) {
       return res.status(403).json({
         error: true,
-        message: "You do not have permission to view reservations for this hotel or the hotel does not exist",
+        message:
+          "You do not have permission to view reservations for this hotel or the hotel does not exist",
       });
     }
     const reservations = await Reservation.find({
-      hotel: hotelId
+      hotel: hotelId,
     })
       .populate({
         path: "rooms",
-        select: "name type", 
+        select: "name type",
       })
-      .populate('user', 'name email')
-      .sort({ checkInDate: -1 }); 
-    const formattedReservations = reservations.map(reservation => {
+      .populate("user", "name email")
+      .sort({ checkInDate: -1 });
+    const formattedReservations = reservations.map((reservation) => {
       const resObj = reservation.toObject();
       resObj.guest = {
-        name: resObj.user?.name || resObj.user?.email || 'Guest',
-        email: resObj.user?.email
+        name: resObj.user?.name || resObj.user?.email || "Guest",
+        email: resObj.user?.email,
       };
       return resObj;
     });
@@ -228,7 +228,6 @@ exports.getHotelReservations = asyncHandler(async (req, res) => {
     });
   }
 });
-
 
 exports.cancelReservation = asyncHandler(async (req, res) => {
   const { reservationId } = req.params;
@@ -344,7 +343,6 @@ exports.cancelReservation = asyncHandler(async (req, res) => {
   }
 });
 
-
 /*
 Thông tin của hóa đơn thanh toán gồm 
 - Mã reservation
@@ -356,14 +354,13 @@ Thông tin của hóa đơn thanh toán gồm
 exports.getReservationDetailById = asyncHandler(async (req, res) => {
   const { reservationId } = req.params;
 
-  if(!reservationId) {
+  if (!reservationId) {
     return res.status(400).json({
-      message: RESERVATION.INVALID_STATUS
-    })
+      message: RESERVATION.INVALID_STATUS,
+    });
   }
 
   try {
-
     const reservation = await Reservation.findById(reservationId)
       .populate("user", "name email phoneNumber") // Chỉ lấy các trường cần thiết
       .populate("hotel", "hotelName address rating star pricePerNight") // Chỉ lấy các trường cần thiết
@@ -375,9 +372,8 @@ exports.getReservationDetailById = asyncHandler(async (req, res) => {
 
     return res.status(200).json({
       reservation,
-      message: "Get detail reservation successfully"
+      message: "Get detail reservation successfully",
     });
-
   } catch (error) {
     return res.status(500).json({
       message: error.message,
@@ -385,13 +381,44 @@ exports.getReservationDetailById = asyncHandler(async (req, res) => {
   }
 });
 
+exports.getRefundingReservations = asyncHandler(async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query; // Lấy tham số từ query
 
-exports.refundMoneyForCustomer = asyncHandler(async (req, res) => {
+    // Khởi tạo bộ lọc
+    let filter = {};
 
+    if (startDate && endDate) {
+      filter.requestDate = {
+        $gte: new Date(startDate), 
+        $lte: new Date(endDate), 
+      };
+    }
 
+    // Truy vấn database với nested populate
+    const refundReservations = await RefundingReservation.find(filter)
+      .populate({
+        path: "reservation", 
+        populate: {
+          path: "user", 
+          select: "name email phone", 
+        },
+      })
+      .sort({ requestDate: -1 }); // Sắp xếp theo ngày giảm dần
 
-})
-
+    return res.status(200).json({
+      success: true,
+      count: refundReservations.length,
+      data: refundReservations,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to get refunding reservations",
+    });
+  }
+});
 
 //automatic update status of reservations
 const autoUpdateReservationStatus = asyncHandler(async () => {
@@ -414,10 +441,7 @@ const autoUpdateReservationStatus = asyncHandler(async () => {
   }
 });
 
-
 const autoDeleteNotPaidReservation = asyncHandler(async () => {
-  const currentDate = new Date();
-
   const reservations = await Reservation.find();
 
   for (const r of reservations) {
@@ -425,8 +449,6 @@ const autoDeleteNotPaidReservation = asyncHandler(async () => {
     if (r.status === "NOT PAID") {
       await Reservation.deleteOne({ _id: r._id });
     }
-
-    console.log(`Delete status for reservation ID ${r._id} to ${r.status}`);
   }
 });
 
@@ -436,7 +458,7 @@ cron.schedule(
   () => {
     // autoUpdateReservationStatus();
     autoDeleteNotPaidReservation();
-    console.log(`Đã xóa not paid reservation sau 5 phút`)
+    console.log(`Đã xóa not paid reservation sau 5 phút`);
   },
   {
     timezone: "Asia/Ho_Chi_Minh",

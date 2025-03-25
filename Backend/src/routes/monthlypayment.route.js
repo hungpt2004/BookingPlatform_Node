@@ -35,8 +35,14 @@ MonthlyRouter.get(
 
 MonthlyRouter.post(
   '/pay-owner',
-  // authController.restrictTo("ADMIN"),
+  authController.restrictTo("ADMIN"),
   MonthlyController.returnBackAmountForOwner
+)
+
+MonthlyRouter.post(
+  '/pay-customer',
+  authController.restrictTo("ADMIN"),
+  MonthlyController.returnBackAmountForCustomer
 )
 
 MonthlyRouter.post(

@@ -6,9 +6,10 @@ const mongoose = require("mongoose");
 const dayjs = require("dayjs");
 const cron = require("node-cron");
 const nodemailer = require("nodemailer");
-const { PERIODIC_PAYMENT_TEMPLATE } = require("../templates/emailTemplates");
+const { PERIODIC_PAYMENT_TEMPLATE, REFUND_CUSTOMER_TEMPLATE } = require("../templates/emailTemplates");
 const user = require("../models/user");
 const { formatCurrencyVND } = require("../utils/fomatPrice");
+const refundingReservation = require("../models/refundingReservation");
 
 exports.getMonthlyPaymentByMonthYear = asyncWrapper(async (req, res) => {
   const currentUserId = req.user.id;
@@ -173,7 +174,7 @@ exports.getDashBoardData = asyncWrapper(async (req, res) => {
     // Tổng doanh thu (chỉ tính đơn thành công)
     const totalRevenue = reservations
       .filter((res) =>
-        ["COMPLETED", "CHECKED OUT", "PROCESSING", "BOOKED"].includes(
+        ["COMPLETED", "CHECKED OUT", "CHECK IN", "BOOKED"].includes(
           res.status
         )
       )
@@ -193,7 +194,7 @@ exports.getDashBoardData = asyncWrapper(async (req, res) => {
     // Duyệt qua từng đơn đặt phòng
     reservations.forEach((res) => {
       if (
-        ["COMPLETED", "CHECKED OUT", "PROCESSING", "BOOKED"].includes(
+        ["COMPLETED", "CHECKED OUT", "CHECK IN", "BOOKED"].includes(
           res.status
         )
       ) {
@@ -268,6 +269,8 @@ exports.getAdminDashBoardData = asyncWrapper(async (req, res) => {
       adminStatus: "APPROVED",
     });
 
+    console.log(activeHotelCount);
+
     // Tổng số lượng đơn đặt phòng
     const totalReservationAmount = reservations.length;
 
@@ -288,7 +291,7 @@ exports.getAdminDashBoardData = asyncWrapper(async (req, res) => {
     // Duyệt qua từng đơn đặt phòng
     reservations.forEach((res) => {
       if (
-        ["COMPLETED", "CHECKED OUT", "PROCESSING", "BOOKED"].includes(
+        ["COMPLETED", "CHECKED OUT", "CHECK IN", "BOOKED"].includes(
           res.status
         )
       ) {
@@ -361,7 +364,12 @@ exports.returnBackAmountForOwner = asyncWrapper(async (req, res) => {
     }
 
     // Send the Email
-    await sendEmailForOwner(owner.email, owner.name, currentMonthly, currentHotel);
+    await sendEmailForOwner(
+      owner.email,
+      owner.name,
+      currentMonthly,
+      currentHotel
+    );
 
     await session.commitTransaction();
     await session.endSession();
@@ -383,7 +391,69 @@ exports.returnBackAmountForOwner = asyncWrapper(async (req, res) => {
   }
 });
 
-exports.returnBackAmountForCustomer = asyncWrapper(async (req, res) => {});
+exports.returnBackAmountForCustomer = asyncWrapper(async (req, res) => {
+  const { refundId, reservationId, customerName, email} = req.body;
+
+  if (!refundId || !reservationId) {
+    return res.status(500).json({
+      message: "Id không hợp lệ",
+    });
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // UPDATE DESICION DATE AND STATUS
+    const currentRefundReservation = await refundingReservation.findOne({
+      _id: refundId,
+      reservation: reservationId,
+    });
+
+    if (!currentRefundReservation) {
+      return res.status(500).json({
+        message: "Yêu cầu hủy không tìm thấy !",
+      });
+    }
+
+    await refundingReservation.findOneAndUpdate(
+      { _id: refundId, reservation: reservationId },
+      {
+        $set: {
+          decisionDate: Date.now(),
+          status: "APPROVED",
+        },
+      }
+    );
+
+    // UPDATE STATUS RESERVATION
+    await reservation.findOneAndUpdate(
+      { _id: reservationId },
+      { $set: { status: "CANCELLED" } }
+    );
+
+    await sendEmailForCustomer(email,currentRefundReservation,customerName);
+
+    console.log("Đơn đã được hủy");
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return res.status(200).json({
+      message: "Hoàn tiền và hủy đơn thành công !"
+    })
+
+  } catch (error) {
+    if (session && session.inTransaction()) {
+      await session.abortTransaction();
+    }
+    await session.endSession();
+    return res.status(500).json({
+      message: "Đã có lỗi khi xác nhận hủy đơn"
+    })
+  }
+
+});
 
 const transporter = nodemailer.createTransport({
   service: "gmail", // Hoặc dịch vụ bạn sử dụng
@@ -393,7 +463,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendEmailForOwner = async (email, ownerName, currentMonthlyPayment, currentHotel) => {
+const sendEmailForOwner = async (
+  email,
+  ownerName,
+  currentMonthlyPayment,
+  currentHotel
+) => {
   console.log(currentMonthlyPayment.month);
 
   try {
@@ -407,10 +482,38 @@ const sendEmailForOwner = async (email, ownerName, currentMonthlyPayment, curren
       )
         .replace("{hotel}", currentHotel.hotelName)
         .replace("{location}", currentHotel.address)
-        .replace("{amount}", formatCurrencyVND(currentMonthlyPayment.amount * 0.9))
+        .replace(
+          "{amount}",
+          formatCurrencyVND(currentMonthlyPayment.amount * 0.9)
+        )
         .replace("{month}", currentMonthlyPayment.month)
         .replace("{year}", currentMonthlyPayment.year)
         .replace("{paymentDate}", currentMonthlyPayment.paymentDate),
+    });
+    console.log("Email sent successfully!");
+  } catch (error) {
+    console.error("Failed to send email:", error);
+  }
+};
+
+const sendEmailForCustomer = async (
+  email,
+  currentRefundReservation,
+  customerName,
+) => {
+  try {
+    await transporter.sendMail({
+      from: process.env.AUTH_EMAIL,
+      to: email,
+      subject: "Periodic Payment",
+      html: REFUND_CUSTOMER_TEMPLATE
+        .replace("{customerName}", customerName)
+        .replace("{refundAmount}", formatCurrencyVND(currentRefundReservation.refundAmount))
+        .replace(
+          "{reservationId}",
+          currentRefundReservation.reservation
+        )
+        .replace("{decisionDate}", Date.now())
     });
     console.log("Email sent successfully!");
   } catch (error) {
