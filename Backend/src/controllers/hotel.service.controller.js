@@ -137,6 +137,8 @@ exports.updateHotelService = catchAsync(async (req, res) => {
 
   await hotelService.save();
 
+  console.log("Update service success")
+
   return res.status(200).json({
     message: "Update hotel service success",
     error: false,

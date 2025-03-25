@@ -19,7 +19,6 @@ import axiosInstance from "../../utils/AxiosInstance"
 import axios from "axios"
 
 const { Title, Text } = Typography
-const { RangePicker } = DatePicker
 
 const FeedbackTable = () => {
   const [feedbacks, setFeedbacks] = useState([])
@@ -35,10 +34,7 @@ const FeedbackTable = () => {
   const [selectedHotel, setSelectedHotel] = useState("")
   const [hotels, setHotels] = useState([])
 
-  feedbacks.forEach((item) => console.log(item.content))
-
-  console.log(selectedHotel)
-
+  // Get Feedback by HotelID
   const fetchFeedbacks = async () => {
     setLoading(true)
     try {
@@ -61,6 +57,7 @@ const FeedbackTable = () => {
     }
   }
 
+  // Get Owned Hotel Data
   const getOwnerHotel = async (req, res) => {
     try {
       const response = await axiosInstance.get("/hotel/get-owned-hotel")
@@ -90,7 +87,7 @@ const FeedbackTable = () => {
     setPagination({ ...pagination, current: 1 })
   }
 
-  // Update the resetFilters function to also reset the hotel filter
+  // Reset Filter
   const resetFilters = () => {
     setSearchText("")
     setFilterRating(null)
@@ -136,6 +133,7 @@ const FeedbackTable = () => {
     return "error"
   }
 
+  // Setting Tables
   const columns = [
     {
       title: "User",
@@ -225,6 +223,7 @@ const FeedbackTable = () => {
     },
   ]
 
+  // Render total feedback and average
   const renderStats = () => {
     const totalFeedbacks = feedbacks.length
     const averageRating =
@@ -324,7 +323,7 @@ const FeedbackTable = () => {
 
   return (
     <div className="d-flex flex-row w-100">
-      <div className="content-wrapper" style={{ marginLeft: "250px", width: "calc(100% - 250px)", minHeight: "100vh" }}>
+      <div className="content-wrapper" style={{ marginLeft: "100px", width: "calc(100% - 250px)", minHeight: "100vh" }}>
         <div className="main-content" style={{ padding: "20px" }}>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <Title level={3} style={{ margin: 0 }}>

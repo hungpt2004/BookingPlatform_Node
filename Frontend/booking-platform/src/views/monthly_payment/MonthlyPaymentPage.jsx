@@ -30,6 +30,7 @@ const MonthlyPayment = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const [ownerHotels, setOwnerHotels] = useState([]);
+  const [totalReservation, setTotalReservations] = useState();
   const [error, setError] = useState('')
 
   //GET OWNER HOTEL DATA
@@ -87,14 +88,13 @@ const MonthlyPayment = () => {
       const response = await axiosInstance.get(`${BASE_URL}/monthly-payment/monthly-data`, { params });
   
       if(response.data && response.data.data) {
+        setTotalReservations(response.data.reservations)
+        console.log(`Total: ${totalReservation}`)
         const apiData = response.data.data.map((item, index) => ({
           key: index + 1,
           id: item._id,
-          hotelId: item.hotel,
-          hotelName: item.hotelName,
-          reservations: item.reservations || 0,
+          hotelName: item.hotel.hotelName,
           revenue: item.amount || 0,
-          commission: item.commission || 0,
           paymentStatus: item.status,
           paymentDate: item.paymentDate ? new Date(item.paymentDate).toISOString().split("T")[0] : null,
         }));
@@ -122,20 +122,15 @@ const MonthlyPayment = () => {
     getOwnerHotel();
   },[]);
 
+  // console.log(`DATA ${JSON.stringify(data[0].hotelId.hotelName,2)}`)
+
   // Table columns
   const columns = [
     {
       title: 'Khách sạn',
-      dataIndex: 'hotelName',
+      dataIndex: 'hotelName', // ✅ Sử dụng "hotelId"
       key: 'hotelName',
       width: 240,
-    },
-    {
-      title: 'Số lượng đặt phòng',
-      dataIndex: 'reservations',
-      key: 'reservations',
-      width: 150,
-      sorter: (a, b) => a.reservations - b.reservations,
     },
     {
       title: 'Doanh thu',
@@ -143,14 +138,6 @@ const MonthlyPayment = () => {
       key: 'revenue',
       width: 180,
       sorter: (a, b) => a.revenue - b.revenue,
-      render: (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value),
-    },
-    {
-      title: 'Phí trả Admin',
-      dataIndex: 'commission',
-      key: 'commission',
-      width: 180,
-      sorter: (a, b) => a.commission - b.commission,
       render: (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value),
     },
     {
@@ -191,8 +178,6 @@ const MonthlyPayment = () => {
 
   // Calculate summary statistics
   const totalRevenue = data.reduce((sum, item) => sum + item.revenue, 0);
-  const totalCommission = data.reduce((sum, item) => sum + item.commission, 0);
-  const totalReservations = data.reduce((sum, item) => sum + item.reservations, 0);
   const paidReservations = data.filter(item => item.paymentStatus === 'PAID').length;
 
   return (
@@ -233,7 +218,7 @@ const MonthlyPayment = () => {
                   >
                     <Option value="all">Tất cả khách sạn</Option>
                     {ownerHotels.map(hotel => (
-                      <Option key={hotel.id} value={hotel?.id}>{hotel?.hotelName}</Option>
+                      <Option key={hotel._id} value={hotel?.id}>{hotel?.hotelName}</Option>
                     ))}
                   </Select>
                 </Col>
@@ -265,18 +250,8 @@ const MonthlyPayment = () => {
               <Col xs={24} sm={12} md={6}>
                 <Card>
                   <Statistic
-                    title="Tổng hoa hồng"
-                    value={totalCommission}
-                    precision={0}
-                    formatter={(value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)}
-                  />
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} md={6}>
-                <Card>
-                  <Statistic
                     title="Số lượng đặt phòng"
-                    value={totalReservations}
+                    value={totalReservation}
                   />
                 </Card>
               </Col>
@@ -285,7 +260,7 @@ const MonthlyPayment = () => {
                   <Statistic
                     title="Đã thanh toán"
                     value={paidReservations}
-                    suffix={`/ ${data.length}`}
+                    suffix={`/ ${totalReservation}`}
                   />
                 </Card>
               </Col>
@@ -308,12 +283,9 @@ const MonthlyPayment = () => {
                   <Table.Summary fixed>
                     <Table.Summary.Row>
                       <Table.Summary.Cell index={0} colSpan={2}><strong>Tổng cộng</strong></Table.Summary.Cell>
-                      <Table.Summary.Cell index={2}><strong>{totalReservations}</strong></Table.Summary.Cell>
+                      <Table.Summary.Cell index={2}><strong>{totalReservation}</strong></Table.Summary.Cell>
                       <Table.Summary.Cell index={3}>
                         <strong>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalRevenue)}</strong>
-                      </Table.Summary.Cell>
-                      <Table.Summary.Cell index={4}>
-                        <strong>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalCommission)}</strong>
                       </Table.Summary.Cell>
                       <Table.Summary.Cell index={5} colSpan={3}></Table.Summary.Cell>
                     </Table.Summary.Row>

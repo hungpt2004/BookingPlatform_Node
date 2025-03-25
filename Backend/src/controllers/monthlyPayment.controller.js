@@ -5,8 +5,89 @@ const monthlyPayment = require("../models/monthlyPayment");
 const mongoose = require("mongoose");
 const dayjs = require("dayjs");
 const cron = require("node-cron");
+const nodemailer = require("nodemailer");
+const { PERIODIC_PAYMENT_TEMPLATE } = require("../templates/emailTemplates");
+const user = require("../models/user");
+const { formatCurrencyVND } = require("../utils/fomatPrice");
 
 exports.getMonthlyPaymentByMonthYear = asyncWrapper(async (req, res) => {
+  const currentUserId = req.user.id;
+
+  console.log(currentUserId);
+
+  try {
+    let { month, year, hotelId, name } = req.query;
+
+    const currentDate = dayjs();
+    month = month ? parseInt(month) : currentDate.month() + 1; // Thêm +1 để đúng format
+    year = year ? parseInt(year) : currentDate.year();
+
+    let filter = { year, month };
+
+    // Validate month
+    if (month) {
+      month = parseInt(month);
+      if (month < 1 || month > 12) {
+        return res.status(400).json({
+          success: false,
+          message: "Month must be between 1 and 12.",
+        });
+      }
+      filter.month = month;
+    }
+
+    // Lọc danh sách các khách sạn thuộc sở hữu của owner hiện tại
+    const ownedHotels = await hotel
+      .find({ owner: currentUserId })
+      .select("_id");
+
+    if (hotelId) {
+      // Nếu có hotelId trong query, chỉ lấy monthlyPayments cho khách sạn đó
+      hotelId = new mongoose.Types.ObjectId(hotelId);
+      filter.hotel = hotelId;
+    } else {
+      // Nếu không có, lấy tất cả các khách sạn của owner
+      filter.hotel = { $in: ownedHotels.map((hotel) => hotel._id) };
+    }
+
+    if (name) {
+      filter.name = { $regex: name, $options: "i" }; // Case-insensitive search
+    }
+
+    // Lấy danh sách monthlyPayments dựa trên filter
+    const monthlyPayments = await monthlyPayment.find(filter).populate("hotel");
+
+    // Lọc reservation theo tháng, năm cho các khách sạn thuộc owner
+    let reservationFilter = {
+      hotel: { $in: ownedHotels.map((hotel) => hotel._id) },
+      checkInDate: {
+        $gte: new Date(`${year}-${month}-01`),
+        $lt: new Date(`${year}-${month + 1}-01`),
+      },
+    };
+
+    // Nếu có hotelId trong query thì chỉ lấy reservation của khách sạn đó
+    if (hotelId) {
+      reservationFilter.hotel = hotelId;
+    }
+
+    const reservations = await reservation.countDocuments(reservationFilter);
+
+    return res.status(200).json({
+      success: true,
+      data: monthlyPayments,
+      reservations,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message,
+    });
+  }
+});
+
+exports.getMonthlyPaymentByMonthYearAdmin = asyncWrapper(async (req, res) => {
   try {
     let { month, year, hotelId, name } = req.query;
 
@@ -36,14 +117,23 @@ exports.getMonthlyPaymentByMonthYear = asyncWrapper(async (req, res) => {
       filter.name = { $regex: name, $options: "i" }; // Case-insensitive search
     }
 
-    const monthlyPayments = await monthlyPayment.find(filter);
+    // Lấy danh sách monthlyPayments dựa trên filter
+    const monthlyPayments = await monthlyPayment.find(filter).populate("hotel");
 
-    console.log(hotelId);
-    console.log(month);
-    console.log(year);
-    console.log(monthlyPayments);
+    // Lấy danh sách reservation dựa trên hotelId hoặc tất cả
+    let reservationFilter = {};
 
-    const reservations = (await reservation.find({ hotel: hotelId })).length;
+    if (hotelId) {
+      reservationFilter.hotel = hotelId;
+    }
+
+    // Lọc reservation theo tháng, năm
+    reservationFilter.checkInDate = {
+      $gte: new Date(`${year}-${month}-01`),
+      $lt: new Date(`${year}-${month + 1}-01`),
+    };
+
+    const reservations = await reservation.countDocuments(reservationFilter);
 
     return res.status(200).json({
       success: true,
@@ -192,7 +282,7 @@ exports.getAdminDashBoardData = asyncWrapper(async (req, res) => {
     // Tổng doanh thu admin ăn 10%
     let totalRevenue = 0;
 
-    // Khởi tạo doanh thu theo tháng
+    // Khởi tạo doanh thu theo tháng (12 tháng)
     const monthlyRevenue = Array(12).fill(0);
 
     // Duyệt qua từng đơn đặt phòng
@@ -203,33 +293,16 @@ exports.getAdminDashBoardData = asyncWrapper(async (req, res) => {
         )
       ) {
         const checkIn = new Date(res.checkInDate);
-        const checkOut = new Date(res.checkOutDate);
+        const month = checkIn.getMonth(); // Lấy tháng từ 0 - 11
 
-        let startMonth = checkIn.getMonth();
-        let endMonth = checkOut.getMonth();
-
-        if (startMonth === endMonth) {
-          // Nếu check-in và check-out cùng một tháng -> cộng dồn vào tháng đó
-          const adminRevenue = res.totalPrice * 0.1;
-          monthlyRevenue[startMonth] += adminRevenue;
-          totalRevenue += adminRevenue;
-        } else {
-          // Nếu check-in và check-out khác tháng -> chia doanh thu theo số ngày
-          let totalDays = (checkOut - checkIn) / (1000 * 60 * 60 * 24); // Tổng số ngày ở
-          let revenuePerDay = (res.totalPrice * 0.1) / totalDays;
-
-          let tempDate = new Date(checkIn);
-          while (tempDate <= checkOut) {
-            let monthIndex = tempDate.getMonth();
-            monthlyRevenue[monthIndex] += revenuePerDay; // Cộng vào tháng tương ứng
-            totalRevenue += revenuePerDay;
-            tempDate.setDate(tempDate.getDate() + 1); // Tăng ngày lên 1
-          }
-        }
+        // Tính 10% doanh thu và cộng dồn vào tháng đó
+        const adminRevenue = res.totalPrice * 0.1;
+        monthlyRevenue[month] += adminRevenue; // Cộng dồn vào tháng tương ứng
+        totalRevenue += adminRevenue; // Cộng dồn vào tổng doanh thu
       }
     });
 
-    // Làm tròn giá trị doanh thu
+    // Làm tròn doanh thu theo tháng
     const formattedMonthlyRevenue = monthlyRevenue.map((revenue) =>
       Math.round(revenue)
     );
@@ -242,20 +315,112 @@ exports.getAdminDashBoardData = asyncWrapper(async (req, res) => {
       cancelReservation,
       normalReservations,
       monthlyRevenue: formattedMonthlyRevenue, // Doanh thu theo tháng
-    })
+    });
   } catch (error) {
     console.error("Error getting dashboard data for admin:", error);
     throw error;
   }
 });
 
-// Auto calculate monthly payment
+exports.returnBackAmountForOwner = asyncWrapper(async (req, res) => {
+  const { hotelId, monthlyId } = req.body;
+
+  if (!hotelId || !monthlyId) {
+    return res.status(400).json({
+      message: "Hotel ID or Monthly ID is missing",
+    });
+  }
+
+  let session;
+
+  try {
+    session = await mongoose.startSession();
+    session.startTransaction();
+
+    const currentHotel = await hotel.findOne({ _id: hotelId }).session(session);
+    if (!currentHotel) {
+      throw new Error("Hotel not found");
+    }
+
+    const owner = await user
+      .findOne({ _id: currentHotel.owner })
+      .session(session);
+    if (!owner) {
+      throw new Error("Owner not found");
+    }
+
+    // Set monthly payment status to PAID and set refundDate
+    const currentMonthly = await monthlyPayment.findOneAndUpdate(
+      { hotel: hotelId, _id: monthlyId },
+      { $set: { status: "PAID", paymentDate: Date.now() } },
+      { new: true, session } // Truyền session đúng cách
+    );
+
+    if (!currentMonthly) {
+      throw new Error("Monthly payment not found");
+    }
+
+    // Send the Email
+    await sendEmailForOwner(owner.email, owner.name, currentMonthly, currentHotel);
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return res.status(200).json({
+      message: "Payment for owner successfully",
+    });
+  } catch (error) {
+    if (session && session.inTransaction()) {
+      await session.abortTransaction();
+      await session.endSession();
+    }
+    console.error("Error:", error.message);
+
+    return res.status(500).json({
+      error: true,
+      message: error.message || "Failed to pay owner",
+    });
+  }
+});
+
+exports.returnBackAmountForCustomer = asyncWrapper(async (req, res) => {});
+
+const transporter = nodemailer.createTransport({
+  service: "gmail", // Hoặc dịch vụ bạn sử dụng
+  auth: {
+    user: process.env.AUTH_EMAIL,
+    pass: process.env.AUTH_PASSWORD,
+  },
+});
+
+const sendEmailForOwner = async (email, ownerName, currentMonthlyPayment, currentHotel) => {
+  console.log(currentMonthlyPayment.month);
+
+  try {
+    await transporter.sendMail({
+      from: process.env.AUTH_EMAIL,
+      to: email,
+      subject: "Periodic Payment",
+      html: PERIODIC_PAYMENT_TEMPLATE.replace(
+        "{ownerName}",
+        ownerName || "User"
+      )
+        .replace("{hotel}", currentHotel.hotelName)
+        .replace("{location}", currentHotel.address)
+        .replace("{amount}", formatCurrencyVND(currentMonthlyPayment.amount * 0.9))
+        .replace("{month}", currentMonthlyPayment.month)
+        .replace("{year}", currentMonthlyPayment.year)
+        .replace("{paymentDate}", currentMonthlyPayment.paymentDate),
+    });
+    console.log("Email sent successfully!");
+  } catch (error) {
+    console.error("Failed to send email:", error);
+  }
+};
+
+// Lưu doanh thu hàng tháng cho tất cả các năm trong Reservation
 const saveMonthlyRevenue = async () => {
   try {
-    const currentDate = new Date();
-    const currentMonth = currentDate.getMonth();
-    const currentYear = currentDate.getFullYear();
-
     // Lấy tất cả khách sạn
     const hotels = await hotel.find();
     const hotelIds = hotels.map((hotel) => hotel._id);
@@ -263,46 +428,73 @@ const saveMonthlyRevenue = async () => {
     // Lấy tất cả đơn đặt phòng
     const reservations = await reservation.find({ hotel: { $in: hotelIds } });
 
-    let totalRevenue = 0;
+    // Khởi tạo đối tượng lưu doanh thu
+    const revenueByHotelMonthYear = {};
 
-    // Tính doanh thu trong tháng hiện tại
-    reservations.forEach((res) => {
-      const checkIn = new Date(res.checkInDate);
-      const checkOut = new Date(res.checkOutDate);
-
-      // Kiểm tra nếu check-in hoặc check-out thuộc tháng hiện tại
+    // Duyệt qua từng đơn đặt phòng
+    for (const res of reservations) {
       if (
-        (checkIn.getMonth() === currentMonth &&
-          checkIn.getFullYear() === currentYear) ||
-        (checkOut.getMonth() === currentMonth &&
-          checkOut.getFullYear() === currentYear)
+        ["COMPLETED", "CHECKED OUT", "PROCESSING", "BOOKED"].includes(
+          res.status
+        )
       ) {
-        if (
-          ["COMPLETED", "CHECKED OUT", "PROCESSING", "BOOKED"].includes(
-            res.status
-          )
-        ) {
-          totalRevenue += res.totalPrice;
+        const checkIn = new Date(res.checkInDate);
+        const checkOut = new Date(res.checkOutDate);
+
+        let tempDate = new Date(checkIn);
+        while (tempDate <= checkOut) {
+          let month = tempDate.getMonth() + 1; // Lấy tháng (1-12)
+          let year = tempDate.getFullYear();
+          let key = `${res.hotel}-${year}-${month}`;
+
+          if (!revenueByHotelMonthYear[key]) {
+            revenueByHotelMonthYear[key] = 0;
+          }
+
+          // Admin ăn 10%
+          const revenue = res.totalPrice * 0.1;
+          revenueByHotelMonthYear[key] += revenue;
+
+          // Cập nhật lại totalPrice của Reservation sau khi trừ 10%
+          res.totalPrice = Math.max(res.totalPrice - revenue, 0);
+
+          tempDate.setDate(tempDate.getDate() + 1); // Tăng ngày lên 1
         }
+
+        // Lưu lại thay đổi của Reservation
+        await res.save();
       }
-    });
+    }
 
     // Lưu hoặc cập nhật vào bảng monthly_payment
-    await monthlyPayment.findOneAndUpdate(
-      { month: currentMonth + 1, year: currentYear },
-      { totalRevenue },
-      { new: true, upsert: true }
-    );
+    for (const [key, amount] of Object.entries(revenueByHotelMonthYear)) {
+      const [hotel, year, month] = key.split("-");
+      const existingPayment = await monthlyPayment.findOne({
+        hotel: hotel,
+        month: parseInt(month),
+        year: parseInt(year),
+      });
 
-    console.log(
-      `Monthly revenue for ${currentMonth + 1}/${currentYear} saved: ${totalRevenue}`
-    );
+      if (existingPayment) {
+        existingPayment.amount += amount;
+        await existingPayment.save();
+      } else {
+        await monthlyPayment.create({
+          hotel: hotel,
+          month: parseInt(month),
+          year: parseInt(year),
+          amount,
+        });
+      }
+    }
+
+    console.log(`Monthly revenue saved for all years.`);
   } catch (error) {
     console.error("Error saving monthly revenue:", error);
   }
 };
 
-//
+// 1 hour auto 1 time
 cron.schedule("0 * * * *", () => {
   console.log("Running monthly revenue job...");
   saveMonthlyRevenue();

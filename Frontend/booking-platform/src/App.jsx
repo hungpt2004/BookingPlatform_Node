@@ -45,6 +45,8 @@ import ServiceTable from "./views/service/ServiceManagementPage";
 import FavoriteListPage from "./views/favorite/FavoriteListPage";
 import OwnerLayout from "./views/layout_render/OwnerLayout";
 import AdminLayout from "./views/layout_render/AdminLayout";
+import PaymentOwnerPage from "./views/monthly_payment/PaymentOwnerPage";
+import PaymentCustomerPage from "./views/monthly_payment/PaymentCustomerPage";
 
 function App() {
   const { user, isAuthenticated } = useAuthStore();
@@ -148,7 +150,8 @@ function App() {
           <Route element={<AdminLayout />}>
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/customer-partner" element={<CustomPartnerPage />} />
-            <Route path="/hotel-partner" />
+            <Route path="/payment-owner" element={<PaymentOwnerPage />} />
+            <Route path="/payment-customer" element={<PaymentCustomerPage />} />
           </Route>
         </Route>
 
