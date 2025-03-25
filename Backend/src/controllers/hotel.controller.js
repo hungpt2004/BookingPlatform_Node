@@ -48,8 +48,6 @@ exports.getOwnedHotels = asyncHandler(async (req, res) => {
   });
 });
 
-
-
 exports.getHotelDetailById = asyncHandler(async (req, res) => {
   const { hotelId } = req.params;
 
@@ -320,6 +318,7 @@ exports.updateHotel = asyncHandler(async (req, res) => {
   }
 });
 
+// Get Hotel Image
 exports.getHotelImg = asyncHandler(async (req, res) => {
   try {
     const { hotelId } = req.params;
@@ -461,7 +460,6 @@ exports.uploadAllDocuments = asyncHandler(async (req, res) => {
     return res.status(500).json({ success: false, message: "Lỗi máy chủ khi tải tài liệu." });
   }
 });
-
 
 /**
  * Upload tất cả ảnh từ request lên Cloudinary và trả về URL

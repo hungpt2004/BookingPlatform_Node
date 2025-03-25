@@ -34,6 +34,12 @@ MonthlyRouter.get(
 );
 
 MonthlyRouter.post(
+  '/pay-owner',
+  // authController.restrictTo("ADMIN"),
+  MonthlyController.returnBackAmountForOwner
+)
+
+MonthlyRouter.post(
   "/create",
   authController.restrictTo("OWNER"),
   MonthlyController.createMonthlyPayment
@@ -43,6 +49,12 @@ MonthlyRouter.get(
   '/monthly-data',
   authController.restrictTo("OWNER"),
   MonthlyController.getMonthlyPaymentByMonthYear
+)
+
+MonthlyRouter.get(
+  '/monthly-data-admin',
+  authController.restrictTo("ADMIN"),
+  MonthlyController.getMonthlyPaymentByMonthYearAdmin
 )
 
 // Nếu cần thêm route cho các role khác thì làm như này:

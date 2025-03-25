@@ -98,4 +98,117 @@ module.exports = {
 </body>
 </html>
 `,
+  PERIODIC_PAYMENT_TEMPLATE: `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Periodic Payment Invoice - Travelofy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .invoice-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        .invoice-header {
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .invoice-details {
+            margin-bottom: 20px;
+        }
+        .invoice-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .invoice-details th, .invoice-details td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .total {
+            font-weight: bold;
+            text-align: right;
+        }
+        .footer {
+            text-align: center;
+            color: #666;
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <h1>Periodic Payment Invoice</h1>
+            <p>Travelofy Billing Statement</p>
+        </div>
+
+        <div class="invoice-details">
+            <p>Dear {ownerName},</p>
+            <p>Hotel: {hotel}</p>
+            <p>Address: {location}</p>
+
+            <table>
+                <tr>
+                    <th>Billing Period</th>
+                    <td>{month} {year}</td>
+                </tr>
+                <tr>
+                    <th>Payment Date</th>
+                    <td>{paymentDate}</td>
+                </tr>
+                <tr>
+                    <th>Total Amount</th>
+                    <td class="total">{amount}</td>
+                </tr>
+            </table>
+        </div>
+
+        <p>This is a confirmation of your periodic payment processed by Travelofy. The amount has been successfully charged to your account.</p>
+
+        <p>If you have any questions or concerns about this invoice, please contact our customer support team.</p>
+
+        <p>Thank you for your continued trust in Travelofy.</p>
+
+        <div class="footer">
+            <p>© {new Date().getFullYear()} Travelofy. All rights reserved.</p>
+            <p>Contact: support@travelofy.com | +1 (555) 123-4567</p>
+        </div>
+    </div>
+</body>
+</html>`,
+  REFUND_CUSTOMER_TEMPLATE: `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Refund Confirmation</title>
+</head>
+<body>
+  <h1>Refund Confirmation</h1>
+  <p>Dear {customerName},</p>
+  <p>We have processed your refund of <strong>{refundAmount}</strong> for the booking ID <strong>{bookingId}</strong>.</p>
+  <p>Refund Date: {refundDate}</p>
+  <p>Please allow 5-7 business days for the refund to reflect in your account.</p>
+  <p>Thank you for choosing Travelofy.</p>
+  <p>Best regards,<br>Travelofy Team</p>
+  <p>&copy; ${new Date().getFullYear()} Travelofy. All rights reserved.</p>
+</body>
+</html>`,
 };

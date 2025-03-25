@@ -14,13 +14,14 @@ import moment from "moment"
 import Sidebar from "../../components/navbar/OwnerSidebar"
 import { AdminCustomNavbar } from "../../components/navbar/AdminCustomNavbar"
 import { BASE_URL } from "../../utils/Constant"
-import { CustomFailedToast, CustomSuccessToast } from "../../components/toast/CustomToast"
+import { CustomFailedToast, CustomSuccessToast, CustomToast } from "../../components/toast/CustomToast"
 import axiosInstance from "../../utils/AxiosInstance"
 import axios from "axios"
 import { services } from "../../components/data/HotelOption"
+import { formatCurrencyVND } from "../../utils/FormatPricePrint"
+import { DeleteConfirmModal, UpdateModal } from "../../components/modal/UpdateAndDeleteModal"
 
 const { Title, Text } = Typography
-const { RangePicker } = DatePicker
 
 const ServiceTable = () => {
    const [feedbacks, setFeedbacks] = useState([])
@@ -32,13 +33,17 @@ const ServiceTable = () => {
    })
    const [searchText, setSearchText] = useState("")
    const [filterRating, setFilterRating] = useState(null)
-   // Add a new state for selected hotel after the filterRating state
    const [selectedHotel, setSelectedHotel] = useState('')
    const [hotels, setHotels] = useState([]);
 
-   feedbacks.forEach((item) => console.log(item.name))
+   // MODAL
+   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
+   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+   const [selectedService, setSelectedService] = useState(null);
 
-   const fetchFeedbacks = async () => {
+
+   // GET SERVICE BY HOTEL ID
+   const fetchServices = async () => {
       setLoading(true);
       try {
          const response = await axios.get(`${BASE_URL}/hotel-service/get-all-hotel-services/${selectedHotel}`);
@@ -60,6 +65,7 @@ const ServiceTable = () => {
       }
    };
 
+   // GET OWNER HOTEL
    const getOwnerHotel = async (req, res) => {
 
       try {
@@ -68,17 +74,61 @@ const ServiceTable = () => {
 
          if (response.data && response.data.hotels) {
             setHotels(response.data.hotels);
-            CustomSuccessToast("Get owner hotel success");
          }
 
       } catch (error) {
          if (error.response.data.message) {
-            CustomFailedToast(error.response.data.message);
+            console.log(error.response.data.message);
          }
 
       }
 
    }
+
+   // Function Update 
+   const handleUpdate = async (updatedService) => {
+      try {
+
+         const { key, name, description, price } = updatedService;
+
+         if (!name) throw new Error("Missing Name");
+         if (!description) throw new Error("Missing Description");
+         if (price === undefined || price === null || price <= 0) throw new Error("Missing or invalid Price");
+
+         const response = await axiosInstance.patch(
+            `/hotel-service/update-hotel-service/${key}`,
+            { name, description, price }
+         );
+
+         if (response.data && response.data.hotelService) {
+            CustomSuccessToast("Service updated successfully");
+            fetchServices(); // Refresh list
+         }
+      } catch (error) {
+         console.error("Error updating service: ", error);
+         CustomFailedToast("Failed to update service");
+      }
+   };
+
+   // Function Delete
+   const handleDelete = async (updatedService) => {
+      try {
+
+         const { key } = updatedService;
+         
+         const response = await axiosInstance.delete(
+            `/hotel-service/delete-hotel-service/${key}`
+         );
+
+         if (response.data && response.data.message) {
+            CustomSuccessToast(response.data.message);
+            fetchServices(); // Refresh list
+         }
+      } catch (error) {
+         console.error("Error updating service: ", error);
+         CustomFailedToast("Failed to delete service");
+      }
+   };
 
    const handleTableChange = (pagination) => {
       setPagination(pagination)
@@ -89,10 +139,22 @@ const ServiceTable = () => {
       setPagination({ ...pagination, current: 1 })
    }
 
-   const handleRatingFilter = (value) => {
-      setFilterRating(value)
-      setPagination({ ...pagination, current: 1 })
-   }
+   // Show Modal
+   const showUpdateModal = (record) => {
+      setSelectedService(record);
+      setIsUpdateModalVisible(true);
+   };
+
+   const showDeleteModal = (record) => {
+      setSelectedService(record);
+      setIsDeleteModalVisible(true);
+   };
+
+   const handleCloseModal = () => {
+      setIsUpdateModalVisible(false);
+      setIsDeleteModalVisible(false);
+      setSelectedService(null);
+   };
 
    // Update the resetFilters function to also reset the hotel filter
    const resetFilters = () => {
@@ -101,31 +163,15 @@ const ServiceTable = () => {
       setPagination({ ...pagination, current: 1 })
    }
 
-
    useEffect(() => {
-      fetchFeedbacks()
+      fetchServices()
    }, [pagination.current, pagination.pageSize, selectedHotel])
 
    useEffect(() => {
       getOwnerHotel()
    }, [])
 
-
-   // Update the filteredData function to also filter by selected hotel
-   const filteredData = () => {
-      return services?.map((service) => {
-         const matchesSearch =
-            !searchText || service.name.toLowerCase().includes(searchText.toLowerCase());
-   
-         const matchesPrice =
-            !priceRange || (service.price >= priceRange.min && service.price <= priceRange.max);
-   
-         return matchesSearch && matchesPrice;
-      }) || [];
-   };
-   
-
-
+   // Table
    const columns = [
       {
          title: "Name",
@@ -134,7 +180,6 @@ const ServiceTable = () => {
          render: (name) => (
             <Space direction="vertical" size="small" style={{ marginBottom: 0 }}>
                <Text strong style={{ fontSize: "14px" }}>
-                  <UserOutlined style={{ marginRight: 8 }} />
                   {name}
                </Text>
             </Space>
@@ -147,7 +192,6 @@ const ServiceTable = () => {
          render: (des) => (
             <Space direction="vertical" size="small" style={{ marginBottom: 0 }}>
                <Text strong style={{ fontSize: "14px" }}>
-                  <HomeOutlined style={{ marginRight: 8 }} />
                   {des}
                </Text>
             </Space>
@@ -160,8 +204,7 @@ const ServiceTable = () => {
          render: (price) => (
             <Space direction="vertical" size="small" style={{ marginBottom: 0 }}>
                <Text strong style={{ fontSize: "14px" }}>
-                  <HomeOutlined style={{ marginRight: 8 }} />
-                  {price}
+                  {formatCurrencyVND(price)}
                </Text>
             </Space>
          ),
@@ -171,13 +214,20 @@ const ServiceTable = () => {
          key: "actions",
          render: (_, record) => (
             <Space size="small">
-               <Button type="primary" icon={<EyeOutlined />} size="small">
-                  Add
-               </Button>
-               <Button type="default" icon={<MessageOutlined />} size="small">
+               <Button
+                  type="primary"
+                  icon={<MessageOutlined />}
+                  size="small"
+                  onClick={() => showUpdateModal(record)}
+               >
                   Update
                </Button>
-               <Button type="default" icon={<MessageOutlined />} size="small">
+               <Button
+                  type="danger"
+                  icon={<MessageOutlined />}
+                  size="small"
+                  onClick={() => showDeleteModal(record)}
+               >
                   Delete
                </Button>
             </Space>
@@ -195,91 +245,109 @@ const ServiceTable = () => {
    }));
 
 
+   console.log(selectedService)
+
    return (
-      <div className="d-flex row w-100">
-         <div className="col-md-3">
-         </div>
-         <div className="col-md-8">
-            <div className="d-flex flex-column">
-               <div className="d-flex justify-content-between align-items-center mb-4">
-                  <Title level={3} style={{ margin: 0 }}>
-                     <span style={{ borderBottom: "3px solid #1890ff", paddingBottom: "5px" }}>Customer Feedbacks</span>
-                  </Title>
-                  <Button type="primary" onClick={fetchFeedbacks} icon={<ReloadOutlined />}>
-                     Refresh Data
-                  </Button>
+      <>
+         <CustomToast />
+         <div className="d-flex row w-100">
+            <div className="col-md-2">
+            </div>
+            <div className="col-md-8">
+               <div className="d-flex flex-column">
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                     <Title level={3} style={{ margin: 0 }}>
+                        <span style={{ borderBottom: "3px solid #1890ff", paddingBottom: "5px" }}>Customer Feedbacks</span>
+                     </Title>
+                     <Button type="primary" onClick={fetchServices} icon={<ReloadOutlined />}>
+                        Refresh Data
+                     </Button>
+                  </div>
+
+
+                  <Card className="mb-4 shadow-sm border-0">
+                     <Card.Body>
+                        <Row className="mb-4">
+                           <Col md={4} className="mb-3 mb-md-0">
+                              <Input
+                                 placeholder="Search by user, hotel or content"
+                                 prefix={<SearchOutlined style={{ color: "#1890ff" }} />}
+                                 value={searchText}
+                                 onChange={(e) => handleSearch(e.target.value)}
+                                 allowClear
+                                 size="large"
+                                 style={{ width: "100%" }}
+                              />
+                           </Col>
+                           <Col md={4} className="mb-3 mb-md-0">
+                              <div className="d-flex align-items-center">
+                                 <Text style={{ marginRight: "8px", whiteSpace: "nowrap" }}>Select Hotel:</Text>
+                                 <select
+                                    className="form-select"
+                                    value={selectedHotel || ""}
+                                    onChange={(e) => setSelectedHotel(e.target.value || null)}
+                                    style={{ flex: 1 }}
+                                 >
+                                    <option value="">All Hotels</option>
+                                    {hotels.map((hotel) => (
+                                       <option key={hotel?._id} value={hotel?._id}>
+                                          {hotel?.hotelName}
+                                       </option>
+                                    ))}
+                                 </select>
+                              </div>
+                           </Col>
+                           <Col md={4} className="d-flex justify-content-md-end align-items-center">
+                              <Space size="middle">
+                                 <Button icon={<ReloadOutlined />} onClick={resetFilters} type="default">
+                                    Reset Filters
+                                 </Button>
+                              </Space>
+                           </Col>
+                        </Row>
+
+                        <Divider style={{ margin: "0 0 16px 0" }} />
+
+                        <Table
+                           columns={columns}
+                           dataSource={dataSource}
+                           rowKey="_id"
+                           pagination={{
+                              ...pagination,
+                              showSizeChanger: true,
+                              showTotal: (total) => `Total ${total} items`,
+                              pageSizeOptions: ["5", "10", "20", "50"],
+                           }}
+                           loading={loading}
+                           onChange={handleTableChange}
+                           bordered={false}
+                           size="middle"
+                           rowClassName={() => "custom-row-hover"}
+                           style={{ overflowX: "auto" }}
+                        />
+                     </Card.Body>
+                  </Card>
                </div>
-
-
-               <Card className="mb-4 shadow-sm border-0">
-                  <Card.Body>
-                     <Row className="mb-4">
-                        <Col md={4} className="mb-3 mb-md-0">
-                           <Input
-                              placeholder="Search by user, hotel or content"
-                              prefix={<SearchOutlined style={{ color: "#1890ff" }} />}
-                              value={searchText}
-                              onChange={(e) => handleSearch(e.target.value)}
-                              allowClear
-                              size="large"
-                              style={{ width: "100%" }}
-                           />
-                        </Col>
-                        <Col md={4} className="mb-3 mb-md-0">
-                           <div className="d-flex align-items-center">
-                              <Text style={{ marginRight: "8px", whiteSpace: "nowrap" }}>Select Hotel:</Text>
-                              <select
-                                 className="form-select"
-                                 value={selectedHotel || ""}
-                                 onChange={(e) => setSelectedHotel(e.target.value || null)}
-                                 style={{ flex: 1 }}
-                              >
-                                 <option value="">All Hotels</option>
-                                 {hotels.map((hotel) => (
-                                    <option key={hotel?._id} value={hotel?._id}>
-                                       {hotel?.hotelName}
-                                    </option>
-                                 ))}
-                              </select>
-                           </div>
-                        </Col>
-                        <Col md={4} className="d-flex justify-content-md-end align-items-center">
-                           <Space size="middle">
-                              <Button icon={<ReloadOutlined />} onClick={resetFilters} type="default">
-                                 Reset Filters
-                              </Button>
-                           </Space>
-                        </Col>
-                     </Row>
-
-                     <Divider style={{ margin: "0 0 16px 0" }} />
-
-                     <Table
-                        columns={columns}
-                        dataSource={dataSource}
-                        rowKey="_id"
-                        pagination={{
-                           ...pagination,
-                           showSizeChanger: true,
-                           showTotal: (total) => `Total ${total} items`,
-                           pageSizeOptions: ["5", "10", "20", "50"],
-                        }}
-                        loading={loading}
-                        onChange={handleTableChange}
-                        bordered={false}
-                        size="middle"
-                        rowClassName={() => "custom-row-hover"}
-                        style={{ overflowX: "auto" }}
-                     />
-                  </Card.Body>
-               </Card>
             </div>
          </div>
-      </div>
+         <UpdateModal
+            visible={isUpdateModalVisible}
+            onClose={handleCloseModal}
+            service={selectedService}
+            onUpdate={handleUpdate}
+         />
+
+         <DeleteConfirmModal
+            visible={isDeleteModalVisible}
+            onClose={handleCloseModal}
+            service={selectedService}
+            onDelete={handleDelete}
+         />
+
+      </>
    )
 }
 
-// Add this CSS to your global styles or component
 const styles = `
   .custom-row-hover:hover {
     background-color: #f5f5f5;

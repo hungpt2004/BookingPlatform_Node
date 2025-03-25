@@ -59,8 +59,8 @@ const AdminSideBar = () => {
       title: "Quản Lý Doanh Thu",
       icon: <FaBuilding />,
       submenus: [
-        { title: "Hoàn Tiền Khách Sạn", path: "#" },
-        { title: "Hoàn Tiền Khách Hàng", path: "#" },
+        { title: "Trả Tiền Khách Sạn", path: "/payment-owner" },
+        { title: "Hoàn Tiền Khách Hàng", path: "/payment-customer" },
       ],
     },
     {

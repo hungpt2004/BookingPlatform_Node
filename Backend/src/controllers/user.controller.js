@@ -4,7 +4,8 @@ const { AUTH } = require("../utils/constantMessage");
 const cloudinary = require("../utils/cloudinary");
 
 exports.getAllUser = asyncHandler(async (req, res) => {
-  const users = await User.find().sort({ createOn: -1 });
+
+  const users = await User.find({role: 'CUSTOMER'}).sort({ createOn: -1 });
 
   if (users.length === 0) {
     return res.status(404).json({
@@ -18,6 +19,7 @@ exports.getAllUser = asyncHandler(async (req, res) => {
     users,
     message: AUTH.GET_SUCCESS,
   });
+  
 });
 
 exports.getCurrentUser = asyncHandler(async (req, res) => {

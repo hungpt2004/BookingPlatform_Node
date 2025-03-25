@@ -9,6 +9,7 @@ const router = express.Router();
 router.use(authController.protect);
 
 UserRouter.get("/get-all-user", UserController.getAllUser);
+
 UserRouter.get("/search", SearchController.searchAndFilterHotels);
 
 UserRouter.route("/update-profile")
