@@ -6,6 +6,7 @@ import ReactPaginate from "react-paginate";
 import { HashLoader } from "react-spinners";
 import { FaEdit, FaTrash, FaStar, FaRegStar } from "react-icons/fa";
 import "./Feedback.css"; // Thêm file CSS riêng
+import { CustomFailedToast, CustomSuccessToast, CustomToast } from "../../components/toast/CustomToast";
 
 const FeedbackPage = () => {
     const [feedbacks, setFeedbacks] = useState([]);
@@ -56,11 +57,15 @@ const FeedbackPage = () => {
     const handleSave = async () => {
         if (!editingFeedback) return;
         try {
-            await axiosInstance.patch(`/feedback/update-feedback/${editingFeedback._id}`, formData);
-            fetchFeedbacks();
-            setShowModal(false);
+            const response = await axiosInstance.patch(`/feedback/update-feedback/${editingFeedback._id}`, formData);
+            if(response.data && response.status === 200) {
+                fetchFeedbacks();
+                setShowModal(false);
+                CustomSuccessToast("Update feedback success")
+            }
         } catch (error) {
             console.error("Error updating feedback:", error);
+            CustomFailedToast(error.response.data.message);
         }
     };
 
@@ -87,7 +92,8 @@ const FeedbackPage = () => {
             <br></br>
             <br></br>
             <br></br>
-            <Container className="mt-4 mb-5">
+            <CustomToast/>
+            <Container className="mt-5 mb-5">
                 <Card className="feedback-card">
                     <Card.Header className="feedback-header">
                         <h2>

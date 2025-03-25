@@ -159,6 +159,11 @@ exports.updateFeedback = asyncHandler(async (req, res) => {
   const updates = {};
 
   if (req.body.content) {
+    const isAllowedWord = await checkProfanityWithGemini(req.body.content)
+    if (isAllowedWord) {
+      console.log("Có từ ngữ không phù hợp trong feedback")
+      return res.status(400).json({ message: `${req.body.content} không phù hợp trong feedback` });
+    }
     updates.content = req.body.content;
   }
   if (req.body.rating) {

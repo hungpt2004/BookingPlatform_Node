@@ -98,6 +98,9 @@ const OwnerSidebar = () => {
     if (localStorage.getItem('payment_link')) {
       localStorage.removeItem('payment_link');
     }
+    if(sessionStorage.getItem('token')){
+      sessionStorage.removeItem('token')
+    }
     logout();
     setUser(null);
     navigate('/');

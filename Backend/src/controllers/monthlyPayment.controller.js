@@ -105,7 +105,6 @@ exports.getMonthlyPaymentByMonthYear = asyncWrapper(async (req, res) => {
   }
 });
 
-
 exports.getMonthlyPaymentByMonthYearAdmin = asyncWrapper(async (req, res) => {
   try {
     let { month, year, hotelId, name } = req.query;
