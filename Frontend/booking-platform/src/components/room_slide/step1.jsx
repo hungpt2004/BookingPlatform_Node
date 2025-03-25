@@ -21,7 +21,7 @@ export const Step1 = ({ nextStep, prevStep }) => {
     const [bedTypes, setBedTypes] = useState([]);
     const handleBefore = () => {
         if (hotelId) {
-            navigate(`/room-management?hotelId=${hotelId}`)
+            navigate(`/room-management-2?hotelId=${hotelId}`)
         } else {
             toCreateHotel()
         }

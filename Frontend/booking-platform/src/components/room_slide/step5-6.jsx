@@ -53,7 +53,7 @@ export const Step5 = ({ prevStep }) => {
 
             if (response.data.error === false) {
                 clearSessionStorage();
-                navigate(`/room-management?hotelId=${hotelId}`);
+                navigate(`/room-management-2?hotelId=${hotelId}`);
             }
         } catch (error) {
             console.error("Room creation failed:", error);
