@@ -74,8 +74,8 @@ exports.getMonthlyPaymentByMonthYear = asyncWrapper(async (req, res) => {
     // Lọc reservation theo tháng, năm cho các khách sạn thuộc owner
     let reservationFilter = {
       hotel: { $in: ownedHotels.map((hotel) => hotel._id) },
-      checkInDate: { $lt: endDate },
-      checkOutDate: { $gte: startDate },
+      checkInDate: { $lt: endDate, $gt: startDate },
+      checkOutDate: { $gte: startDate, $lt: endDate},
     };
 
     // Nếu có hotelId, chỉ lấy reservation của khách sạn đó
