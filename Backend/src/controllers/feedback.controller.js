@@ -27,7 +27,7 @@ async function checkProfanityWithGemini(content) {
 };
 
 exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
-  
+
   const { hotelId } = req.params;
 
   const [listFeedback, userFeeback] = await Promise.all([
@@ -43,7 +43,7 @@ exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
     ).populate("user"),
   ]);
 
-  if(!hotelId) {
+  if (!hotelId) {
     listFeedback = await Feedback.find();
   }
 
@@ -59,11 +59,11 @@ exports.getAllFeedBackByHotelId = asyncHandler(async (req, res) => {
   });
 });
 
-exports.getTopComments = asyncHandler( async (req, res) => {
+exports.getTopComments = asyncHandler(async (req, res) => {
 
   const feedbacks = await Feedback.find().populate('user').sort({ rating: -1 }).limit(5);
 
-  if(feedbacks.length <= 0) {
+  if (feedbacks.length <= 0) {
     return res.status(500).json({
       error: true,
       message: FEEDBACK.NOT_FOUND
@@ -140,11 +140,6 @@ exports.createFeedback = async (req, res) => {
       { _id: reservation.hotel._id },
       { $set: { rating: avgValueRatingUpdate } }
     )
-
-    res.status(201).json({
-      message: "Feedback đã được gửi thành công!",
-      feedback,
-    });
 
     res.status(201).json({ message: "Feedback đã được gửi thành công!", feedback });
   } catch (error) {
