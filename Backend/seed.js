@@ -1,14 +1,14 @@
-const mongoose = require("mongoose");
-const bed = require("./src/models/bed");
-const feedback = require("./src/models/feedback");
-const hotel = require("./src/models/hotel");
-const bed = require("./src/models/bed");
-const bed = require("./src/models/bed");
-const bed = require("./src/models/bed");
-const bed = require("./src/models/bed");
-const bed = require("./src/models/bed");
-const bed = require("./src/models/bed");
-const bed = require("./src/models/bed");
+// const mongoose = require("mongoose");
+// const bed = require("./src/models/bed");
+// const feedback = require("./src/models/feedback");
+// const hotel = require("./src/models/hotel");
+// const bed = require("./src/models/bed");
+// const bed = require("./src/models/bed");
+// const bed = require("./src/models/bed");
+// const bed = require("./src/models/bed");
+// const bed = require("./src/models/bed");
+// const bed = require("./src/models/bed");
+// const bed = require("./src/models/bed");
 
 const feedbackContents = [
   "Dịch vụ tuyệt vời! Nhân viên thân thiện và hỗ trợ nhanh chóng.",
@@ -997,20 +997,21 @@ for (let i = 0; i < 20; i++) {
 
 // Trạng thái của Reservation
 const reservationStatuses = [
-  "BOOKED", // Đã đặt, trả tiền nhưng chưa check-in
-  "CHECKED IN", // Đang ở, đã check-in
-  "CHECKED OUT", // Đã check-out, có thể để lại phản hồi
-  "COMPLETED", // Hoàn thành, đã phản hồi
-  "PENDING", // Chờ xử lý hoặc xác nhận
-  "CANCELLED", // Đã hủy
-  "NOT PAID", // Chưa trả tiền
+  "BOOKED",       // Đã đặt, trả tiền nhưng chưa check-in
+  "CHECKED IN",   // Đang ở, đã check-in
+  "CHECKED OUT",  // Đã check-out, có thể để lại phản hồi
+  "COMPLETED",    // Hoàn thành, đã phản hồi
+  "PENDING",      // Chờ xử lý hoặc xác nhận
+  "CANCELLED",    // Đã hủy
+  "NOT PAID",     // Chưa trả tiền
 ];
 
-// Insert Reservations - Trạng thái ngẫu nhiên
 for (let i = 0; i < 300; i++) {
+  // Chọn trạng thái ngẫu nhiên
   let randomStatus =
-    reservationStatuses[Math.floor(Math.random() * reservationStatuses.length)]; // Chọn ngẫu nhiên từ 1-3 phòng
+    reservationStatuses[Math.floor(Math.random() * reservationStatuses.length)];
 
+  // Chọn 3 phòng ngẫu nhiên từ roomIds
   let selectedRoomIds = [];
   while (selectedRoomIds.length < 3) {
     let randomRoom = roomIds[Math.floor(Math.random() * roomIds.length)];
@@ -1023,38 +1024,36 @@ for (let i = 0; i < 300; i++) {
   for (let j = 0; j < selectedRoomIds.length; j++) {
     selectedRooms.push({
       room: selectedRoomIds[j],
-      quantity: Math.floor(Math.random() * 3) + 1, // 1-3 phòng mỗi loại
+      quantity: Math.floor(Math.random() * 3) + 1, // Số lượng phòng từ 1 đến 3
     });
   }
 
+  // Thiết lập ngày check-in và check-out ngẫu nhiên
   let checkInDate = new Date(2025, 0, 1 + Math.floor(Math.random() * 365));
   let checkOutDate = new Date(checkInDate);
-  checkOutDate.setDate(
-    checkOutDate.getDate() + Math.floor(Math.random() * 7) + 1
-  ); // 1-7 đêm
-
+  checkOutDate.setDate(checkOutDate.getDate() + Math.floor(Math.random() * 7) + 1);
   let numNights = Math.ceil(
     (checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)
-  ); // Tính số đêm ở
+  );
 
   let totalPrice = 0;
 
-  // ✅ Lấy thông tin khách sạn
+  // Lấy thông tin khách sạn theo thứ tự (liên kết giữa hotel và reservation)
   let hotelId = hotelIds[i % hotelIds.length];
   let hotelData = db.hotels.findOne({ _id: hotelId });
   let hotelPricePerNight = hotelData ? hotelData.pricePerNight || 0 : 0;
 
-  // ✅ Tính tổng giá từ các phòng
+  // Tính tổng giá từ các phòng được chọn
   for (let k = 0; k < selectedRooms.length; k++) {
     let roomData = db.rooms.findOne({ _id: selectedRooms[k].room });
     let roomPrice = roomData ? roomData.price : 0;
     totalPrice += roomPrice * selectedRooms[k].quantity * numNights;
   }
 
-  // ✅ Cộng thêm giá khách sạn theo đêm
+  // Cộng thêm giá khách sạn theo đêm
   totalPrice += hotelPricePerNight * numNights;
 
-  // 🔍 Kiểm tra nếu totalPrice là NaN
+  // Kiểm tra nếu tổng giá là NaN
   if (isNaN(totalPrice)) {
     console.error(`❌ Lỗi: totalPrice = NaN tại lượt thứ ${i + 1}`);
     console.error({
@@ -1068,7 +1067,7 @@ for (let i = 0; i < 300; i++) {
     continue; // Bỏ qua insert nếu có lỗi
   }
 
-  // ✅ Insert nếu totalPrice hợp lệ
+  // Insert reservation với trạng thái ngẫu nhiên
   let reservation = db.reservations.insertOne({
     user: userIds[i % userIds.length],
     hotel: hotelId,
@@ -1076,33 +1075,49 @@ for (let i = 0; i < 300; i++) {
     checkInDate: checkInDate,
     checkOutDate: checkOutDate,
     status: randomStatus,
-    totalPrice: totalPrice, // Tổng tiền chính xác
+    totalPrice: totalPrice,
   });
 
   reservationIds.push(reservation.insertedId);
 }
 
+
 // Insert 10 Feedbacks - chỉ áp dụng với reservation có trạng thái hợp lệ
-const feedbackSet = new Set();
-for (let i = 0; i < 400; i++) {
-  let randomIndex = i % feedbackContents.length;
-  let userId = userIds[i % userIds.length];
-  let hotelId = hotelIds[i % hotelIds.length];
-
-  let reservation = db.reservations.findOne({ _id: reservationIds[i] }); // Chỉ cho phép feedback với reservation có trạng thái CHECKED OUT hoặc COMPLETED
-
-  if (["COMPLETED"].includes(reservation.status)) {
-    let feedbackKey = `${userId}-${hotelId}`;
-    if (!feedbackSet.has(feedbackKey)) {
-      db.feedbacks.insertOne({
-        user: userId,
-        reservation: reservationIds[i],
-        hotel: hotelId,
-        content: feedbackContents[randomIndex],
-        rating: Math.floor(Math.random() * 5) + 1,
-        createdAt: new Date(),
-      });
-      feedbackSet.add(feedbackKey);
-    }
+reservationIds.forEach((resId) => {
+  let reservation = db.reservations.findOne({ _id: resId });
+  if (reservation && reservation.status === "COMPLETED") {
+    db.feedbacks.insertOne({
+      user: reservation.user,           // Lấy thông tin user từ reservation
+      reservation: resId,
+      hotel: reservation.hotel,         // Lấy thông tin khách sạn từ reservation
+      content: feedbackContents[Math.floor(Math.random() * feedbackContents.length)],
+      rating: Math.floor(Math.random() * 5) + 1,
+      createdAt: new Date(),
+    });
   }
-}
+});
+
+
+// const feedbackSet = new Set();
+// for (let i = 0; i < 400; i++) {
+//   let randomIndex = i % feedbackContents.length;
+//   let userId = userIds[i % userIds.length];
+//   let hotelId = hotelIds[i % hotelIds.length];
+
+//   let reservation = db.reservations.findOne({ _id: reservationIds[i] }); // Chỉ cho phép feedback với reservation có trạng thái CHECKED OUT hoặc COMPLETED
+
+//   if (["COMPLETED"].includes(reservation.status)) {
+//     let feedbackKey = `${userId}-${hotelId}`;
+//     if (!feedbackSet.has(feedbackKey)) {
+//       db.feedbacks.insertOne({
+//         user: userId,
+//         reservation: reservationIds[i],
+//         hotel: hotelId,
+//         content: feedbackContents[randomIndex],
+//         rating: Math.floor(Math.random() * 5) + 1,
+//         createdAt: new Date(),
+//       });
+//       feedbackSet.add(feedbackKey);
+//     }
+//   }
+// }

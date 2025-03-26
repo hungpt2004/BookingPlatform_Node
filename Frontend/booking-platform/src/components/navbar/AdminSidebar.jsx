@@ -47,7 +47,7 @@ const AdminSideBar = () => {
       icon: <FaHotel />,
       submenus: [
         { title: "Phê Duyệt Khách Sạn", path: "/hotel-approval" },
-        { title: "Danh Sách Khách Sạn", path: "/" },
+        // { title: "Danh Sách Khách Sạn", path: "/" },
         { title: "Cộng Tác Khách Hàng", path: "customer-partner" },
         { title: "Cộng Tác Chủ Khách Sạn", path: "hotel-partner" },
       ],
