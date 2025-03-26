@@ -260,16 +260,18 @@ const RoomManagementPage = () => {
                         {console.log("room::", room)}
                         <EditOutlined />
                     </Button>
-                    <Button
-                        type="link"
-                        danger
-                        onClick={() => {
-                            setSelectedRoom(room);
-                            setShowDeleteModal(true);
-                        }}
-                    >
-                        <DeleteOutlined />
-                    </Button>
+                    {rooms.length > 1 &&
+                        <Button
+                            type="link"
+                            danger
+                            onClick={() => {
+                                setSelectedRoom(room);
+                                setShowDeleteModal(true);
+                            }}
+                        >
+                            <DeleteOutlined />
+                        </Button>
+                    }
                 </>
             )
         }
@@ -316,6 +318,8 @@ const RoomManagementPage = () => {
                                 >
                                     +
                                 </Button>
+
+
                             </Input.Group>
                         </Col>
                     </Row>
