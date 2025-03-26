@@ -92,11 +92,11 @@ const OwnerManagementPage = () => {
             title: 'Status',
             key: 'status',
             render: (_, record) => (
-              <Tag color={!record.isLocked ? 'green' : 'volcano'}>
-                {!record.isLocked ? 'Active' : 'Locked'}
-              </Tag>
+                <Tag color={!record.isLocked ? 'green' : 'volcano'}>
+                    {!record.isLocked ? 'Active' : 'Locked'}
+                </Tag>
             ),
-          },
+        },
         {
             title: 'Details',
             key: 'details',
@@ -113,16 +113,16 @@ const OwnerManagementPage = () => {
             title: 'Ban Status',
             key: 'ban status',
             render: (_, record) => (
-              <Select
-                value={!record.isLocked ? "active" : "locked"}
-                onChange={(value) => handleStatusChange(record._id, value)}
-                options={[
-                  { label: "Locked", value: "locked" },
-                  { label: "Active", value: "active" },
-                ]}
-              />
+                <Select
+                    value={!record.isLocked ? "active" : "locked"}
+                    onChange={(value) => handleStatusChange(record._id, value)}
+                    options={[
+                        { label: "Locked", value: "locked" },
+                        { label: "Active", value: "active" },
+                    ]}
+                />
             ),
-          },
+        },
     ];
 
     const showOwnerDetails = (owner) => {
@@ -152,27 +152,27 @@ const OwnerManagementPage = () => {
         // Map select value to the isLocked boolean
         const newIsLocked = status === "locked";
         try {
-          setOwners(prev => prev.map(owner =>
-            owner._id === userId ? { ...owner, updating: true } : owner
-          ));
-      
-          // Call the toggleLock API endpoint (ensure your backend route is set up accordingly)
-          await axiosInstance.put(`/customer/toggle-lock/${userId}`, {
-            isLocked: newIsLocked,
-          });
-      
-          setOwners(prev => prev.map(owner =>
-            owner._id === userId ? { ...owner, isLocked: newIsLocked, updating: false } : owner
-          ));
-      
-          message.success('Status updated successfully');
+            setOwners(prev => prev.map(owner =>
+                owner._id === userId ? { ...owner, updating: true } : owner
+            ));
+
+            // Call the toggleLock API endpoint (ensure your backend route is set up accordingly)
+            await axiosInstance.put(`/customer/toggle-lock/${userId}`, {
+                isLocked: newIsLocked,
+            });
+
+            setOwners(prev => prev.map(owner =>
+                owner._id === userId ? { ...owner, isLocked: newIsLocked, updating: false } : owner
+            ));
+
+            message.success('Status updated successfully');
         } catch (error) {
-          message.error('Failed to update status');
-          setOwners(prev => prev.map(owner =>
-            owner._id === userId ? { ...owner, updating: false } : owner
-          ));
+            message.error('Failed to update status');
+            setOwners(prev => prev.map(owner =>
+                owner._id === userId ? { ...owner, updating: false } : owner
+            ));
         }
-      };
+    };
 
     useEffect(() => {
         fetchOwners();

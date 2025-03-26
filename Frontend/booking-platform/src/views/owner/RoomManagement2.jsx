@@ -139,7 +139,7 @@ const RoomManagementPage = () => {
     }, [initialHotelId, hotels]);
 
     const toCreateRoom = (hotelId) => {
-        navigate(`/create-room/${hotelId}`);
+        navigate(`/create-room-owner/${hotelId}`);
     };
 
     // Fetch hotels
@@ -277,8 +277,8 @@ const RoomManagementPage = () => {
 
     const renderBedConfiguration = () => (
         <Form.Item label="Bed Configuration">
-            {console.log("bedOptions::", bedOptions)}
-            {console.log("formData.bedTypes::", formData.bedTypes)}
+            {/* {console.log("bedOptions::", bedOptions)}
+            {console.log("formData.bedTypes::", formData.bedTypes)} */}
             {bedOptions.map((bedOption, index) => {
                 const bedType = formData.bedTypes.find(bt => bt._id === bedOption._id);
                 const count = bedType?.count || 0;
