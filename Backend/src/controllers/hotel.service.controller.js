@@ -4,8 +4,7 @@ const Hotel = require("../models/hotel");
 const HotelService = require("../models/hotelService.js");
 require("dotenv").config();
 
-
-// Get all hotel services - Son
+// Get all hotel services
 exports.getAllHotelServices = catchAsync(async (req, res) => {
   const hotelServices = await HotelService.find();
 
@@ -24,7 +23,6 @@ exports.getAllHotelServices = catchAsync(async (req, res) => {
 });
 
 exports.getAllHotelServicesByHotelId = catchAsync(async (req, res) => {
-
   const { hotelId } = req.params;
 
   if (!hotelId) {
@@ -34,7 +32,9 @@ exports.getAllHotelServicesByHotelId = catchAsync(async (req, res) => {
     });
   }
 
-  const hotelServices = await Hotel.findOne({ _id: hotelId }).populate('services');
+  const hotelServices = await Hotel.findOne({ _id: hotelId }).populate(
+    "services"
+  );
 
   if (hotelServices.length === 0) {
     return res.status(404).json({
@@ -97,7 +97,6 @@ exports.createHotelService = catchAsync(async (req, res) => {
   }
 
   const newHotelService = new HotelService({
-    hotel: hotelId,
     name,
     description,
     price,
@@ -105,9 +104,17 @@ exports.createHotelService = catchAsync(async (req, res) => {
 
   await newHotelService.save();
 
+  // Update only the services array without touching other fields
+  await Hotel.findByIdAndUpdate(
+    hotelId,
+    { $push: { services: newHotelService._id } },
+    { new: true }
+  );
+
   return res.status(200).json({
     message: "Create hotel service success",
     error: false,
+    hotelService: newHotelService, // Optionally return the created service
   });
 });
 
@@ -137,7 +144,7 @@ exports.updateHotelService = catchAsync(async (req, res) => {
 
   await hotelService.save();
 
-  console.log("Update service success")
+  console.log("Update service success");
 
   return res.status(200).json({
     message: "Update hotel service success",
