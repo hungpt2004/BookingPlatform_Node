@@ -173,8 +173,8 @@ export const EmailVerificationPage = () => {
                         disabled={actionLoading === "verifying" || code.some((digit) => !digit)}
                         className="btn btn-primary w-100 py-2 fw-bold"
                      >
-                        {/* {actionLoading === "verifying" ? "Verifying..." : "Verify Email"} */}
-                        {loading ? <Spinner color='info' aria-label="Loading..."/> : "Verify Email"}
+                        {actionLoading === "verifying" ? "Verifying..." : "Verify Email"}
+                        {/* {loading ? <Spinner color='info' aria-label="Loading..."/> : "Verify Email"} */}
                      </motion.button>
                   </form>
 
