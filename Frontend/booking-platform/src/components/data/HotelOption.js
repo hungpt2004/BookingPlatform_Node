@@ -1,6 +1,6 @@
 const hotelType = [
     { id: 1, title: '1 khách sạn với nhiều phòng' },
-    { id: 2, title: 'Nhiều khách sạn với nhiều phòng' },
+    // { id: 2, title: 'Nhiều khách sạn với nhiều phòng' },
 ];
 
 const mainOptions = [
@@ -64,12 +64,12 @@ const nation = [
 ];
 
 const documentTypes = [
-        { type: "businessRegistration", label: "Thủ tục đăng ký kinh doanh khách sạn" },
-        { type: "fireProtection", label: "Giấy phép đủ điều kiện Phòng cháy chữa cháy" },
-        { type: "securityCertificate", label: "Giấy chứng nhận an ninh trật tự" },
-        { type: "foodSafety", label: "Giấy chứng nhận cơ sở đủ điều kiện vệ sinh an toàn thực phẩm" },
-        { type: "environmentalProtection", label: "Giấy phép cam kết bảo vệ môi trường" },
-        { type: "hotelRating", label: "Đăng ký xếp hạng sao/Quyết định công nhận hạng tiêu chuẩn cơ sở lưu trú du lịch" }
-    ];
+    { type: "businessRegistration", label: "Thủ tục đăng ký kinh doanh khách sạn" },
+    { type: "fireProtection", label: "Giấy phép đủ điều kiện Phòng cháy chữa cháy" },
+    { type: "securityCertificate", label: "Giấy chứng nhận an ninh trật tự" },
+    { type: "foodSafety", label: "Giấy chứng nhận cơ sở đủ điều kiện vệ sinh an toàn thực phẩm" },
+    { type: "environmentalProtection", label: "Giấy phép cam kết bảo vệ môi trường" },
+    { type: "hotelRating", label: "Đăng ký xếp hạng sao/Quyết định công nhận hạng tiêu chuẩn cơ sở lưu trú du lịch" }
+];
 
 export { hotelType, mainOptions, extraOptions, hotelStar, yesNo, services, typeOption, nation, documentTypes };

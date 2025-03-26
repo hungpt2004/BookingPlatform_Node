@@ -163,7 +163,7 @@ export const LoginPage = () => {
     try {
       const data = await login(email, password);
       const user = data.data.user;
-  
+
       if (user.isLocked) {
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("user");
@@ -172,14 +172,14 @@ export const LoginPage = () => {
           autoClose: 2000,
         });
         setLoading(false);
-        return; 
+        return;
       }
-  
+
       toast.success("Đăng nhập thành công", {
         position: "top-center",
         autoClose: 2000,
       });
-  
+
       setTimeout(() => {
         setLoading(false);
         setShowLoginModal(false);
@@ -199,13 +199,23 @@ export const LoginPage = () => {
       });
     }
   };
-  
-  
+
+
 
   const handleSignUp = async (e) => {
     e.preventDefault();
     try {
       const userData = await login(email, password);
+      if (userData.isLocked) {
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("user");
+        toast.error("Your account is banned. Please contact support.", {
+          position: "top-center",
+          autoClose: 2000,
+        });
+        setLoading(false);
+        return;
+      }
       toast.success("Đăng nhập thành công", {
         position: "top-center",
         autoClose: 2000,

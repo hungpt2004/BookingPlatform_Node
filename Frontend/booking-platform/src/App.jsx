@@ -52,6 +52,7 @@ import OwnerManagementPage from "./views/customer/HotelPartnerPage";
 import RoomManagementPage from "./views/owner/RoomManagement2";
 import LockStatusChecker from "./views/admin/checkban";
 import ListCustomerPage from "./views/admin/ListCustomerPage";
+import { CreateRoomOwner } from "./views/room/CreateRoomOwner";
 
 function App() {
   const { user, isAuthenticated } = useAuthStore();
@@ -118,7 +119,7 @@ function App() {
         <Route path="/forgot" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/redirect" element={<RoleRedirect />} />
-       
+
         {/* Note sửa lỗi home */}
 
         {/* Customer routes */}
@@ -148,7 +149,7 @@ function App() {
             <Route path="/feedback-management" element={<FeedbackTable />} />
             <Route path="/service-management" element={<ServiceTable />} />
             <Route path="/booking-management" element={<BookingManagePage />} />
-           </Route>
+          </Route>
         </Route>
 
         {/* Admin routes */}
@@ -181,7 +182,7 @@ function App() {
         <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage />} />
         <Route path="/create-hotel" element={<Createhotel />} />
         <Route path='/create-room' element={<CreateRoom />} />
-        <Route path='/create-room/:hotelId' element={<CreateRoom />} />
+        <Route path='/create-room-owner/:hotelId' element={<CreateRoomOwner />} />
       </Routes>
     </Router>
   );
