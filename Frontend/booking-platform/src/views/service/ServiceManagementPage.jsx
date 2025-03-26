@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import {
   Table,
@@ -31,7 +33,6 @@ import {
   CustomToast,
 } from "../../components/toast/CustomToast";
 import axiosInstance from "../../utils/AxiosInstance";
-import axios from "axios";
 import { services } from "../../components/data/HotelOption";
 import { formatCurrencyVND } from "../../utils/FormatPricePrint";
 import {
@@ -65,7 +66,7 @@ const ServiceTable = () => {
   const fetchServices = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `${BASE_URL}/hotel-service/get-all-hotel-services/${selectedHotel}`
       );
 
