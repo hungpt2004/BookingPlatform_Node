@@ -491,7 +491,7 @@ const BookingSchedule = () => {
                     <Button variant="secondary" onClick={handleCloseDetailsModal}>
                         Close
                     </Button>
-                    {selectedReservation && selectedReservation._id && (
+                    {/* {selectedReservation && selectedReservation._id && (
                         <Button
                             variant="primary"
                             onClick={() => {
@@ -501,7 +501,7 @@ const BookingSchedule = () => {
                         >
                             View Customer Receit
                         </Button>
-                    )}
+                    )} */}
                 </Modal.Footer>
             </Modal>
 

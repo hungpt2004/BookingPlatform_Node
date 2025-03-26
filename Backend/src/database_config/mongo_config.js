@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const mongoURL = process.env.MONGO_URL;
-//const mongoURL = "mongodb://localhost:27017/BookingDatabase";
+//const mongoURL = process.env.MNHAT_URL;
+
 
 const connectDB = async () => {
    try {
