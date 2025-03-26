@@ -161,7 +161,7 @@ exports.createHotel = asyncHandler(async (req, res) => {
       hotelParent
     } = req.body;
 
-    console.log("get from FE", req.body);
+    // console.log("get from FE", req.body);
 
     // Validate required fields
     if (!hotelName || !description || !address || !phoneNumber) {
@@ -192,18 +192,20 @@ exports.createHotel = asyncHandler(async (req, res) => {
     const parsedFacilities = parseField(facilities);
     const parsedBusinessDocuments = parseField(businessDocuments);
     const parsedimageUrls = parseField(imageUrls);
+    const parsedRooms = parseField(rooms);
 
     console.log("Final Data:", {
       services: parsedServices,
       facilities: parsedFacilities,
       businessDocuments: parsedBusinessDocuments,
       imageUrls: parsedimageUrls,
-      rooms: rooms.map(r => ({
-        bedTypes: r.roomDetails.bedTypes,
-        facilities: r.facilities
-      }))
+      // rooms: rooms.map(r => ({
+      //   bedTypes: r.roomDetails.bedTypes,
+      //   facilities: r.facilities
+      // }))
     });
 
+    console.log(parsedRooms);
     // Create new hotel with service IDs
     const newHotel = new Hotel({
       hotelName,
@@ -228,10 +230,12 @@ exports.createHotel = asyncHandler(async (req, res) => {
 
     // Create Rooms
     const createdRooms = [];
-    for (const roomData of rooms) {
-      const { roomDetails, facilities: roomFacilities, ...rest } = roomData;
+    for (const roomData of parsedRooms) {
+      console.log("roomData", roomData);
+      const { roomName, roomDetails, facilities: roomFacilities, ...rest } = roomData;
       const newRoom = new Room({
         ...rest,
+        name: roomName,
         type: roomDetails.roomType,
         price: parseFloat(rest.price),
         capacity: roomDetails.capacity,
@@ -239,10 +243,11 @@ exports.createHotel = asyncHandler(async (req, res) => {
         quantity: roomDetails.roomQuantity,
         hotel: newHotel._id,
         facilities: roomFacilities,
-        bed: roomDetails.bedTypes.map((bed) => ({
+        bed: rest.bedTypes.map((bed) => ({
           bed: bed.bedId,
           quantity: bed.count,
         })),
+        description: "Default description"
       });
       await newRoom.save({ session });
       createdRooms.push(newRoom._id); // Save the ObjectId

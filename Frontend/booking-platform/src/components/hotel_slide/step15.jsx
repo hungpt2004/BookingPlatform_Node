@@ -84,7 +84,7 @@ const Step15 = ({ prevStep }) => {
             setSelectedGroup(2);
             setHotelParent(savedHotelGroup);
         }
-        else{
+        else {
             setSelectedGroup(1);
         }
     }, []);
@@ -168,7 +168,7 @@ const Step15 = ({ prevStep }) => {
             }
         });
     };
-   
+
     const createHotelFromSessionStorage = async () => {
         try {
             // Get all data from sessionStorage
@@ -179,6 +179,7 @@ const Step15 = ({ prevStep }) => {
             const hotelFacilities = JSON.parse(sessionStorage.getItem('hotelFacility'));
             const hotelServiceData = JSON.parse(sessionStorage.getItem('hotelService'));
             const imageUrls = JSON.parse(sessionStorage.getItem('hotelPhotos'));
+            const hotelRoom = JSON.parse(sessionStorage.getItem('rooms'));
             // Tạo FormData để gửi thông tin khách sạn
             const formData = new FormData();
             formData.append('hotelName', hotelNameAndStar.hotelName);
@@ -191,6 +192,7 @@ const Step15 = ({ prevStep }) => {
             formData.append('services', JSON.stringify(hotelServiceData));
             formData.append('imageUrls', JSON.stringify(imageUrls));
             formData.append('hotelGroup', hotelParent ? hotelParent : '');
+            formData.append('rooms', JSON.stringify(hotelRoom));
             const response = await axiosInstance.post('/hotel/create', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
