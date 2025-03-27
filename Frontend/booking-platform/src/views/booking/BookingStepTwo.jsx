@@ -394,18 +394,6 @@ const BookingStepTwo = () => {
                           </p>
                         </div>
                       </div>
-
-                      <div className="ms-5 ps-2">
-                        <p className="mb-2 fw-bold">Guest name</p>
-                        <Row className="mb-3">
-                          <Col md={6}>
-                            <Form.Control type="text" placeholder="First name" className="py-2" />
-                          </Col>
-                          <Col md={6}>
-                            <Form.Control type="text" placeholder="Last name" className="py-2" />
-                          </Col>
-                        </Row>
-                      </div>
                     </div>
                   ))}
                 </Card.Body>
