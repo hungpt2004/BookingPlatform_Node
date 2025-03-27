@@ -10,7 +10,6 @@ import { HotelDetailPage } from "./views/details/HotelDetailPage";
 import ForgotPasswordPage from "./views/forgot_password/ForgotPasswordPage";
 import ResetPasswordPage from "./views/reset_password/ResetPasswordPage";
 import { SuccessPaymentPage } from "./views/status/SuccessPaymentPage";
-import FavoriteHotelsList from "./views/favorite/FavoriteHotelsList"
 import CustomerProfileSetting from "./views/customer/CustomerProfileSetting";
 import FeedbackPage from "./views/feedback/feedback";
 import CancelPaymentPage from "./views/status/CancelPaymentPage";
@@ -23,21 +22,21 @@ import { Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/authRoutes/ProtectedRoute";
 import AdminDashboard from "./views/admin/AdminDashboard";
 import { Spinner } from "react-bootstrap";
-import { Createhotel } from './views/hotel/Createhotel'
-import { CreateRoom } from './views/room/createRoom'
-import CancelPolicy from './views/room/roomPriceType/CancelPolicy'
-import PricePerPerson from './views/room/roomPriceType/PricePerCapacity'
-import PriceNoRefund from './views/room/roomPriceType/PriceNoRefund'
-import PricePerWeek from './views/room/roomPriceType/PricePerWeek'
-import HotelPhotos from './views/hotel/CreateHotelPhotos'
-import BookingManagePage from './views/owner/BookingManagePage'
-import ReviewPage from './views/owner/ReviewPage'
-import HotelReservations from './views/owner/BookingSchedule'
-import HotelDetailOwnerPage from './views/owner/HotelDetailOwner'
+import { Createhotel } from "./views/hotel/Createhotel";
+import { CreateRoom } from "./views/room/createRoom";
+import CancelPolicy from "./views/room/roomPriceType/CancelPolicy";
+import PricePerPerson from "./views/room/roomPriceType/PricePerCapacity";
+import PriceNoRefund from "./views/room/roomPriceType/PriceNoRefund";
+import PricePerWeek from "./views/room/roomPriceType/PricePerWeek";
+import HotelPhotos from "./views/hotel/CreateHotelPhotos";
+import BookingManagePage from "./views/owner/BookingManagePage";
+import ReviewPage from "./views/owner/ReviewPage";
+import HotelReservations from "./views/owner/BookingSchedule";
+import HotelDetailOwnerPage from "./views/owner/HotelDetailOwner";
 import BookingSchedule from "./views/owner/BookingSchedule";
 import RoomManagePage from "./views/owner/RoomManagement";
-import OwnerHomePage from './views/owner/HomePage'
-import FinancePage from './views/owner/FinancePage'
+import OwnerHomePage from "./views/owner/HomePage";
+import FinancePage from "./views/owner/FinancePage";
 import CustomPartnerPage from "./views/customer/CustomerPartnerPage";
 import HotelManagementPage from "./views/hotel/HotelManagementPage";
 import FeedbackTable from "./views/feedback/FeedbackOwnerPage";
@@ -103,9 +102,9 @@ function App() {
       case "ADMIN":
         return <Navigate to="/admin-dashboard" />;
       case "CUSTOMER":
-        return <Navigate to="/home" />;
+        return <Navigate to="/" />;
       default:
-        return <Navigate to="/home" />;
+        return <Navigate to="/" />;
     }
   };
 
@@ -113,18 +112,16 @@ function App() {
     <Router>
       <LockStatusChecker />
       <Routes>
-        {/* Public routes - accessible to all */}
-        <Route path="/" element={<LoginPage />} />
+        {/* Default route is now home */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/verify-email" element={<EmailVerificationPage />} />
         <Route path="/forgot" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/redirect" element={<RoleRedirect />} />
 
-        {/* Note sửa lỗi home */}
-
         {/* Customer routes */}
         <Route element={<ProtectedRoute allowedRoles={["CUSTOMER"]} />}>
-          <Route path="/home" element={<HomePage />} />
           <Route path="/transaction" element={<HistoryTransaction />} />
           <Route path="/booking-step2" element={<BookingStepTwo />} />
           <Route path="/hotel-detail/:id" element={<HotelDetailPage />} />
@@ -141,10 +138,16 @@ function App() {
           <Route element={<OwnerLayout />}>
             <Route path="/dashboard" element={<DashboardOverview />} />
             <Route path="/monthly-owner" element={<MonthlyPayment />} />
-            <Route path='/room-management/' element={<RoomManagePage />} />
-            <Route path='/room-management-2/' element={<RoomManagementPage />} />
-            <Route path='/booking-schedule/:hotelId' element={<BookingSchedule />} />
-            <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage />} />
+            <Route path="/room-management/" element={<RoomManagePage />} />
+            <Route
+              path="/room-management-2/"
+              element={<RoomManagementPage />}
+            />
+            <Route
+              path="/booking-schedule/:hotelId"
+              element={<BookingSchedule />}
+            />
+            <Route path="/detail/:hotelId" element={<HotelDetailOwnerPage />} />
             <Route path="/hotel-management" element={<HotelManagementPage />} />
             <Route path="/feedback-management" element={<FeedbackTable />} />
             <Route path="/service-management" element={<ServiceTable />} />
@@ -168,18 +171,22 @@ function App() {
         {/* Catch-all route - redirects to appropriate homepage based on role */}
         <Route path="*" element={<RoleRedirect />} />
 
-        <Route path='/cancel-policy' element={<CancelPolicy />} />
-        <Route path='/edit-capacity-price' element={<PricePerPerson />} />
-        <Route path='/edit-non-refundable' element={<PriceNoRefund />} />
-        <Route path='/edit-weekly-price' element={<PricePerWeek />} />
-        <Route path='/create-photo' element={<HotelPhotos />} />
-        <Route path='/owner-homepage' element={<OwnerHomePage />} />
-        <Route path='/owner-finance' element={<FinancePage />} />
-        <Route path='/booking-management' element={<BookingManagePage />} />
-        <Route path='/reviews' element={<ReviewPage />} />
-        <Route path='/booking-schedule/:hotelId' element={<HotelReservations />} />
+        {/* Other existing routes remain the same */}
+        <Route path="/cancel-policy" element={<CancelPolicy />} />
+        <Route path="/edit-capacity-price" element={<PricePerPerson />} />
+        <Route path="/edit-non-refundable" element={<PriceNoRefund />} />
+        <Route path="/edit-weekly-price" element={<PricePerWeek />} />
+        <Route path="/create-photo" element={<HotelPhotos />} />
+        <Route path="/owner-homepage" element={<OwnerHomePage />} />
+        <Route path="/owner-finance" element={<FinancePage />} />
+        <Route path="/booking-management" element={<BookingManagePage />} />
+        <Route path="/reviews" element={<ReviewPage />} />
+        <Route
+          path="/booking-schedule/:hotelId"
+          element={<HotelReservations />}
+        />
         <Route path="/dashboard/*" element={<DashboardPage />} />
-        <Route path='/detail/:hotelId' element={<HotelDetailOwnerPage />} />
+        <Route path="/detail/:hotelId" element={<HotelDetailOwnerPage />} />
         <Route path="/create-hotel" element={<Createhotel />} />
         <Route path='/create-room' element={<CreateRoom />} />
         <Route path='/create-room-owner/:hotelId' element={<CreateRoomOwner />} />
