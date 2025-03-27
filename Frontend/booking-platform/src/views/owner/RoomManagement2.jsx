@@ -139,7 +139,7 @@ const RoomManagementPage = () => {
     }, [initialHotelId, hotels]);
 
     const toCreateRoom = (hotelId) => {
-        navigate(`/create-room/${hotelId}`);
+        navigate(`/create-room-owner/${hotelId}`);
     };
 
     // Fetch hotels
@@ -260,16 +260,18 @@ const RoomManagementPage = () => {
                         {console.log("room::", room)}
                         <EditOutlined />
                     </Button>
-                    <Button
-                        type="link"
-                        danger
-                        onClick={() => {
-                            setSelectedRoom(room);
-                            setShowDeleteModal(true);
-                        }}
-                    >
-                        <DeleteOutlined />
-                    </Button>
+                    {rooms.length > 1 &&
+                        <Button
+                            type="link"
+                            danger
+                            onClick={() => {
+                                setSelectedRoom(room);
+                                setShowDeleteModal(true);
+                            }}
+                        >
+                            <DeleteOutlined />
+                        </Button>
+                    }
                 </>
             )
         }
@@ -277,8 +279,8 @@ const RoomManagementPage = () => {
 
     const renderBedConfiguration = () => (
         <Form.Item label="Bed Configuration">
-            {console.log("bedOptions::", bedOptions)}
-            {console.log("formData.bedTypes::", formData.bedTypes)}
+            {/* {console.log("bedOptions::", bedOptions)}
+            {console.log("formData.bedTypes::", formData.bedTypes)} */}
             {bedOptions.map((bedOption, index) => {
                 const bedType = formData.bedTypes.find(bt => bt._id === bedOption._id);
                 const count = bedType?.count || 0;
@@ -316,6 +318,8 @@ const RoomManagementPage = () => {
                                 >
                                     +
                                 </Button>
+
+
                             </Input.Group>
                         </Col>
                     </Row>
