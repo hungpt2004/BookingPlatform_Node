@@ -54,40 +54,54 @@ const BookingStepTwo = () => {
     distanceNight,
     listFeedback,
     numberOfPeople,
-    checkInTime, 
+    checkInTime,
     checkOutTime
   } = bookingData || {}
 
   useEffect(() => {
-    if (!bookingData) return
+    if (!bookingData) return;
 
     const fetchAndExpandRooms = async () => {
       try {
         // Fetch all rooms by their IDs
         const roomsData = await Promise.all(
           roomIds.map((room) => axiosInstance.get(`/room/get-room-by-id/${room.roomId}`).then((res) => res.data.room)),
-        )
+        );
 
         // Expand rooms based on quantity
-        const expanded = []
+        const expanded = [];
         roomsData.forEach((room) => {
-          const quantity = roomQuantities[room._id]
+          const quantity = roomQuantities[room._id];
           for (let i = 0; i < quantity; i++) {
             expanded.push({
               ...room,
               instanceId: `${room._id}-${i}`, // Unique ID per instance
-            })
+            });
           }
-        })
+        });
 
-        setExpandedRooms(expanded)
+        setExpandedRooms(expanded);
       } catch (error) {
-        console.error("Error fetching rooms:", error)
+        console.error("Error fetching rooms:", error);
       }
-    }
+    };
 
-    fetchAndExpandRooms()
-  }, [roomIds, bookingData])
+    fetchAndExpandRooms();
+
+    // Lấy dữ liệu user từ sessionStorage và cập nhật formData
+    const userData = JSON.parse(sessionStorage.getItem("user"));
+    if (userData) {
+      const { firstName, lastName } = splitName(userData.name);
+      setFormData({
+        firstName,
+        lastName,
+        email: userData.email,
+        country: "VN",
+        phoneNumber: userData.phoneNumber || "",
+        arrivalTime: "",
+      });
+    }
+  }, [roomIds, bookingData]);
 
   console.log(`Expanded room : ${JSON.stringify(expandedRooms, 2)}`)
 
@@ -184,7 +198,7 @@ const BookingStepTwo = () => {
         window.location.href = responsePayment.data.checkoutUrl
       }
 
-      if(responseBooking.data && responseBooking.data.redirect && responseBooking.data.message) {
+      if (responseBooking.data && responseBooking.data.redirect && responseBooking.data.message) {
         window.location.href = responseBooking.data.redirect
         CustomFailedToast(responseBooking.data.message)
       }
@@ -194,10 +208,16 @@ const BookingStepTwo = () => {
       console.error("Payment error:", error)
     }
   }
-
+ 
+  const splitName = (fullName) => {
+    const names = fullName.split(" ");
+    const lastName = names.pop() || ""; // Lấy phần tử cuối làm last name
+    const firstName = names.join(" "); // Phần còn lại là first name
+    return { firstName, lastName };
+  };
   return (
     <>
-      <CustomToast/>
+      <CustomToast />
       <CustomNavbar />
       <div className="py-4 mt-5" style={{ backgroundColor: "#f5f5f5" }}>
         <Container className="py-3" style={{ maxWidth: "85%" }}>
@@ -654,7 +674,7 @@ const BookingStepTwo = () => {
                         We use secure transmission and encrypted storage to protect your personal information
                       </span>
                     </div>
-                    
+
                   </div>
                 </Card.Body>
               </Card>
