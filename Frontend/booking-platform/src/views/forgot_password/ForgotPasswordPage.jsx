@@ -25,7 +25,13 @@ const ForgotPasswordPage = () => {
   };
 
   return (
-    <>
+    <div
+      className="min-vh-100 bg-dark d-flex align-items-center justify-content-center position-relative overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(to bottom right, #1a1e21, #0d47a1, #0097a7)",
+      }}
+    >
       <Container className="d-flex justify-content-center align-items-center vh-100">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -108,7 +114,7 @@ const ForgotPasswordPage = () => {
           </Card>
         </motion.div>
       </Container>
-    </>
+    </div>
   );
 };
 

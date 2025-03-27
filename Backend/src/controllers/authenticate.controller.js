@@ -123,7 +123,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     isVerified: false,
     image: imageUrl,
     verificationToken: hashedToken,
-    verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,// 24 hours
+    verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
     cmnd: "N/A",
     address: "N/A",
     phoneNumber: "N/A",
@@ -239,7 +239,6 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   const user = await User.findOne({ email }).select("+password");
-
 
   console.log(`Hashed password from DB: ${user.name}`);
   console.log(`Hashed password from DB: ${user.password}`);
