@@ -104,7 +104,7 @@ export const Step5 = ({ prevStep }) => {
     };
 
     const calculateRevenue = () => {
-        if (!price) return "0";
+        if (!price || Number(price) <= 0) return "0";
         const revenue = Number(price) * (1 - commissionRate);
         return formatCurrency(revenue);
     };

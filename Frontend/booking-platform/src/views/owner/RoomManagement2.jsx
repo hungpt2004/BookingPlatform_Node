@@ -259,6 +259,7 @@ const RoomManagementPage = () => {
                         {console.log("formData.bedTypes::", formData.bedTypes)}
                         {console.log("room::", room)}
                         <EditOutlined />
+                        Edit
                     </Button>
                     {rooms.length > 1 &&
                         <Button
@@ -270,6 +271,7 @@ const RoomManagementPage = () => {
                             }}
                         >
                             <DeleteOutlined />
+                            Delete
                         </Button>
                     }
                 </>

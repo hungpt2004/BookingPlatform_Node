@@ -224,7 +224,7 @@ export const Step4 = ({ nextStep, prevStep }) => {
 
     // Load saved room name or set a default value
     const [roomName, setRoomName] = useState(() => {
-        return sessionStorage.getItem(storageKey) || "Phòng Giường Đôi";
+        return sessionStorage.getItem(storageKey) || sessionStorage.setItem(storageKey, "Phòng Giường Đôi");
     });
 
     const handleRoomChange = (e) => {
