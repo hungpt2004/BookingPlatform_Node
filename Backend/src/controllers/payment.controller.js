@@ -206,14 +206,19 @@ exports.cancelPayment = asyncHandler(async (req, res) => {
   const currentUser = req.user;
   const { id } = req.params;
 
-  if (!id) {
+  console.log("Current User ID:", currentUser.id);
+  console.log("Reservation ID:", id);
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(404).json({
       error: true,
       message: RESERVATION.NOT_FOUND,
     });
   }
 
-  const reservation = await Reservation.findOne({ _id: id, user: currentUser.id });
+  const reservation = await Reservation.findOne({ _id: id});
+
+  console.log(reservation)
 
   if (!reservation) {
     return res.status(404).json({
@@ -234,7 +239,7 @@ exports.cancelPayment = asyncHandler(async (req, res) => {
 
   try {
     for (const roomItem of reservation.rooms) {
-      if (!roomItem.room) continue; // Tránh lỗi khi roomItem không hợp lệ
+      if (!mongoose.Types.ObjectId.isValid(roomItem.room)) continue;
 
       const room = await Room.findOne({ _id: roomItem.room }).session(session);
       if (room) {
@@ -243,7 +248,7 @@ exports.cancelPayment = asyncHandler(async (req, res) => {
       }
     }
 
-    await Reservation.findOneAndDelete({ _id: id, user: currentUser.id }).session(session);
+    await Reservation.findOneAndDelete({ _id: id, user: currentUser.id }, { session });
 
     await session.commitTransaction();
     session.endSession();
@@ -255,11 +260,13 @@ exports.cancelPayment = asyncHandler(async (req, res) => {
 
   } catch (err) {
     if (session && session.inTransaction()) {
-      await session.abortTransaction();
+      try {
+        await session.abortTransaction();
+      } catch (abortErr) {
+        console.error("Failed to abort transaction:", abortErr);
+      }
     }
-
-    session.endSession();
-
+    if (session) session.endSession();
     return res.status(400).json({
       error: true,
       message: PAYMENT.CANCEL_FAIL,
@@ -302,21 +309,11 @@ exports.successPayment = asyncHandler(async (req, res) => {
   // const rooms = reservation.rooms;
 
   try {
-    //Trừ số phòng đã đặt
-    // for (var roomItem of rooms) {
-    //   const room = await Room.findById(roomItem.room).session(session); //Session ở đây thông báo rằng hành động này cùng thuộc 1 transactions
-    //   if (!room) {
-    //     throw new Error(`Room with ID ${roomItem.room} not found in database`);
-    //   }
-    //   room.quantity -= roomItem.quantity;
-    //   await room.save({ session }); //Session ở đây thông báo rằng hành động này cùng thuộc 1 transactions
-    // }
-
     //Update trạng thái đơn
     await Reservation.findOneAndUpdate(
-      { _id: id, user: currentUser.id },
+      { _id: id },
       { $set: { status: "BOOKED" } },
-      { new: true, session }
+      { new: true, session } // Truyền đúng session ở đây
     );
 
     await session.commitTransaction(); //Thực hiện xong tất cả thì commit
@@ -340,40 +337,40 @@ exports.successPayment = asyncHandler(async (req, res) => {
   }
 });
 
-async function restoreRooms() {
-  console.log("Đang kiểm tra các đặt phòng đã hết hạn...");
+// async function restoreRooms() {
+//   console.log("Đang kiểm tra các đặt phòng đã hết hạn...");
 
-  const now = new Date();
+//   const now = new Date();
 
-  // Lấy tất cả các đơn đặt phòng có ngày check-out đã qua
-  const expiredReservations = await Reservation.find({
-    checkOutDate: { $lt: now }, // Lọc các đơn đã hết hạn
-    status: "CHECK OUT", //Check-out thôi vì Completed chỉ có comment xong thì đổi
-  });
+//   // Lấy tất cả các đơn đặt phòng có ngày check-out đã qua
+//   const expiredReservations = await Reservation.find({
+//     checkOutDate: { $lt: now }, // Lọc các đơn đã hết hạn
+//     status: "CHECK OUT", //Check-out thôi vì Completed chỉ có comment xong thì đổi
+//   });
 
-  for (const reservation of expiredReservations) {
-    for (const roomItem of reservation.rooms) {
-      const room = await Room.findById(roomItem.room);
-      if (room) {
-        room.quantity += roomItem.quantity;
-        await room.save();
-      }
-    }
-  }
+//   for (const reservation of expiredReservations) {
+//     for (const roomItem of reservation.rooms) {
+//       const room = await Room.findById(roomItem.room);
+//       if (room) {
+//         room.quantity += roomItem.quantity;
+//         await room.save();
+//       }
+//     }
+//   }
 
-  console.log(
-    `Đã khôi phục số phòng cho ${expiredReservations.length} đơn đặt phòng.`
-  );
-}
+//   console.log(
+//     `Đã khôi phục số phòng cho ${expiredReservations.length} đơn đặt phòng.`
+//   );
+// }
 
 // Lên lịch chạy cron job mỗi ngày lúc 00:00 (nửa đêm)
-cron.schedule(
-  "0 0 * * *",
-  async () => {
-    console.log("🔄 Đang chạy cron job khôi phục số phòng...");
-    await restoreRooms();
-  },
-  {
-    timezone: "Asia/Ho_Chi_Minh",
-  }
-);
+// cron.schedule(
+//   "0 0 * * *",
+//   async () => {
+//     console.log("🔄 Đang chạy cron job khôi phục số phòng...");
+//     await restoreRooms();
+//   },
+//   {
+//     timezone: "Asia/Ho_Chi_Minh",
+//   }
+// );

@@ -27,7 +27,7 @@ const DashboardOverview = () => {
         if (response.data) {
           setDashboardData({
             totalReservations: response.data.totalReservationAmount,
-            revenue: formatCurrencyVND(response.data.totalRevenue),
+            revenue: response.data.totalRevenue,
             activeHotels: response.data.activeHotel,
             successBooking: response.data.normalReservations,
             pendingBookings: response.data.cancelReservation,
@@ -189,7 +189,7 @@ const DashboardOverview = () => {
                       <i className="bi bi-currency-dollar fs-5 text-success"></i>
                     </div>
                   </div>
-                  <h3 className="fw-bold mb-0">{dashboardData.revenue}</h3>
+                  <h3 className="fw-bold mb-0">{formatCurrencyVND(dashboardData.revenue)}</h3>
                   <div className="d-flex align-items-center mt-3">
                     <span className="badge bg-success me-2">+8.4%</span>
                     <small className="text-muted">from last period</small>

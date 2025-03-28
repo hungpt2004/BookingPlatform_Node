@@ -15,16 +15,22 @@ const CancelPaymentPage = () => {
   const statusPayment = searchParams.get('status');
 
   useEffect(() => {
+    let isMounted = true; // Cờ kiểm tra component đã unmount chưa
     const successCancelPaymentAction = async () => {
       try {
         const response = await axiosInstance.post(`payment/cancel/${id}`);
-        if (response.data?.message) {
+        if (response.data?.message && response.data) {
           CustomSuccessToast(response.data.message);
           sessionStorage.removeItem('payment_link')
           console.log("Đã hủy thanh toán")
+          setTimeout(() => {
+            if (isMounted) navigate("/home");
+          }, 3000);
         }
       } catch (err) {
-        CustomFailedToast(err.response?.data?.message || "Cancel payment failed.");
+        // if(err.response.data.message || isMounted) {
+        //   CustomFailedToast(err.response?.data?.message || "Cancel payment failed.");
+        // }
       }
     };
 
@@ -32,7 +38,7 @@ const CancelPaymentPage = () => {
     if (cancelStatus === "true" && statusPayment === "CANCELLED") {
       successCancelPaymentAction();
     }
-  }, [id, cancelStatus, statusPayment]); // Đưa các biến vào dependency array
+  }, []); // Đưa các biến vào dependency array
 
   console.log("Trước khi xóa:", sessionStorage.getItem('payment_link'));
   sessionStorage.removeItem('payment_link');

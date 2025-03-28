@@ -22,7 +22,7 @@ export const SuccessPaymentPage = () => {
           sessionStorage.removeItem('payment_link')
         }
       } catch (err) {
-        CustomFailedToast(err.response?.data?.message || "Payment failed.");
+        // CustomFailedToast(err.response?.data?.message || "Payment failed.");
       }
     };
 

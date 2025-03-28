@@ -293,7 +293,6 @@ const BookingSchedule = () => {
     if (loading) {
         return (
             <div>
-                <AdminSidebar />
                 <Container className="mt-5 text-center">
                     <Spinner animation="border" role="status" />
                     <p className="mt-2">Loading reservations...</p>
