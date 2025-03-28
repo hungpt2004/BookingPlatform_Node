@@ -1,6 +1,9 @@
 const Hotel = require("../models/hotel");
 const Room = require("../models/room");
 const Reservation = require("../models/reservation");
+const HotelService = require("../models/hotelService");
+const HotelFacility = require("../models/hotelFacility");
+const RoomFacility= require("../models/hotelFacility");
 const { HOTEL } = require("../utils/constantMessage");
 
 exports.searchAndFilterHotels = async (req, res) => {
@@ -12,6 +15,8 @@ exports.searchAndFilterHotels = async (req, res) => {
       checkoutDate,
       hotelRating,
       numberOfPeople,
+      serviceNames,
+      facilityNames,
       page = 1,
       limit = 4,
     } = req.query;
@@ -37,7 +42,16 @@ exports.searchAndFilterHotels = async (req, res) => {
       // query.star = { $gte: minRating, $lte: maxRating };
     }
 
-    const allHotels = await Hotel.find(query);
+    if (serviceNames) {
+      const serviceArray = serviceNames.split(',');
+      const services = await HotelService.find({
+        name: { $in: serviceArray.map(name => new RegExp(`^${name}$`, 'i')) }
+      });
+      query.services = { $in: services.map(s => s._id) };
+    }
+    
+    const allHotels = await Hotel.find(query)
+      .populate('services')
     const hotelsWithRooms = await Promise.all(
       allHotels.map(async (hotel) => {
         const rooms = await Room.find({ hotel: hotel._id });
@@ -92,3 +106,18 @@ exports.searchAndFilterHotels = async (req, res) => {
     });
   }
 };
+exports.getAllServiceToSearch = async (req, res) =>{
+  try {
+    const services = await HotelService.aggregate([
+      { $group: { 
+          _id: { $toLower: "$name" }, 
+          name: { $first: "$name" } 
+        } 
+      },
+      { $project: { _id: 0, name: 1 } }
+    ]);
+    res.status(200).json({ error: false, services: services.map(s => s.name) });
+  } catch (error) {
+    res.status(500).json({ error: true, message: error.message });
+  }
+}

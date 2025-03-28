@@ -124,3 +124,46 @@ body {
   opacity: 1;
   transform: scale(1.1); /* Phóng to nhẹ */
 }
+
+/* Checkbox styling */
+.form-check-input:checked {
+  background-color: #003b95;
+  border-color: #003b95;
+}
+
+.form-check-label {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.form-check-label:hover {
+  color: #003b95;
+}
+
+/* Scrollable filter sections */
+.filter-section {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.filter-section h6 {
+  color: #003b95;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+/* Add matching styles for room facilities */
+.room-facility-filter {
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 15px;
+  padding: 15px;
+}
+
+.room-facility-filter h6 {
+  color: #003b95;
+  font-weight: bold;
+  margin-bottom: 12px;
+}

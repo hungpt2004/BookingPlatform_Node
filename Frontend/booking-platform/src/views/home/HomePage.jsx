@@ -46,8 +46,24 @@ export const HomePage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [vietCities, setVietCities] = useState([]);
   const [favorites, setFavorites] = useState([]);
+  const [services, setServices] = useState([]);
+  const [selectedServices, setSelectedServices] = useState([]);
 
-  // Fetch user's favorites on component mount
+  const handleServiceChange = (service) => {
+    setSelectedServices(prev =>
+      prev.includes(service)
+        ? prev.filter(s => s !== service)
+        : [...prev, service]
+    );
+  };
+
+  const handleFacilityChange = (facility) => {
+    setSelectedFacilities(prev =>
+      prev.includes(facility)
+        ? prev.filter(f => f !== facility)
+        : [...prev, facility]
+    );
+  };
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
@@ -187,6 +203,19 @@ export const HomePage = () => {
     );
   };
 
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/customer/services/unique-names`);
+        setServices(response.data.services);
+      } catch (error) {
+        console.error('Error fetching services:', error);
+      }
+    };
+    fetchServices();
+  }, []);
+
+
   const fetchHotels = async (newPage = 1) => {
     if (!validateDates()) return;
     setLoading(true);
@@ -201,6 +230,7 @@ export const HomePage = () => {
           checkoutDate,
           hotelRating: `${minRating}-5`,
           numberOfPeople,
+          serviceNames: selectedServices.join(','),
           page: newPage
         }
       });
@@ -352,6 +382,29 @@ export const HomePage = () => {
               >
                 <StarRating value={minRating} onChange={(value) => setMinRating(value)} />
               </motion.div>
+              <div className="fw-bold mb-2">Filter by Services:</div>
+              <div className="form-group">
+                {services.map(service => (
+                  <div key={service} className="form-check">
+                    <input
+                      type="checkbox"
+                      id={service}
+                      checked={selectedServices.includes(service)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedServices([...selectedServices, service]);
+                        } else {
+                          setSelectedServices(selectedServices.filter(s => s !== service));
+                        }
+                      }}
+                      className="form-check-input"
+                    />
+                    <label htmlFor={service} className="form-check-label ms-2">
+                      {service}
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
             {/* Hotels Display Section */}
             <div className="col-md-9">

@@ -7,7 +7,7 @@ const authController = require("./../controllers/authenticate.controller");
 const router = express.Router();
 
 UserRouter.get("/search", SearchController.searchAndFilterHotels);
-
+UserRouter.get("/services/unique-names", SearchController.getAllServiceToSearch);
 router.use(authController.protect);
 
 UserRouter.get("/get-all-user", UserController.getAllUser);
