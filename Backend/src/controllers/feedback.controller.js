@@ -99,11 +99,11 @@ exports.createFeedback = async (req, res) => {
     }
 
     // Kiểm tra nội dung bằng Gemini
-    const isProfane = await checkProfanityWithGemini(content);
-    if (isProfane) {
-      console.log("Có từ ngữ không phù hợp trong feedback")
-      return res.status(400).json({ message: `${content} không phù hợp trong feedback` });
-    }
+    // const isProfane = await checkProfanityWithGemini(content);
+    // if (isProfane) {
+    //   console.log("Có từ ngữ không phù hợp trong feedback")
+    //   return res.status(400).json({ message: `${content} không phù hợp trong feedback` });
+    // }
 
     // Nếu nội dung hợp lệ, tiếp tục tạo feedback
     const feedback = new Feedback({
